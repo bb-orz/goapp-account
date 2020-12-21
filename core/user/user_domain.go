@@ -1,11 +1,11 @@
 package user
 
 import (
-	"GoWebScaffold/core"
-	"GoWebScaffold/infras/global"
-	"GoWebScaffold/infras/jwt"
-	"GoWebScaffold/infras/oauth"
-	"GoWebScaffold/services"
+	"github.com/bb-orz/goinfras/XGlobal"
+	"github.com/bb-orz/goinfras/XJwt"
+	"github.com/bb-orz/goinfras/XOAuth"
+	"goinfras-sample-account/core"
+	"goinfras-sample-account/services"
 	"github.com/segmentio/ksuid"
 )
 
@@ -42,7 +42,7 @@ func (domain *UserDomain) GenToken(no, name, avatar string) (string, error) {
 	var err error
 	var token string
 	// 生成
-	token, err = XJWT.TokenUtils().Encode(XJWT.UserClaim{
+	token, err = XJwt.XTokenUtils().Encode(XJwt.UserClaim{
 		Id:     no,
 		Name:   name,
 		Avatar: avatar,

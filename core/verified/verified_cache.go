@@ -1,18 +1,18 @@
 package verified
 
 import (
-	"GoWebScaffold/infras/store/redisStore"
+	"github.com/bb-orz/goinfras/Xstore/XRedis"
 	"github.com/garyburd/redigo/redis"
 	"strconv"
 )
 
 type verifiedCache struct {
-	commonRedis *redisStore.CommonRedisDao
+	commonRedis *XRedis.CommonRedisDao
 }
 
 func NewMailCache() *verifiedCache {
 	cache := new(verifiedCache)
-	cache.commonRedis = redisStore.NewCommonRedisDao()
+	cache.commonRedis = XRedis.XCommon()
 	return cache
 }
 

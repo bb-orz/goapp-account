@@ -1,17 +1,17 @@
 package user
 
 import (
-	"GoWebScaffold/infras/store/redisStore"
+	"github.com/bb-orz/goinfras/XStore/XRedis"
 	"github.com/garyburd/redigo/redis"
 )
 
 type userCache struct {
-	commonRedis *redisStore.CommonRedisDao
+	commonRedis *XRedis.CommonRedisDao
 }
 
 func NewUserCache() *userCache {
 	cache := new(userCache)
-	cache.commonRedis = redisStore.NewCommonRedisDao()
+	cache.commonRedis = XRedis.XCommon()
 	return cache
 }
 

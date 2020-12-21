@@ -1,8 +1,8 @@
 package oauth2
 
 import (
-	"GoWebScaffold/core"
-	"GoWebScaffold/infras/oauth"
+	"github.com/bb-orz/goinfras/XOAuth"
+	"goinfras-sample-account/core"
 )
 
 /*
@@ -18,7 +18,7 @@ func NewOauthDomain() *OauthDomain {
 // 通过accessCode获取qq user info
 func (domain *OauthDomain) GetQQOauthUserInfo(accessCode string) (*XOAuth.OAuthAccountInfo, error) {
 	var oAuthResult XOAuth.OAuthResult
-	oAuthResult = XOAuth.Manager().QQ.Authorize(accessCode)
+	oAuthResult = XOAuth.XQQOAuthManager().Authorize(accessCode)
 
 	if oAuthResult.Error != nil || !oAuthResult.Result {
 		return nil, core.WrapError(oAuthResult.Error, core.ErrorFormatDomainThirdPart, "QQ.Authorize")
@@ -30,7 +30,7 @@ func (domain *OauthDomain) GetQQOauthUserInfo(accessCode string) (*XOAuth.OAuthA
 // 通过accessCode获取wechat user info
 func (domain *OauthDomain) GetWechatOauthUserInfo(accessCode string) (*XOAuth.OAuthAccountInfo, error) {
 	var oAuthResult XOAuth.OAuthResult
-	oAuthResult = XOAuth.Manager().Wechat.Authorize(accessCode)
+	oAuthResult = XOAuth.XWechatOAuthManager().Authorize(accessCode)
 
 	if oAuthResult.Error != nil || !oAuthResult.Result {
 		return nil, core.WrapError(oAuthResult.Error, core.ErrorFormatDomainThirdPart, "Wechat.Authorize")
@@ -42,7 +42,7 @@ func (domain *OauthDomain) GetWechatOauthUserInfo(accessCode string) (*XOAuth.OA
 // 通过accessCode获取weibo user info
 func (domain *OauthDomain) GetWeiboOauthUserInfo(accessCode string) (*XOAuth.OAuthAccountInfo, error) {
 	var oAuthResult XOAuth.OAuthResult
-	oAuthResult = XOAuth.Manager().Weibo.Authorize(accessCode)
+	oAuthResult = XOAuth.XWeiboOAuthManager().Authorize(accessCode)
 
 	if oAuthResult.Error != nil || !oAuthResult.Result {
 		return nil, core.WrapError(oAuthResult.Error, core.ErrorFormatDomainThirdPart, "Weibo.Authorize")

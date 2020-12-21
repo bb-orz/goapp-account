@@ -1,7 +1,7 @@
 package services
 
 import (
-	"GoWebScaffold/hub"
+	"github.com/bb-orz/goinfras"
 )
 
 /* 定义邮件服务模块的服务层方法，并定义数据传输对象DTO*/
@@ -9,7 +9,7 @@ var mailService IMailService
 
 // 用于对外暴露邮件服务，唯一的暴露点，供接口层调用
 func GetMailService() IMailService {
-	infras.Check(mailService)
+	goinfras.Check(mailService)
 	return mailService
 }
 

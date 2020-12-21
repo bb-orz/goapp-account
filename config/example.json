@@ -1,0 +1,251 @@
+{
+
+  "Global": {
+    "Env": "debug",
+    "AppName": "MyApp",
+    "ServerName": "example.com"
+  },
+  "Gin": {
+    "Mode": "debug",
+    "ListenHost": "127.0.0.1",
+    "ListenPort": 8090,
+    "Tls": false,
+    "CertFile": "",
+    "KeyFile": ""
+  },
+  "Echo": {
+    "Debug": true,
+    "ListenHost": "127.0.0.1",
+    "ListenPort": 8089,
+    "Tls": false,
+    "CertFile": "",
+    "KeyFile": "",
+    "UseSelfMiddleware": false
+  },
+  "Cron": {
+    "Location": "Local"
+  },
+  "OAuth": {
+    "WechatSignSwitch": false,
+    "WechatOAuth2AppKey": "",
+    "WechatOAuth2AppSecret": "",
+    "WeiboSignSwitch": false,
+    "WeiboOAuth2AppKey": "",
+    "WeiboOAuth2AppSecret": "",
+    "QQSignSwitch": false,
+    "QQOAuth2AppKey": "",
+    "QQOAuth2AppSecret": ""
+  },
+  "Etcd": {
+    "Endpoints": [
+      "127.0.0.1:2379",
+      "127.0.0.1:2380"
+    ],
+    "Username": "",
+    "Password": "",
+    "PermitWithoutStream": false,
+    "RejectOldCluster": false,
+    "AutoSyncInterval": 0,
+    "DialTimeout": 0,
+    "DialKeepAliveTime": 0,
+    "DialKeepAliveTimeout": 0,
+    "MaxCallRecvMsgSize": 0,
+    "MaxCallSendMsgSize": 0
+  },
+  "Logger": {
+    "AppName": "",
+    "AppVersion": "",
+    "DevEnv": true,
+    "DebugLevelSwitch": false,
+    "InfoLevelSwitch": true,
+    "WarnLevelSwitch": true,
+    "ErrorLevelSwitch": true,
+    "DPanicLevelSwitch": true,
+    "PanicLevelSwitch": false,
+    "FatalLevelSwitch": true,
+    "SimpleZapCore": true,
+    "RotateZapCore": false,
+    "SyncZapCore": false,
+    "StdoutLogSwitch": true,
+    "LogDir": "./log",
+    "RetateLogSwitch": false,
+    "MaxDayCount": 30,
+    "WithRotationTime": 1,
+    "SyncLogSwitch": false,
+    "MongoLogSwitch": false,
+    "MongoLogCollection": "ginger_log",
+    "MongoLogExpire": 0
+  },
+  "Mysql": {
+    "DbHost": "127.0.0.1",
+    "DbPort": 3306,
+    "DbUser": "dev",
+    "DbPasswd": "123456",
+    "DbName": "dev_db",
+    "ConnMaxLifetime": 60,
+    "MaxIdleConns": 100,
+    "MaxOpenConns": 200,
+    "ChartSet": "utf8",
+    "AllowCleartextPasswords": true,
+    "InterpolateParams": true,
+    "Timeout": 5,
+    "ReadTimeout": 30,
+    "ParseTime": true,
+    "PING": true
+  },
+  "Gorm": {
+    "Dialect": "mysql",
+    "DbHost": "127.0.0.1",
+    "DbPort": 3306,
+    "DbUser": "dev",
+    "DbPasswd": "123456",
+    "DbName": "dev_db",
+    "ChartSet": "utf8",
+    "ParseTime": true,
+    "Local": "Local",
+    "ConnMaxLifetime": 3600,
+    "MaxOpenConns": 100,
+    "MaxIdleConns": 10,
+    "DefaultStringSize": 256,
+    "DisableDatetimePrecision": true,
+    "DontSupportRenameIndex": true,
+    "DontSupportRenameColumn": true,
+    "SkipInitializeWithVersion": false,
+    "PreferSimpleProtocol": true,
+    "TimeZone": "Asia/Shanghai",
+    "SslMode": "disable"
+  },
+  "Mongodb": {
+    "DbHosts": [
+      "127.0.0.1:27017"
+    ],
+    "DbUser": "",
+    "DbPasswd": "",
+    "Database": "dev_db",
+    "ReplicaSet": "",
+    "PasswordSet": true,
+    "LocalThreshold": 15,
+    "Compressors": "nil",
+    "Direct": true,
+    "HeartbeatInterval": 10,
+    "MinPoolSize": 100,
+    "MaxPoolSize": 1000,
+    "MaxConnIdleTime": 120,
+    "AutoEncryptionOptions": false,
+    "ConnectTimeout": 20,
+    "RetryReads": true,
+    "RetryWrites": true
+  },
+  "Redis": {
+    "DbHost": "127.0.0.1",
+    "DbPort": 6379,
+    "DbAuth": false,
+    "DbPasswd": "",
+    "MaxActive": 0,
+    "MaxIdle": 50,
+    "IdleTimeout": 60
+  },
+  "RedisPubSub": {
+    "Switch": false,
+    "DbHost": "localhost",
+    "DbPort": 6379,
+    "DbAuth": false,
+    "DbPasswd": 123456,
+    "MaxActive": 0,
+    "MaxIdle": 0,
+    "IdleTimeout": 0
+  },
+  "NatsMq": {
+    "Switch": false,
+    "NatsServer": [
+      {
+        "Host": "",
+        "Port": 0,
+        "AuthSwitch": false,
+        "UserName": "",
+        "Password": ""
+      }
+    ]
+  },
+  "QiniuOss": {
+    "Switch": false,
+    "AccessKey": "",
+    "SecretKey": "",
+    "Bucket": "",
+    "UseHTTPS": false,
+    "UseCdnDomains": false,
+    "UpTokenExpires": 7200,
+    "CallbackURL": "",
+    "CallbackBodyType": "application/json",
+    "EndUser": "",
+    "FsizeMin": 1024,
+    "FsizeLimit": 10485760,
+    "MimeLimit": "image/jpeg;image/png;image/gif"
+  },
+  "AliyunOss": {
+    "Switch": false,
+    "AccessKeyId": "",
+    "AccessKeySecret": "",
+    "BucketName": "",
+    "Endpoint": "http://oss-cn-shenzhen.aliyuncs.com",
+    "UseCname": false,
+    "ConnTimeout": 10,
+    "RwTimeout": 120,
+    "SecurityToken": "",
+    "EnableMD5": false,
+    "EnableCRC": true,
+    "Proxy": "",
+    "AuthProxy": ""
+  },
+  "AliyunSms": {
+    "EndPoint": "dysmsapi.aliyuncs.com",
+    "AccessKeyId": "",
+    "AccessSecret": ""
+  },
+  "EsOfficial": {
+    "Addresses": "",
+    "Username": "",
+    "Password": "",
+    "CloudID": "",
+    "APIKey": "",
+    "CACert": null,
+    "RetryOnStatus": [
+      502,
+      503,
+      504
+    ],
+    "DisableRetry": false,
+    "EnableRetryOnTimeout": false,
+    "MaxRetries": 5,
+    "DiscoverNodesOnStart": "fasle",
+    "DiscoverNodesInterval": 10,
+    "EnableMetrics": "fasle",
+    "EnableDebugLogger": "fasle"
+  },
+  "EsOlivere": {
+    "URL": "",
+    "Username": "",
+    "Password": "",
+    "Sniff": false,
+    "Healthcheck": false,
+    "Infolog": "",
+    "Errorlog": "",
+    "Tracelog": ""
+  },
+  "Validate": {
+    "TransZh": true
+  },
+  "Mail": {
+    "NoAuth": true,
+    "NoSmtp": false,
+    "Server": "",
+    "Port": null,
+    "User": "",
+    "Password": ""
+  },
+  "Jwt": {
+    "UseCache": true,
+    "PrivateKey": "keykeykeykey",
+    "ExpSeconds": 3600
+  }
+}

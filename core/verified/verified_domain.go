@@ -1,10 +1,10 @@
 package verified
 
 import (
-	"GoWebScaffold/core"
-	"GoWebScaffold/infras/global"
-	"GoWebScaffold/infras/mail"
-	"GoWebScaffold/services"
+	"github.com/bb-orz/goinfras/XGlobal"
+	"github.com/bb-orz/goinfras/XMail"
+	"goinfras-sample-account/core"
+	"goinfras-sample-account/services"
 	"fmt"
 	"strconv"
 )
@@ -37,11 +37,11 @@ func (domain *VerifiedDomain) genEmailVerifiedCode(uid uint) (string, error) {
 }
 
 // 构造验证邮箱邮件
-func (domain *VerifiedDomain) sendValidateEmail(email string, code string) error {
-	from := "no-reply@" + XGlobal.Config().ServerName
-	subject := "Verified Email Code From " + XGlobal.Config().AppName
+func (domain *VerifiedDomain) sendValidateEmail(address string, code string) error {
+	from := "no-reply@" + XGlobal.GConfig().ServerName
+	subject := "Verified Email Code From " + XGlobal.GConfig().AppName
 	body := fmt.Sprintf("Verified Code: %s", code)
-	return XMail.SendSimpleMail(from, email, subject, body)
+	return XMail.XCommonMail().SendSimpleMail(from,"","", subject, body,"text/plain","",[]string{address})
 }
 
 // 发送验证码到邮箱
@@ -96,13 +96,13 @@ func (domain *VerifiedDomain) genResetPasswordCode(uid uint) (string, error) {
 }
 
 // 构造验证邮箱邮件
-func (domain *VerifiedDomain) sendResetPasswordCodeEmail(email string, code string) error {
-	from := "no-reply@" + XGlobal.Config().ServerName
-	subject := "Reset Password Code From " + XGlobal.Config().AppName
+func (domain *VerifiedDomain) sendResetPasswordCodeEmail(address string, code string) error {
+	from := "no-reply@" + XGlobal.GConfig().ServerName
+	subject := "Reset Password Code From " + XGlobal.GConfig().AppName
 	// TODO 设置重置密码的链接
-	url := XGlobal.Config().ServerName + "?code=" + code
+	url := XGlobal.GConfig().ServerName + "?code=" + code
 	body := fmt.Sprintf("Click This link To Reset Your Password: %s", url)
-	return XMail.SendSimpleMail(from, email, subject, body)
+	return XMail.XCommonMail().SendSimpleMail(from,"","", subject, body,"text/plain","",[]string{address})
 }
 
 // 发送验证码到邮箱

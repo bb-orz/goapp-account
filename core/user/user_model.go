@@ -1,7 +1,7 @@
 package user
 
 import (
-	"GoWebScaffold/services"
+	"goinfras-sample-account/services"
 	"github.com/jinzhu/gorm"
 )
 

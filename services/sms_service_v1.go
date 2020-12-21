@@ -1,7 +1,8 @@
 package services
 
 import (
-	"GoWebScaffold/hub"
+	"github.com/bb-orz/goinfras"
+
 )
 
 /* 定义短信服务模块的服务层方法，并定义数据传输对象DTO*/
@@ -9,7 +10,7 @@ var smsService ISmsService
 
 // 用于对外暴露短信服务，唯一的暴露点，供接口层调用
 func GetSmsService() ISmsService {
-	infras.Check(smsService)
+	goinfras.Check(smsService)
 	return smsService
 }
 

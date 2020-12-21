@@ -1,10 +1,10 @@
 package restful
 
 import (
-	"GoWebScaffold/infras/ginger"
-	"GoWebScaffold/infras/jwt"
-	"GoWebScaffold/services"
 	"github.com/gin-gonic/gin"
+	"github.com/bb-orz/goinfras/XGin"
+	"github.com/bb-orz/goinfras/XJwt"
+	"goinfras-sample-account/services"
 )
 
 /*
@@ -13,7 +13,7 @@ API层，调用相关Service，封装响应返回，并记录日志
 
 func init() {
 	// 初始化时注册该模块API
-	Xgin.RegisterApi(new(UserApi))
+	XGin.RegisterApi(new(UserApi))
 }
 
 type UserApi struct {
@@ -25,12 +25,12 @@ type UserApi struct {
 // 设置该模块的API Router
 func (api *UserApi) SetRoutes() {
 	api.userService = services.GetUserService()
-	engine := Xgin.GinEngine()
+	engine := XGin.XEngine()
 
 	// 如TokenUtils服务已初始化，添加中间件
 	var authMiddlerware gin.HandlerFunc
-	if tku := XJWT.TokenUtils(); tku != nil {
-		authMiddlerware = Xgin.JwtAuthMiddleware(tku)
+	if tku := XJwt.XTokenUtils(); tku == nil {
+		authMiddlerware = XGin.JwtAuthMiddleware()
 	}
 
 	engine.POST("/login", api.loginHandler)

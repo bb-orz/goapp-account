@@ -1,8 +1,8 @@
 package services
 
 import (
-	"GoWebScaffold/hub"
 	"time"
+	"github.com/bb-orz/goinfras"
 )
 
 /* 定义用户模块的服务层方法，并定义数据传输对象DTO*/
@@ -10,7 +10,7 @@ var userService IUserService
 
 // 用于对外暴露账户应用服务，唯一的暴露点，供接口层调用
 func GetUserService() IUserService {
-	infras.Check(userService)
+	goinfras.Check(userService)
 	return userService
 }
 
