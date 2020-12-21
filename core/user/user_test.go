@@ -3,8 +3,9 @@ package user
 import (
 	"github.com/bb-orz/goinfras/XStore/XGorm"
 	"github.com/bb-orz/goinfras/XValidate"
-	"goinfras-sample-account/services"
 	. "github.com/smartystreets/goconvey/convey"
+	"goinfras-sample-account/core"
+	"goinfras-sample-account/services"
 	"testing"
 )
 
@@ -22,7 +23,7 @@ func TestUserService_CreateUser(t *testing.T) {
 			Password:   "123456",
 			RePassword: "123456",
 		}
-		service := new(services.UserService)
+		service := new(core.UserService)
 		userDTO, err := service.CreateUserWithEmail(dto)
 		So(err, ShouldBeNil)
 
@@ -38,7 +39,7 @@ func TestUserService_GetUserInfo(t *testing.T) {
 		err = XGorm.CreateDefaultDB(nil)
 		So(err, ShouldBeNil)
 
-		service := new(services.UserService)
+		service := new(core.UserService)
 		userDTO, err := service.GetUserInfo(services.GetUserInfoDTO{1})
 		So(err, ShouldBeNil)
 		Println("Get User Info:", userDTO)

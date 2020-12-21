@@ -1,10 +1,9 @@
 package restful
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/bb-orz/goinfras/XGin"
 	"github.com/bb-orz/goinfras/XJwt"
-	"goinfras-sample-account/services"
+	"github.com/gin-gonic/gin"
 )
 
 /*
@@ -16,15 +15,10 @@ func init() {
 	XGin.RegisterApi(new(UserApi))
 }
 
-type UserApi struct {
-	userService services.IUserService
-	mailService services.IMailService
-	smsService  services.ISmsService
-}
+type UserApi struct {}
 
 // 设置该模块的API Router
 func (api *UserApi) SetRoutes() {
-	api.userService = services.GetUserService()
 	engine := XGin.XEngine()
 
 	// 如TokenUtils服务已初始化，添加中间件
@@ -52,7 +46,9 @@ func (api *UserApi) SetRoutes() {
 
 /*用户登录*/
 func (api *UserApi) loginHandler(ctx *gin.Context) {
-
+	// TODO Receive Request ...
+	// TODO Call Services method ...
+	// TODO Send Response ...
 }
 
 /*用户登出*/

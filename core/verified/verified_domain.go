@@ -14,7 +14,7 @@ type VerifiedDomain struct {
 	cache *verifiedCache
 }
 
-func NewMailDomain() *VerifiedDomain {
+func NewVerifiedDomain() *VerifiedDomain {
 	domain := new(VerifiedDomain)
 	domain.cache = NewMailCache()
 	return domain

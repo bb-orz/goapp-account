@@ -1,6 +1,6 @@
 module goinfras-sample-account
 
-go 1.14
+go 1.15
 
 replace (
 	cloud.google.com/go => github.com/googleapis/google-cloud-go v0.47.0
