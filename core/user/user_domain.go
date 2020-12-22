@@ -48,19 +48,20 @@ func (domain *UserDomain) GenToken(no, name, avatar string) (string, error) {
 	var err error
 	var token string
 	// 生成
-	token, err = XJwt.XTokenUtils().Encode(XJwt.UserClaim{
+	var claim =XJwt.UserClaim{
 		Id:     no,
 		Name:   name,
 		Avatar: avatar,
-	})
+	}
+	token, err = XJwt.XTokenUtils().Encode(claim)
 	if err != nil {
-		return "", common.WrapError(err, common.ErrorFormatDomainAlgorithm, DomainName, "jwt.TokenUtils().Encode")
+		return "", common.DomainInnerErrorOnEncodeData(err, claim)
 	}
 
 	// 缓存
 	err = domain.cache.SetUserToken(no, token)
 	if err != nil {
-		return "", common.WrapError(err, common.ErrorFormatDomainCacheSet, DomainName, "domain.cache.SetUserToken")
+		return "", common.DomainInnerErrorOnCacheSet(err,"SetUserToken")
 	}
 
 	return token, nil
@@ -72,7 +73,7 @@ func (domain *UserDomain) IsUserExist(uid uint) (bool, error) {
 	var isExist bool
 
 	if isExist, err = domain.dao.IsUserIdExist(uid); err != nil {
-		return false, common.WrapError(err, common.ErrorFormatDomainSqlQuery, DomainName, "IsEmailExist")
+		return false, common.DomainInnerErrorOnSqlQuery(err,"IsUserIdExist")
 	} else if isExist {
 		return true, nil
 	}
@@ -85,7 +86,7 @@ func (domain *UserDomain) IsEmailExist(email string) (bool, error) {
 	var err error
 	var isExist bool
 	if isExist, err = domain.dao.IsEmailExist(email); err != nil {
-		return false, common.WrapError(err, common.ErrorFormatDomainSqlQuery, DomainName, "IsEmailExist")
+		return false, common.DomainInnerErrorOnSqlQuery(err,  "IsEmailExist")
 	} else if isExist {
 		return true, nil
 	}
@@ -98,7 +99,7 @@ func (domain *UserDomain) IsPhoneExist(phone string) (bool, error) {
 	var err error
 	var isExist bool
 	if isExist, err = domain.dao.IsPhoneExist(phone); err != nil {
-		return false, common.WrapError(err, common.ErrorFormatDomainSqlQuery, DomainName, "IsPhoneExist")
+		return false, common.DomainInnerErrorOnSqlQuery(err, "IsPhoneExist")
 	} else if isExist {
 		return true, nil
 	}
@@ -118,7 +119,7 @@ func (domain *UserDomain) CreateUserForEmail(dto services.CreateUserWithEmailDTO
 	createUserData.Status = UserStatusNotVerified // 初始创建时未验证状态
 
 	if userDTO, err = domain.dao.Create(&createUserData); err != nil {
-		return nil, common.WrapError(err, common.ErrorFormatDomainSqlInsert, DomainName, "Create")
+		return nil, common.DomainInnerErrorOnSqlInsert(err, "Create")
 	}
 	return userDTO, nil
 }
@@ -136,7 +137,7 @@ func (domain *UserDomain) CreateUserForPhone(dto services.CreateUserWithPhoneDTO
 	createUserData.Status = UserStatusNotVerified // 初始创建时未验证状态
 
 	if userDTO, err = domain.dao.Create(&createUserData); err != nil {
-		return nil, common.WrapError(err, common.ErrorFormatDomainSqlInsert, DomainName, "Create")
+		return nil, common.DomainInnerErrorOnSqlInsert(err, "Create")
 	}
 	return userDTO, nil
 }
@@ -164,7 +165,7 @@ func (domain *UserDomain) CreateUserOAuthBinding(platform uint, oauthInfo *XOAut
 	}
 
 	if userOAuthsResult, err = domain.dao.CreateUserWithOAuth(&createUserData); err != nil {
-		return nil, common.WrapError(err, common.ErrorFormatDomainSqlInsert, DomainName, "CreateUserWithOAuth")
+		return nil, common.DomainInnerErrorOnSqlInsert(err, "CreateUserWithOAuth")
 	}
 
 	return userOAuthsResult, nil
@@ -176,7 +177,7 @@ func (domain *UserDomain) GetUserOauths(platform uint, openId, unionId string) (
 	var userOAuthsResult *services.UserOAuthsDTO
 
 	if userOAuthsResult, err = domain.dao.GetUserOAuths(platform, openId, unionId); err != nil {
-		return nil, common.WrapError(err, common.ErrorFormatDomainSqlQuery, DomainName, "GetUserOAuths")
+		return nil, common.DomainInnerErrorOnSqlQuery(err, "GetUserOAuths")
 	}
 
 	return userOAuthsResult, nil
@@ -186,7 +187,7 @@ func (domain *UserDomain) GetUserInfo(uid uint) (*services.UserDTO, error) {
 	var err error
 	var userDTO *services.UserDTO
 	if userDTO, err = domain.dao.GetById(uid); err != nil {
-		return nil, common.WrapError(err, common.ErrorFormatDomainSqlQuery, DomainName, "GetById")
+		return nil, common.DomainInnerErrorOnSqlQuery(err, "GetById")
 	}
 	return userDTO, nil
 }
@@ -195,7 +196,7 @@ func (domain *UserDomain) GetUserInfoByEmail(email string) (*services.UserDTO, e
 	var err error
 	var userDTO *services.UserDTO
 	if userDTO, err = domain.dao.GetByEmail(email); err != nil {
-		return nil, common.WrapError(err, common.ErrorFormatDomainSqlQuery, DomainName, "GetByEmail")
+		return nil, common.DomainInnerErrorOnSqlQuery(err, "GetByEmail")
 	}
 	return userDTO, nil
 }
@@ -204,7 +205,7 @@ func (domain *UserDomain) GetUserInfoByPhone(phone string) (*services.UserDTO, e
 	var err error
 	var userDTO *services.UserDTO
 	if userDTO, err = domain.dao.GetByPhone(phone); err != nil {
-		return nil, common.WrapError(err, common.ErrorFormatDomainSqlQuery, DomainName, "GetByPhone")
+		return nil, common.DomainInnerErrorOnSqlQuery(err, "GetByPhone")
 	}
 	return userDTO, nil
 }
@@ -213,7 +214,7 @@ func (domain *UserDomain) GetUserInfoByPhone(phone string) (*services.UserDTO, e
 func (domain *UserDomain) SetStatus(uid, status uint) error {
 	var err error
 	if err = domain.dao.SetUserInfo(uid, "status", status); err != nil {
-		return common.WrapError(err, common.ErrorFormatDomainSqlUpdate, DomainName, "SetUserInfo")
+		return common.DomainInnerErrorOnSqlUpdate(err, "SetUserInfo")
 	}
 	return nil
 }
@@ -222,7 +223,7 @@ func (domain *UserDomain) SetStatus(uid, status uint) error {
 func (domain *UserDomain) SetUserInfo(uid uint, field string, value interface{}) error {
 	var err error
 	if err = domain.dao.SetUserInfo(uid, field, value); err != nil {
-		return common.WrapError(err, common.ErrorFormatDomainSqlUpdate, DomainName, "SetUserInfo")
+		return common.DomainInnerErrorOnSqlUpdate(err, "SetUserInfo")
 	}
 	return nil
 }
@@ -231,7 +232,7 @@ func (domain *UserDomain) SetUserInfo(uid uint, field string, value interface{})
 func (domain *UserDomain) SetUserInfos(uid uint, dto services.SetUserInfoDTO) error {
 	var err error
 	if err = domain.dao.SetUserInfos(uid, dto); err != nil {
-		return common.WrapError(err, common.ErrorFormatDomainSqlUpdate, DomainName, "SetUserInfo")
+		return common.DomainInnerErrorOnSqlUpdate(err, "SetUserInfos")
 	}
 
 	return nil
@@ -243,7 +244,7 @@ func (domain *UserDomain) ReSetPassword(uid uint, password string) error {
 	var hashStr, salt string
 	hashStr, salt = domain.encryptPassword(password)
 	if err = domain.dao.SetPasswordAndSalt(uid, hashStr, salt); err != nil {
-		return common.WrapError(err, common.ErrorFormatDomainSqlUpdate, DomainName, "SetPasswordAndSalt")
+		return common.DomainInnerErrorOnSqlUpdate(err, "SetPasswordAndSalt")
 	}
 	return nil
 }
@@ -252,7 +253,7 @@ func (domain *UserDomain) ReSetPassword(uid uint, password string) error {
 func (domain *UserDomain) DeleteUser(uid uint) error {
 	var err error
 	if err = domain.dao.DeleteById(uid); err != nil {
-		return common.WrapError(err, common.ErrorFormatDomainSqlDelete, DomainName, "DeleteById")
+		return common.DomainInnerErrorOnSqlDelete(err, "DeleteById")
 	}
 	return nil
 }
@@ -261,7 +262,7 @@ func (domain *UserDomain) DeleteUser(uid uint) error {
 func (domain *UserDomain) ShamDeleteUser(uid uint) error {
 	var err error
 	if err = domain.dao.SetDeletedAtById(uid); err != nil {
-		return common.WrapError(err, common.ErrorFormatDomainSqlShamDelete, DomainName, "SetDeletedAtById")
+		return common.DomainInnerErrorOnSqlShamDelete(err, "SetDeletedAtById")
 	}
 	return nil
 }

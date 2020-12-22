@@ -30,11 +30,16 @@ const (
 	ErrorOnCacheGetFormat = "[Domain Inner Error]: Cache Get Error | [command]:%s" // 缓存获取错误
 
 	// 服务端内部网络请求报错
-	ErrorOnNetRequestFormat = "[Domain Inner Error]: Network Request Error | [Request]:%s"   // 网络请求相关错误
-	ErrorOnThirdPartFormat  = "[Domain Inner Error]: Network ThirdPart Error | [Request]:%s" // 第三方接口错误相关错误
+	ErrorOnNetRequestFormat = "[Domain Inner Error]: Network Request Error | [Request]:%v"   // 网络请求相关错误
+	ErrorOnThirdPartFormat  = "[Domain Inner Error]: Network ThirdPart Error | [Request]:%v" // 第三方接口错误相关错误
 
 	// 算法逻辑类错误信息格式
-	ErrorOnAlgorithmFormat = "[Domain Inner Error]: Algorithm Error | [CALL]:%s" // 算法执行错误
+	ErrorOnAlgorithmFormat = "[Domain Inner Error]: Algorithm Error | [Info]:%s" // 算法执行错误
+
+	// 服务端内部编解码错误
+	ErrorOnEncodeFormat = "[Domain Inner Error]: Encode Error | source data:%v"   // 编码算法错误
+	ErrorOnDecodeFormat = "[Domain Inner Error]: Decode Error | code string:%s"   // 解码算法错误
+
 )
 
 
@@ -132,16 +137,25 @@ func DomainInnerErrorOnCacheGet(err error,command string) SError {
 }
 
 // 网络请求错误包装方法
-func DomainInnerErrorOnNetRequest(err error,command string) SError {
-	return ServerErrorWrapper(err,ErrorOnNetRequestFormat,command)
+func DomainInnerErrorOnNetRequest(err error,req interface{}) SError {
+	return ServerErrorWrapper(err,ErrorOnNetRequestFormat,req)
 }
 
 // 第三方服务请求错误包装方法
-func DomainInnerErrorOnThirdPartRequest(err error,command string) SError {
-	return ServerErrorWrapper(err,ErrorOnThirdPartFormat,command)
+func DomainInnerErrorOnThirdPartRequest(err error,req interface{}) SError {
+	return ServerErrorWrapper(err,ErrorOnThirdPartFormat,req)
 }
 
 // 内部业务算法错误包装方法
-func DomainInnerErrorOnAlgorithm(err error,command string) SError {
-	return ServerErrorWrapper(err,ErrorOnAlgorithmFormat,command)
+func DomainInnerErrorOnAlgorithm(err error,info string) SError {
+	return ServerErrorWrapper(err,ErrorOnAlgorithmFormat,info)
+}
+
+// 数据编码算法错误
+func DomainInnerErrorOnEncodeData(err error,data interface{}) SError {
+	return ServerErrorWrapper(err,ErrorOnEncodeFormat,data)
+}
+// 数据解码算法错误
+func DomainInnerErrorOnDecodeData(err error,code string) SError {
+	return ServerErrorWrapper(err,ErrorOnDecodeFormat,code)
 }

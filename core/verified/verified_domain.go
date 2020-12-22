@@ -34,7 +34,7 @@ func (domain *VerifiedDomain) genEmailVerifiedCode(uid uint) (string, error) {
 	// 保存到缓存
 	err = domain.cache.SetUserVerifiedEmailCode(uid, code)
 	if err != nil {
-		return "", common.WrapError(err, common.ErrorFormatDomainCacheSet, DomainName, "SetUserVerifiedEmailCode")
+		return "",common.DomainInnerErrorOnCacheSet(err, "SetUserVerifiedEmailCode")
 	}
 
 	return code, nil
@@ -45,7 +45,11 @@ func (domain *VerifiedDomain) sendValidateEmail(address string, code string) err
 	from := "no-reply@" + XGlobal.GetHost()
 	subject := "Verified Email Code From " + XGlobal.GetAppName()
 	body := fmt.Sprintf("Verified Code: %s", code)
-	return XMail.XCommonMail().SendSimpleMail(from,"","", subject, body,"text/plain","",[]string{address})
+	err := XMail.XCommonMail().SendSimpleMail(from,"","", subject, body,"text/plain","",[]string{address})
+	if err != nil {
+		return common.DomainInnerErrorOnNetRequest(err, "SendSimpleMail")
+	}
+	return nil
 }
 
 // 发送验证码到邮箱
@@ -72,7 +76,7 @@ func (domain *VerifiedDomain) VerifiedEmail(uid uint, vcode string) (bool, error
 	// 缓存取出
 	code, err = domain.cache.GetUserVerifiedEmailCode(uid)
 	if err != nil {
-		return false, common.WrapError(err, common.ErrorFormatDomainCacheGet, DomainName, "GetUserVerifiedEmailCode")
+		return false,common.DomainInnerErrorOnCacheGet(err, "GetUserVerifiedEmailCode")
 	}
 
 	// 校验
@@ -93,7 +97,7 @@ func (domain *VerifiedDomain) genResetPasswordCode(uid uint) (string, error) {
 	// 保存到缓存
 	err = domain.cache.SetForgetPasswordVerifiedCode(uid, code)
 	if err != nil {
-		return "", common.WrapError(err, common.ErrorFormatDomainCacheSet, DomainName, "SetForgetPasswordVerifiedCode")
+		return "",common.DomainInnerErrorOnCacheSet(err, "SetForgetPasswordVerifiedCode")
 	}
 
 	return code, nil
@@ -106,7 +110,11 @@ func (domain *VerifiedDomain) sendResetPasswordCodeEmail(address string, code st
 	// TODO 设置重置密码的链接
 	url := XGlobal.GetHost() + "?code=" + code
 	body := fmt.Sprintf("Click This link To Reset Your Password: %s", url)
-	return XMail.XCommonMail().SendSimpleMail(from,"","", subject, body,"text/plain","",[]string{address})
+	err := XMail.XCommonMail().SendSimpleMail(from,"","", subject, body,"text/plain","",[]string{address})
+	if err != nil {
+		return common.DomainInnerErrorOnNetRequest(err, "SendSimpleMail")
+	}
+	return nil
 }
 
 // 发送验证码到邮箱
@@ -134,7 +142,7 @@ func (domain *VerifiedDomain) VerifiedResetPasswordCode(uid uint, vcode string) 
 	// 缓存取出
 	code, err = domain.cache.GetForgetPasswordVerifiedCode(uid)
 	if err != nil {
-		return false, common.WrapError(err, common.ErrorFormatDomainCacheGet, DomainName, "GetForgetPasswordVerifiedCode")
+		return false, common.DomainInnerErrorOnCacheGet(err, "GetForgetPasswordVerifiedCode")
 	}
 
 	// 校验
@@ -153,13 +161,13 @@ func (domain *VerifiedDomain) genPhoneVerifiedCode(uid uint) (string, error) {
 	// 生成4位随机数字
 	code, err = XGlobal.RandomNumber(4)
 	if err != nil {
-		return "", common.WrapError(err, common.ErrorFormatDomainAlgorithm, DomainName, "global.RandomNumber")
+		return "", common.DomainInnerErrorOnAlgorithm(err,  "XGlobal.RandomNumber(4)")
 	}
 
 	// 保存到缓存
 	err = domain.cache.SetUserVerifiedPhoneCode(uid, code)
 	if err != nil {
-		return "", common.WrapError(err, common.ErrorFormatDomainCacheSet, DomainName, "SetUserVerifiedPhoneCode")
+		return "", common.DomainInnerErrorOnCacheSet(err, "SetUserVerifiedPhoneCode")
 	}
 
 	return code, nil
@@ -195,13 +203,13 @@ func (domain *VerifiedDomain) VerifiedPhone(uid uint, vcode string) (bool, error
 	// 缓存取出
 	code, err = domain.cache.GetUserVerifiedPhoneCode(uid)
 	if err != nil {
-		return false, err
+		return false, common.DomainInnerErrorOnCacheGet(err,"GetUserVerifiedPhoneCode")
 	}
 
 	// 校验
 	if vcode == code {
 		return true, nil
+	}else {
+		return false,common.DomainInnerErrorOnDecodeData(err,fmt.Sprintf("[validating code]:%s | [cache code]:%s",vcode,code))
 	}
-
-	return false, nil
 }
