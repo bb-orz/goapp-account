@@ -22,9 +22,9 @@ func (api *UserApi) SetRoutes() {
 	engine := XGin.XEngine()
 
 	// 如TokenUtils服务已初始化，添加中间件
-	var authMiddlerware gin.HandlerFunc
+	var authMiddleware gin.HandlerFunc
 	if tku := XJwt.XTokenUtils(); tku == nil {
-		authMiddlerware = XGin.JwtAuthMiddleware()
+		authMiddleware = XGin.JwtAuthMiddleware()
 	}
 
 	engine.POST("/login", api.loginHandler)
@@ -39,7 +39,7 @@ func (api *UserApi) SetRoutes() {
 	oauthGroup.GET("/weixin", api.oauthWeixinHandler)
 	oauthGroup.GET("/weibo", api.oauthWeiboHandler)
 
-	userGroup := engine.Group("/user", authMiddlerware)
+	userGroup := engine.Group("/user", authMiddleware)
 	userGroup.GET("/get", api.getUserInfoHandler)
 	userGroup.POST("/set", api.setUserInfoHandler)
 }
@@ -47,7 +47,12 @@ func (api *UserApi) SetRoutes() {
 /*用户登录*/
 func (api *UserApi) loginHandler(ctx *gin.Context) {
 	// TODO Receive Request ...
+
+
 	// TODO Call Services method ...
+
+
+
 	// TODO Send Response ...
 }
 

@@ -51,10 +51,9 @@ const (
 // 服务层错误信息格式
 const (
 	ErrorFormatServiceDTOValidate   = "[Service Error]: Validate DTO Error"                   // DTO验证错误信息
-	ErrorFormatServiceCheckInfo     = "[Service Error]: Check Info Error | [Info]:%s"         // 信息检查相关错误
-	ErrorFormatServiceStorage       = "[Service Error]: Storage Data Error"                   // 存储相关错误
+	ErrorFormatServiceCheckInfo     = "[Service Error]: Check Error | [Info]:%s"         	  // 信息检查相关错误
+	ErrorFormatServiceStorage       = "[Service Error]: Storage Error"                   	  // 存储相关错误
 	ErrorFormatServiceCache         = "[Service Error]: Cache Data Error"                     // 存储相关错误
-	ErrorFormatServiceBusinesslogic = "[Service Error]: Business Logic Error | [Info]:%s"     // 业务逻辑相关错误
+	ErrorFormatServiceBizLogic 		= "[Service Error]: Biz Logic Error | [Info]:%s"          // 业务逻辑相关错误
 	ErrorFormatServiceNetRequest    = "[Service Error]: Network Request Error | [Request]:%s" // 网络请求相关错误
-
 )
