@@ -12,7 +12,7 @@ import (
 	"github.com/bb-orz/goinfras/XValidate"
 	"goinfras-sample-account/restful/middleware"
 	_ "goinfras-sample-account/restful" // 自动载入Restful API模块
-	_ "goinfras-sample-account/core"
+	_ "goinfras-sample-account/core" // 自动载入业务核心，注册service实例
 )
 
 // 注册应用组件启动器，把基础设施各资源组件化
@@ -37,7 +37,8 @@ func RegisterStarter() {
 
 	// 注册gin web 服务启动器
 	// TODO add your gin middlewares
-	goinfras.RegisterStarter(XGin.NewStarter(middleware.CorsMiddleware(),middleware.ErrorMiddleware()))
+	// 尾部中间件设置为统一错误处理和统一http响应
+	goinfras.RegisterStarter(XGin.NewStarter(middleware.CorsMiddleware(),middleware.ErrorMiddleware(),middleware.ResponseMiddleware()))
 
 	// 对资源组件启动器进行排序
 	goinfras.SortStarters()

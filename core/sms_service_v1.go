@@ -33,11 +33,11 @@ func (service *SmsServiceV1) SendPhoneVerifiedCode(dto services.SendPhoneVerifie
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return err
+		return  common.ClientErrorOnValidateParameters(err)
 	}
 
 	if err = verifiedDomain.SendValidatePhoneMsg(dto); err != nil {
-		return common.WrapError(err, common.ErrorFormatServiceCache)
+		return common.ServerInnerError(err, verifiedDomain.DomainName())
 	}
 
 	return nil

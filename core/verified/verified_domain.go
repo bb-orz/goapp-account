@@ -20,6 +20,10 @@ func NewVerifiedDomain() *VerifiedDomain {
 	return domain
 }
 
+func  (domain *VerifiedDomain)DomainName() string {
+	return "VerifiedDomain"
+}
+
 // 生成邮箱验证码
 func (domain *VerifiedDomain) genEmailVerifiedCode(uid uint) (string, error) {
 	var err error

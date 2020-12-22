@@ -47,7 +47,6 @@ func (d *userDAO) IsUserNameExist(name string) (bool, error) {
 
 // 查找邮箱是否存在
 func (d *userDAO) IsEmailExist(email string) (bool, error) {
-
 	return d.isExist(&UserModel{Email: email})
 }
 

@@ -35,11 +35,11 @@ func (service *MailServiceV1) SendEmailForVerified(dto services.SendEmailForVeri
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return err
+		return  common.ClientErrorOnValidateParameters(err)
 	}
 
 	if err = verifiedDomain.SendValidateEmail(dto); err != nil {
-		return common.WrapError(err, common.ErrorFormatServiceCache)
+		return common.ServerInnerError(err, verifiedDomain.DomainName())
 	}
 
 	return nil
@@ -53,11 +53,11 @@ func (service *MailServiceV1) SendEmailForgetPassword(dto services.SendEmailForg
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return err
+		return  common.ClientErrorOnValidateParameters(err)
 	}
 
 	if err = verifiedDomain.SendResetPasswordCodeEmail(dto); err != nil {
-		return common.WrapError(err, common.ErrorFormatServiceCache)
+		return common.ServerInnerError(err, verifiedDomain.DomainName())
 	}
 
 	return nil

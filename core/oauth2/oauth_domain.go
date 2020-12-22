@@ -15,6 +15,11 @@ func NewOauthDomain() *OauthDomain {
 	return domain
 }
 
+func (domain *OauthDomain)DomainName() string {
+	return "OauthDomain"
+
+}
+
 // 通过accessCode获取qq user info
 func (domain *OauthDomain) GetQQOauthUserInfo(accessCode string) (*XOAuth.OAuthAccountInfo, error) {
 	var oAuthResult XOAuth.OAuthResult

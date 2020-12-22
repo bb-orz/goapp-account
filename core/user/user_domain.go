@@ -18,11 +18,17 @@ type UserDomain struct {
 	cache *userCache
 }
 
+
+
 func NewUserDomain() *UserDomain {
 	domain := new(UserDomain)
 	domain.dao = NewUserDAO()
 	domain.cache = NewUserCache()
 	return domain
+}
+
+func (domain *UserDomain) DomainName() string {
+	return "UserDomain"
 }
 
 // 生成用户编号

@@ -2,7 +2,7 @@ package middleware
 
 import "github.com/gin-gonic/gin"
 
-func ErrorMiddleware() gin.HandlerFunc {
+func ResponseMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 	}
