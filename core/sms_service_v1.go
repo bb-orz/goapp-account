@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/bb-orz/goinfras/XValidate"
+	"goinfras-sample-account/common"
 	"goinfras-sample-account/core/verified"
 	"goinfras-sample-account/services"
 	"sync"
@@ -36,7 +37,7 @@ func (service *SmsServiceV1) SendPhoneVerifiedCode(dto services.SendPhoneVerifie
 	}
 
 	if err = verifiedDomain.SendValidatePhoneMsg(dto); err != nil {
-		return WrapError(err, ErrorFormatServiceCache)
+		return common.WrapError(err, common.ErrorFormatServiceCache)
 	}
 
 	return nil

@@ -4,7 +4,7 @@ go 1.15
 
 replace (
 	cloud.google.com/go => github.com/googleapis/google-cloud-go v0.47.0
-	// github.com/bb-orz/goinfras => /Users/fun/Code/MyProject/goinfras
+	github.com/bb-orz/goinfras => /Users/fun/Code/MyProject/goinfras
 	github.com/coreos/bbolt => go.etcd.io/bbolt v1.3.4
 	github.com/coreos/go-systemd => github.com/coreos/go-systemd/v22 v22.0.0
 	go.uber.org/atomic => github.com/uber-go/atomic v1.5.0

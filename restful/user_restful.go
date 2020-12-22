@@ -4,6 +4,8 @@ import (
 	"github.com/bb-orz/goinfras/XGin"
 	"github.com/bb-orz/goinfras/XJwt"
 	"github.com/gin-gonic/gin"
+	"goinfras-sample-account/services"
+	"net/http"
 )
 
 /*
@@ -40,20 +42,26 @@ func (api *UserApi) SetRoutes() {
 	oauthGroup.GET("/weibo", api.oauthWeiboHandler)
 
 	userGroup := engine.Group("/user", authMiddleware)
-	userGroup.GET("/get", api.getUserInfoHandler)
+	userGroup.GET("/:id", api.getUserInfoHandler)
 	userGroup.POST("/set", api.setUserInfoHandler)
 }
 
 /*用户登录*/
 func (api *UserApi) loginHandler(ctx *gin.Context) {
-	// TODO Receive Request ...
+	// Receive Request ...
+	email := ctx.PostForm("email")
+	passwd := ctx.PostForm("password")
 
 
-	// TODO Call Services method ...
+	// Call Services method ...
+	userService := services.GetUserService()
+	token, err := userService.EmailAuth(services.AuthWithEmailPasswordDTO{Email:email,Password:passwd})
+	if err != nil {
+		_ = ctx.Error(err)
+	}
 
-
-
-	// TODO Send Response ...
+	// Send Response ...
+	ctx.JSON(http.StatusOK,gin.H{"token":token})
 }
 
 /*用户登出*/
@@ -94,5 +102,9 @@ func (api *UserApi) setUserInfoHandler(ctx *gin.Context) {
 
 /*获取用户信息*/
 func (api *UserApi) getUserInfoHandler(ctx *gin.Context) {
+	id := ctx.Param("id")
+	ctx.JSON(http.StatusOK,gin.H{"id":id})
+
+
 
 }

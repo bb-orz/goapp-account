@@ -4,6 +4,7 @@ import (
 	"github.com/bb-orz/goinfras/XGlobal"
 	"github.com/bb-orz/goinfras/XOAuth"
 	"github.com/bb-orz/goinfras/XValidate"
+	"goinfras-sample-account/common"
 	"goinfras-sample-account/core/oauth2"
 	"goinfras-sample-account/core/user"
 	"goinfras-sample-account/core/verified"
@@ -39,19 +40,19 @@ func (service *UserServiceV1) CreateUserWithEmail(dto services.CreateUserWithEma
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return nil, WrapError(err, ErrorFormatServiceDTOValidate)
+		return nil, common.WrapError(err, common.ErrorFormatServiceDTOValidate)
 	}
 
 	// 验证用户邮箱是否存在
 	if isExist, err = userDomain.IsEmailExist(dto.Email); err != nil {
-		return nil, WrapError(err, ErrorFormatServiceStorage)
+		return nil, common.WrapError(err, common.ErrorFormatServiceStorage)
 	} else if isExist {
-		return nil, WrapError(err, ErrorFormatServiceCheckInfo, "Email Account Exist!")
+		return nil, common.WrapError(err, common.ErrorFormatServiceCheckInfo, "Email Account Exist!")
 	}
 
 	userDTO, err = userDomain.CreateUserForEmail(dto)
 	if err != nil {
-		return nil, WrapError(err, ErrorFormatServiceBizLogic, "Create User Fail")
+		return nil, common.WrapError(err, common.ErrorFormatServiceBizLogic, "Create User Fail")
 	}
 	return userDTO, nil
 }
@@ -66,19 +67,19 @@ func (service *UserServiceV1) CreateUserWithPhone(dto services.CreateUserWithPho
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return nil, WrapError(err, ErrorFormatServiceDTOValidate)
+		return nil, common.WrapError(err, common.ErrorFormatServiceDTOValidate)
 	}
 
 	// 验证用户手机号码是否存在
 	if isExist, err = userDomain.IsPhoneExist(dto.Phone); err != nil {
-		return nil, WrapError(err, ErrorFormatServiceStorage)
+		return nil, common.WrapError(err, common.ErrorFormatServiceStorage)
 	} else if isExist {
-		return nil, WrapError(err, ErrorFormatServiceCheckInfo, "Phone Account Exist!")
+		return nil, common.WrapError(err, common.ErrorFormatServiceCheckInfo, "Phone Account Exist!")
 	}
 
 	userDTO, err = userDomain.CreateUserForPhone(dto)
 	if err != nil {
-		return nil, WrapError(err, ErrorFormatServiceBizLogic, "Create User Fail")
+		return nil, common.WrapError(err, common.ErrorFormatServiceBizLogic, "Create User Fail")
 	}
 	return userDTO, nil
 }
@@ -93,24 +94,24 @@ func (service *UserServiceV1) EmailAuth(dto services.AuthWithEmailPasswordDTO) (
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return "", WrapError(err, ErrorFormatServiceDTOValidate)
+		return "", common.WrapError(err, common.ErrorFormatServiceDTOValidate)
 	}
 
 	// 查找邮件账号是否存在
 	if userDTO, err = userDomain.GetUserInfoByEmail(dto.Email); err != nil {
-		return "", WrapError(err, ErrorFormatServiceStorage)
+		return "", common.WrapError(err, common.ErrorFormatServiceStorage)
 	}
 	if userDTO == nil {
-		return "", WrapError(err, ErrorFormatServiceCheckInfo, "Email Account Not Exist!")
+		return "", common.WrapError(err, common.ErrorFormatServiceCheckInfo, "Email Account Not Exist!")
 	} else if !XGlobal.ValidatePassword(dto.Password, userDTO.Salt, userDTO.Password) {
 		// 校验密码失败
-		return "", WrapError(err, ErrorFormatServiceCheckInfo, "Password Error!")
+		return "", common.WrapError(err, common.ErrorFormatServiceCheckInfo, "Password Error!")
 	}
 
 	// JWT token
 	token, err = userDomain.GenToken(userDTO.No, userDTO.Name, userDTO.Avatar)
 	if err != nil {
-		return "", WrapError(err, ErrorFormatServiceBizLogic)
+		return "", common.WrapError(err, common.ErrorFormatServiceBizLogic)
 	}
 
 	return token, nil
@@ -127,26 +128,26 @@ func (service *UserServiceV1) PhoneAuth(dto services.AuthWithPhonePasswordDTO) (
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return "", WrapError(err, ErrorFormatServiceDTOValidate)
+		return "", common.WrapError(err, common.ErrorFormatServiceDTOValidate)
 	}
 
 	// 查找手机账号是否存在
 	userDTO, err = userDomain.GetUserInfoByPhone(dto.Phone)
 	if err != nil {
-		return "", WrapError(err, ErrorFormatServiceStorage)
+		return "", common.WrapError(err, common.ErrorFormatServiceStorage)
 	}
 
 	if userDTO == nil {
-		return "", WrapError(err, ErrorFormatServiceCheckInfo, "该用户不存在!")
+		return "", common.WrapError(err, common.ErrorFormatServiceCheckInfo, "该用户不存在!")
 	} else if !XGlobal.ValidatePassword(dto.Password, userDTO.Salt, userDTO.Password) {
 		// 校验密码失败
-		return "", WrapError(err, ErrorFormatServiceCheckInfo, "密码错误!")
+		return "", common.WrapError(err, common.ErrorFormatServiceCheckInfo, "密码错误!")
 	}
 
 	// JWT token
 	token, err = userDomain.GenToken(userDTO.No, userDTO.Name, userDTO.Avatar)
 	if err != nil {
-		return "", WrapError(err, ErrorFormatServiceBizLogic)
+		return "", common.WrapError(err, common.ErrorFormatServiceBizLogic)
 	}
 	return token, nil
 }
@@ -160,13 +161,13 @@ func (service *UserServiceV1) GetUserInfo(dto services.GetUserInfoDTO) (*service
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return nil, WrapError(err, ErrorFormatServiceDTOValidate)
+		return nil, common.WrapError(err, common.ErrorFormatServiceDTOValidate)
 	}
 
 	// 查找用户信息
 	userDTO, err = userDomain.GetUserInfo(dto.ID)
 	if err != nil {
-		return nil, WrapError(err, ErrorFormatServiceStorage)
+		return nil, common.WrapError(err, common.ErrorFormatServiceStorage)
 	}
 
 	return userDTO, nil
@@ -180,13 +181,13 @@ func (service *UserServiceV1) SetUserInfos(dto services.SetUserInfoDTO) error {
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return WrapError(err, ErrorFormatServiceDTOValidate)
+		return common.WrapError(err, common.ErrorFormatServiceDTOValidate)
 	}
 
 	uid := dto.ID
 	err = userDomain.SetUserInfos(uid, dto)
 	if err != nil {
-		return WrapError(err, ErrorFormatServiceStorage)
+		return common.WrapError(err, common.ErrorFormatServiceStorage)
 	}
 
 	return nil
@@ -201,13 +202,13 @@ func (service *UserServiceV1) ValidateEmail(dto services.ValidateEmailDTO) (bool
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return false, WrapError(err, ErrorFormatServiceDTOValidate)
+		return false, common.WrapError(err, common.ErrorFormatServiceDTOValidate)
 	}
 
 	// 从cache拿出保存的邮箱验证码
 	pass, err = verifiedDomain.VerifiedEmail(dto.ID, dto.VerifiedCode)
 	if err != nil {
-		return false, WrapError(err, ErrorFormatServiceCache, "缓存验证码校验错误")
+		return false, common.WrapError(err, common.ErrorFormatServiceCache, "缓存验证码校验错误")
 	}
 
 	if pass {
@@ -226,13 +227,13 @@ func (service *UserServiceV1) ValidatePhone(dto services.ValidatePhoneDTO) (bool
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return false, WrapError(err, ErrorFormatServiceDTOValidate)
+		return false, common.WrapError(err, common.ErrorFormatServiceDTOValidate)
 	}
 
 	// 从cache拿出保存的短信验证码
 	pass, err = verifiedDomain.VerifiedPhone(dto.ID, dto.VerifiedCode)
 	if err != nil {
-		return false, WrapError(err, ErrorFormatServiceCache, "缓存验证码校验错误")
+		return false, common.WrapError(err, common.ErrorFormatServiceCache, "缓存验证码校验错误")
 	}
 
 	if pass {
@@ -250,12 +251,12 @@ func (service *UserServiceV1) SetStatus(dto services.SetStatusDTO) (int, error) 
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return -1, WrapError(err, ErrorFormatServiceDTOValidate)
+		return -1, common.WrapError(err, common.ErrorFormatServiceDTOValidate)
 	}
 
 	err = userDomain.SetStatus(dto.ID, dto.Status)
 	if err != nil {
-		return -1, WrapError(err, ErrorFormatServiceStorage)
+		return -1, common.WrapError(err, common.ErrorFormatServiceStorage)
 	}
 
 	return 0, nil
@@ -270,26 +271,26 @@ func (service *UserServiceV1) ChangePassword(dto services.ChangePasswordDTO) err
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return WrapError(err, ErrorFormatServiceDTOValidate)
+		return common.WrapError(err, common.ErrorFormatServiceDTOValidate)
 	}
 
 	// 查找账号是否存在
 	userDTO, err = userDomain.GetUserInfo(dto.ID)
 	if err != nil {
-		return WrapError(err, ErrorFormatServiceStorage)
+		return common.WrapError(err, common.ErrorFormatServiceStorage)
 	}
 
 	// 校验旧密码
 	if userDTO == nil {
-		return WrapError(err, ErrorFormatServiceCheckInfo, "该用户不存在!")
+		return common.WrapError(err, common.ErrorFormatServiceCheckInfo, "该用户不存在!")
 	} else if !XGlobal.ValidatePassword(dto.Old, userDTO.Salt, userDTO.Password) {
 		// 校验旧密码失败
-		return WrapError(err, ErrorFormatServiceCheckInfo, "旧密码错误!")
+		return common.WrapError(err, common.ErrorFormatServiceCheckInfo, "旧密码错误!")
 	}
 
 	// 设置新密码
 	if err = userDomain.ReSetPassword(dto.ID, dto.New); err != nil {
-		return WrapError(err, ErrorFormatServiceStorage)
+		return common.WrapError(err, common.ErrorFormatServiceStorage)
 	}
 
 	return nil
@@ -307,26 +308,26 @@ func (service *UserServiceV1) ForgetPassword(dto services.ForgetPasswordDTO) err
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return WrapError(err, ErrorFormatServiceDTOValidate)
+		return common.WrapError(err, common.ErrorFormatServiceDTOValidate)
 	}
 
 	// 查找账号是否存在
 	isExist, err = userDomain.IsUserExist(dto.ID)
 	if err != nil {
-		return WrapError(err, ErrorFormatServiceStorage)
+		return common.WrapError(err, common.ErrorFormatServiceStorage)
 	}
 	if !isExist {
-		return WrapError(err, ErrorFormatServiceCheckInfo, "该用户不存在!")
+		return common.WrapError(err, common.ErrorFormatServiceCheckInfo, "该用户不存在!")
 	}
 
 	// 校验Code
 	isVerified, err = verifiedDomain.VerifiedResetPasswordCode(dto.ID, dto.Code)
 	if err != nil {
-		return WrapError(err, ErrorFormatServiceCache)
+		return common.WrapError(err, common.ErrorFormatServiceCache)
 	}
 
 	if !isVerified {
-		return WrapError(nil, ErrorFormatServiceCheckInfo, "重置密码校验码错误，请重试！")
+		return common.WrapError(nil, common.ErrorFormatServiceCheckInfo, "重置密码校验码错误，请重试！")
 	}
 
 	return nil
@@ -354,19 +355,19 @@ func (service *UserServiceV1) QQOAuth(dto services.QQLoginDTO) (string, error) {
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return "", WrapError(err, ErrorFormatServiceDTOValidate)
+		return "", common.WrapError(err, common.ErrorFormatServiceDTOValidate)
 	}
 
 	// oauth domain：使用qq回调授权码code开始鉴权流程并获取QQ用户信息
 	qqOauthAccountInfo, err = oauthDomain.GetQQOauthUserInfo(dto.AccessCode)
 	if err != nil {
-		return "", WrapError(err, ErrorFormatServiceNetRequest, "GetQQUserInfo")
+		return "", common.WrapError(err, common.ErrorFormatServiceNetRequest, "GetQQUserInfo")
 	}
 
 	// oauth domain: 使用OpenId UnionId查找user oauth表查看用户是否存在
 	findUserBindingDTO, err = userDomain.GetUserOauths(user.QQOauthPlatform, qqOauthAccountInfo.OpenId, qqOauthAccountInfo.UnionId)
 	if err != nil {
-		return "", WrapError(err, ErrorFormatServiceStorage, "IsOauthUserExist")
+		return "", common.WrapError(err, common.ErrorFormatServiceStorage, "IsOauthUserExist")
 	}
 
 	// 如不存在进入创建用户流程,否则进登录流程
@@ -379,11 +380,11 @@ func (service *UserServiceV1) QQOAuth(dto services.QQLoginDTO) (string, error) {
 				userOAuthsInfo.User.Name,
 				userOAuthsInfo.User.Avatar)
 			if err != nil {
-				return "", WrapError(err, ErrorFormatServiceBizLogic)
+				return "", common.WrapError(err, common.ErrorFormatServiceBizLogic)
 			}
 			return token, nil
 		} else {
-			return "", WrapError(err, ErrorFormatServiceStorage, "CreateUserOauthBinding")
+			return "", common.WrapError(err, common.ErrorFormatServiceStorage, "CreateUserOauthBinding")
 		}
 	}
 
@@ -393,7 +394,7 @@ func (service *UserServiceV1) QQOAuth(dto services.QQLoginDTO) (string, error) {
 		findUserBindingDTO.User.Name,
 		findUserBindingDTO.User.Avatar)
 	if err != nil {
-		return "", WrapError(err, ErrorFormatServiceBizLogic)
+		return "", common.WrapError(err, common.ErrorFormatServiceBizLogic)
 	}
 
 	return token, nil
@@ -414,19 +415,19 @@ func (service *UserServiceV1) WechatOAuth(dto services.WechatLoginDTO) (string, 
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return "", WrapError(err, ErrorFormatServiceDTOValidate)
+		return "", common.WrapError(err, common.ErrorFormatServiceDTOValidate)
 	}
 
 	// oauth domain：使用wechat回调授权码code开始鉴权流程并获取微信用户信息
 	wechatOauthAccountInfo, err = oauthDomain.GetQQOauthUserInfo(dto.AccessCode)
 	if err != nil {
-		return "", WrapError(err, ErrorFormatServiceNetRequest, "GetQQUserInfo")
+		return "", common.WrapError(err, common.ErrorFormatServiceNetRequest, "GetQQUserInfo")
 	}
 
 	// oauth domain: 使用OpenId UnionId查找user oauth表查看用户是否存在
 	findUserBindingDTO, err = userDomain.GetUserOauths(user.WechatOauthPlatform, wechatOauthAccountInfo.OpenId, wechatOauthAccountInfo.UnionId)
 	if err != nil {
-		return "", WrapError(err, ErrorFormatServiceStorage, "IsOauthUserExist")
+		return "", common.WrapError(err, common.ErrorFormatServiceStorage, "IsOauthUserExist")
 	}
 
 	// 如不存在进入创建用户流程,否则进登录流程
@@ -439,11 +440,11 @@ func (service *UserServiceV1) WechatOAuth(dto services.WechatLoginDTO) (string, 
 				userOAuthsInfo.User.Name,
 				userOAuthsInfo.User.Avatar)
 			if err != nil {
-				return "", WrapError(err, ErrorFormatServiceBizLogic)
+				return "", common.WrapError(err, common.ErrorFormatServiceBizLogic)
 			}
 			return token, nil
 		} else {
-			return "", WrapError(err, ErrorFormatServiceStorage, "CreateUserOauthBinding")
+			return "", common.WrapError(err, common.ErrorFormatServiceStorage, "CreateUserOauthBinding")
 		}
 	}
 
@@ -453,7 +454,7 @@ func (service *UserServiceV1) WechatOAuth(dto services.WechatLoginDTO) (string, 
 		findUserBindingDTO.User.Name,
 		findUserBindingDTO.User.Avatar)
 	if err != nil {
-		return "", WrapError(err, ErrorFormatServiceBizLogic)
+		return "", common.WrapError(err, common.ErrorFormatServiceBizLogic)
 	}
 
 	return token, nil
@@ -474,19 +475,19 @@ func (service *UserServiceV1) WeiboOAuth(dto services.WeiboLoginDTO) (string, er
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return "", WrapError(err, ErrorFormatServiceDTOValidate)
+		return "", common.WrapError(err, common.ErrorFormatServiceDTOValidate)
 	}
 
 	// oauth domain：使用wechat回调授权码code开始鉴权流程并获取微信用户信息
 	weiboOauthAccountInfo, err = oauthDomain.GetQQOauthUserInfo(dto.AccessCode)
 	if err != nil {
-		return "", WrapError(err, ErrorFormatServiceNetRequest, "GetQQUserInfo")
+		return "", common.WrapError(err, common.ErrorFormatServiceNetRequest, "GetQQUserInfo")
 	}
 
 	// oauth domain: 使用OpenId UnionId查找user oauth表查看用户是否存在
 	findUserBindingDTO, err = userDomain.GetUserOauths(user.WeiboOauthPlatform, weiboOauthAccountInfo.OpenId, weiboOauthAccountInfo.UnionId)
 	if err != nil {
-		return "", WrapError(err, ErrorFormatServiceStorage, "IsOauthUserExist")
+		return "", common.WrapError(err, common.ErrorFormatServiceStorage, "IsOauthUserExist")
 	}
 
 	// 如不存在进入创建用户流程,否则进登录流程
@@ -499,11 +500,11 @@ func (service *UserServiceV1) WeiboOAuth(dto services.WeiboLoginDTO) (string, er
 				userOAuthsInfo.User.Name,
 				userOAuthsInfo.User.Avatar)
 			if err != nil {
-				return "", WrapError(err, ErrorFormatServiceBizLogic)
+				return "", common.WrapError(err, common.ErrorFormatServiceBizLogic)
 			}
 			return token, nil
 		} else {
-			return "", WrapError(err, ErrorFormatServiceStorage, "CreateUserOauthBinding")
+			return "", common.WrapError(err, common.ErrorFormatServiceStorage, "CreateUserOauthBinding")
 		}
 	}
 
@@ -513,7 +514,7 @@ func (service *UserServiceV1) WeiboOAuth(dto services.WeiboLoginDTO) (string, er
 		findUserBindingDTO.User.Name,
 		findUserBindingDTO.User.Avatar)
 	if err != nil {
-		return "", WrapError(err, ErrorFormatServiceBizLogic)
+		return "", common.WrapError(err, common.ErrorFormatServiceBizLogic)
 	}
 
 	return token, nil

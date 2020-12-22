@@ -1,9 +1,11 @@
 {
 
   "Global": {
-    "Env": "debug",
-    "AppName": "MyApp",
-    "ServerName": "example.com"
+    "Env"      : "debug",
+    "Host"     : "example.com",
+    "Endpoint" : "localhost",
+    "AppName"  : "goinfras_app",
+    "Version"  : "v1.0.0"
   },
   "Gin": {
     "Mode": "debug",

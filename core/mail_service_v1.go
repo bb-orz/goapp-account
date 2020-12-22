@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/bb-orz/goinfras/XValidate"
+	"goinfras-sample-account/common"
 	"goinfras-sample-account/core/verified"
 	"goinfras-sample-account/services"
 	"sync"
@@ -38,7 +39,7 @@ func (service *MailServiceV1) SendEmailForVerified(dto services.SendEmailForVeri
 	}
 
 	if err = verifiedDomain.SendValidateEmail(dto); err != nil {
-		return WrapError(err, ErrorFormatServiceCache)
+		return common.WrapError(err, common.ErrorFormatServiceCache)
 	}
 
 	return nil
@@ -56,7 +57,7 @@ func (service *MailServiceV1) SendEmailForgetPassword(dto services.SendEmailForg
 	}
 
 	if err = verifiedDomain.SendResetPasswordCodeEmail(dto); err != nil {
-		return WrapError(err, ErrorFormatServiceCache)
+		return common.WrapError(err, common.ErrorFormatServiceCache)
 	}
 
 	return nil

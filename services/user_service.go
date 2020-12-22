@@ -1,7 +1,6 @@
 package services
 
 import (
-	_ "goinfras-sample-account/core" // 自动载入services实例
 	"time"
 )
 
