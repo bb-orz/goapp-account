@@ -38,7 +38,11 @@ func RegisterStarter() {
 	// 注册gin web 服务启动器
 	// TODO add your gin middlewares
 	// 尾部中间件设置为统一错误处理和统一http响应
-	goinfras.RegisterStarter(XGin.NewStarter(middleware.CorsMiddleware(),middleware.ResponseMiddleware(),middleware.ErrorMiddleware()))
+	goinfras.RegisterStarter(XGin.NewStarter(
+		middleware.CorsMiddleware(),
+		middleware.ResponseMiddleware(),
+		middleware.ErrorMiddleware(),
+	))
 
 	// 对资源组件启动器进行排序
 	goinfras.SortStarters()
