@@ -58,7 +58,7 @@ func (err SError) Error() string {
 
 // 打印包装器的错误信息，供日志记录器写入
 func (err SError) Printf() string {
-	return ""
+	return fmt.Sprintf("[Error Message]:%s | [StackTrace]:%s | [Misc]:%s | \n\t [Inner]:%s",err.Message,err.StackTrace,err.Misc,err.Inner)
 }
 
 // 工具函数：服务器内部错误信息在系统各模块传递时的“错误包装器”

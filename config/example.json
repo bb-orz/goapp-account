@@ -13,7 +13,8 @@
     "ListenPort": 8090,
     "Tls": false,
     "CertFile": "",
-    "KeyFile": ""
+    "KeyFile": "",
+    "RecoveryDebugStack": true
   },
   "Echo": {
     "Debug": true,

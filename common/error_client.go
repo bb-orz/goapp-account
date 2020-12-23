@@ -4,9 +4,9 @@ import "fmt"
 
 // 可暴露给客户端的错误类型
 type CError struct {
-	Code uint								// 自定义错误码
-	Err error								// 基本错误信息
-	Message    string						// 格式化错误信息，建议由fmt.Sprintf封装
+	Code uint				`json:"code"`				// 自定义错误码
+	Err  error				`json:"error"`				// 基本错误信息
+	Message    string		`json:"message"`				// 格式化错误信息，建议由fmt.Sprintf封装
 }
 
 // 实现error 接口

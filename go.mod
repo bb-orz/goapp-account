@@ -39,4 +39,5 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/segmentio/ksuid v1.0.3
 	github.com/smartystreets/goconvey v1.6.4
+	gopkg.in/go-playground/validator.v9 v9.31.0
 )

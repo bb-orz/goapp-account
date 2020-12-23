@@ -1,11 +1,10 @@
 package common
 
-import "github.com/gin-gonic/gin"
-
 /* 统一响应信息格式 */
 
-func ResponseMiddleware() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
+type CResponse struct {
+	Code uint // 自定义响应码
+	Message string // 自定义码解释
+	Data interface{} // 放置任何类型的返回数据
 
-	}
 }

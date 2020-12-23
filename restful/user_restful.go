@@ -58,8 +58,9 @@ func (api *UserApi) loginHandler(ctx *gin.Context) {
 	token, err := userService.EmailAuth(services.AuthWithEmailPasswordDTO{Email:email,Password:passwd})
 	if err != nil {
 		_ = ctx.Error(err)
+		return
 	}
-
+	println("Login Request....After")
 	// Send Response ...
 	ctx.JSON(http.StatusOK,gin.H{"token":token})
 }
@@ -104,7 +105,6 @@ func (api *UserApi) setUserInfoHandler(ctx *gin.Context) {
 func (api *UserApi) getUserInfoHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 	ctx.JSON(http.StatusOK,gin.H{"id":id})
-
 
 
 }
