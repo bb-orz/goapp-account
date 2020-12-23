@@ -4,6 +4,7 @@ import (
 	"github.com/bb-orz/goinfras/XGin"
 	"github.com/bb-orz/goinfras/XJwt"
 	"github.com/gin-gonic/gin"
+	"goinfras-sample-account/common"
 	"goinfras-sample-account/services"
 	"net/http"
 )
@@ -60,13 +61,13 @@ func (api *UserApi) loginHandler(ctx *gin.Context) {
 		_ = ctx.Error(err)
 		return
 	}
-	println("Login Request....After")
 	// Send Response ...
-	ctx.JSON(http.StatusOK,gin.H{"token":token})
+	common.GinResponseOK(ctx,gin.H{"token":token})
 }
 
 /*用户登出*/
 func (api *UserApi) logoutHandler(ctx *gin.Context) {
+
 
 }
 

@@ -1,6 +1,10 @@
 package common
 
-import "fmt"
+import (
+	"fmt"
+	// "github.com/bb-orz/goinfras/XValidate"
+	// "gopkg.in/go-playground/validator.v9"
+)
 
 // 可暴露给客户端的错误类型
 type CError struct {
@@ -18,9 +22,9 @@ func (err CError) Error() string {
 
 // 客户端错误信息格式
 const (
-	ClientErrorOnValidateCode = 10001
-	ClientErrorOnCheckInfoCode = 10002
-	ClientErrorOnNetRequestCode = 10003
+	ClientErrorOnValidateCode = 20001
+	ClientErrorOnCheckInfoCode = 20002
+	ClientErrorOnNetRequestCode = 20003
 
 )
 
@@ -28,8 +32,8 @@ const (
 // 客户端请求错误：验证请求参数DTO错误
 func ClientErrorOnValidateParameters(err error) CError  {
 	return CError{
-		Code:ClientErrorOnValidateCode,
-		Err:      err,
+		Code:		ClientErrorOnValidateCode,
+		Err:		err,
 		Message:   "[Client Error]: Validate Parameters Error",
 	}
 }
@@ -37,17 +41,17 @@ func ClientErrorOnValidateParameters(err error) CError  {
 // 客户端请求错误：与服务端检查信息错误
 func ClientErrorOnCheckInformation(err error,info string) CError  {
 	return CError{
-		Code:ClientErrorOnCheckInfoCode,
-		Err:      err,
-		Message:  fmt.Sprintf("[Client Error]: Check Information Error | [Info]:%s" ,info),
+		Code:	  	ClientErrorOnCheckInfoCode,
+		Err:      	err,
+		Message:  	fmt.Sprintf("[Client Error]: Check Information Error | [Info]:%s" ,info),
 	}
 }
 
 // 客户端请求错误：网络请求错误
 func ClientErrorOnNetRequest(err error,info string) CError  {
 	return CError{
-		Code:ClientErrorOnNetRequestCode,
-		Err:      err,
-		Message:  fmt.Sprintf("[Client Error]: Network Request Error | [Request]:%s" ,info),
+		Code:		ClientErrorOnNetRequestCode,
+		Err:     	err,
+		Message:  	fmt.Sprintf("[Client Error]: Network Request Error | [Request]:%s" ,info),
 	}
 }
