@@ -1,8 +1,9 @@
 package common
 
-import (
-	"github.com/gin-gonic/gin"
-	"net/http"
+const (
+	ResponseHeaderKey = "_resp_header"  // 传递给ResponseMiddleware的http header设置键名
+	ResponseDataKey = "_resp_data"		// // 传递给ResponseMiddleware的响应信息设置键名
+
 )
 
 const (
@@ -12,7 +13,7 @@ const (
 )
 
 const (
-	StatusOK = "OK"
+	MessageOK = "OK"
 
 )
 
@@ -20,14 +21,14 @@ const (
 /* 统一响应信息格式 */
 type Response struct {
 	Code int			`json:"code"`			// 自定义响应码
-	Status string 		`json:"status"`			// 自定义码解释
+	Message string 		`json:"msg"`			// 自定义码解释
 	Data interface{} 	`json:"data"`			// 放置任何类型的返回数据
 }
 
-func GinResponseOK(ctx *gin.Context ,data interface{})  {
-	ctx.JSON(http.StatusOK,Response{
+func ResponseOK(data interface{}) Response {
+	return Response{
 		Code: CodeOK,
-		Status: StatusOK,
+		Message: MessageOK,
 		Data:data,
-	})
+	}
 }

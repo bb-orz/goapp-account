@@ -2,8 +2,6 @@ package common
 
 import (
 	"fmt"
-	// "github.com/bb-orz/goinfras/XValidate"
-	// "gopkg.in/go-playground/validator.v9"
 )
 
 // 可暴露给客户端的错误类型

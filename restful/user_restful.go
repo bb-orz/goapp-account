@@ -61,8 +61,9 @@ func (api *UserApi) loginHandler(ctx *gin.Context) {
 		_ = ctx.Error(err)
 		return
 	}
-	// Send Response ...
-	common.GinResponseOK(ctx,gin.H{"token":token})
+
+	// Send Data to Response Middleware ...
+	ctx.Set(common.ResponseDataKey,common.ResponseOK(gin.H{"token":token}))
 }
 
 /*用户登出*/

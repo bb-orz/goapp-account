@@ -16,7 +16,6 @@ func ErrorMiddleware() gin.HandlerFunc {
 		// 错误处理在业务处理后，响应之前
 		ctx.Next()
 
-
 		// 判断错误类型是服务端内部错误还是客户端逻辑错误
 		e := ctx.Errors.Last().Err
 		if e != nil {
