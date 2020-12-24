@@ -19,6 +19,6 @@ type ISmsService interface {
 }
 
 type SendPhoneVerifiedCodeDTO struct {
-	ID    uint `validate:"required,numeric"`
-	Phone uint `validate:"required,numeric"`
+	ID    uint `validate:"required,numeric";json:"id"`
+	Phone uint `validate:"required,numeric";json:"phone"`
 }

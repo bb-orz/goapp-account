@@ -82,89 +82,89 @@ type UserOAuthsDTO struct {
 */
 
 type QQLoginDTO struct {
-	AccessCode string `validate:"required"`
+	AccessCode string `validate:"required";json:"access_code"`
 }
 
 type WechatLoginDTO struct {
-	AccessCode string `validate:"required"`
+	AccessCode string `validate:"required";json:"access_code"`
 }
 
 type WeiboLoginDTO struct {
-	AccessCode string `validate:"required"`
+	AccessCode string `validate:"required";json:"access_code"`
 }
 
 // 创建用户的数据传输对象
 type CreateUserWithEmailDTO struct {
-	Name       string `validate:"required,alphanum"`
-	Email      string `validate:"required,email"`
-	Password   string `validate:"required,alphanumunicode"`
-	RePassword string `validate:"required,alphanumunicode,eqfield=Password"`
+	Name       string `validate:"required,alphanum";json:"name"`
+	Email      string `validate:"required,email";json:"email"`
+	Password   string `validate:"required,alphanumunicode";json:"password"`
+	RePassword string `validate:"required,alphanumunicode,eqfield=Password";json:"repassword"`
 }
 
 // 创建用户的数据传输对象
 type CreateUserWithPhoneDTO struct {
-	Name       string `validate:"required,alphanum"`
-	Phone      string `validate:"required,numeric,eq=11"`
-	Password   string `validate:"required,alphanumunicode"`
-	RePassword string `validate:"required,alphanumunicode,eqfield=Password"`
+	Name       string `validate:"required,alphanum";json:"name"`
+	Phone      string `validate:"required,numeric,eq=11";json:"phone"`
+	Password   string `validate:"required,alphanumunicode";json:"password"`
+	RePassword string `validate:"required,alphanumunicode,eqfield=Password";json:"repassword"`
 }
 
 // 邮箱密码鉴权数据传输对象
 type AuthWithEmailPasswordDTO struct {
-	Email    string `validate:"required,email"`
-	Password string `validate:"required,alphanumunicode"`
+	Email    string `validate:"required,email";json:"email"`
+	Password string `validate:"required,alphanumunicode";json:"password"`
 }
 
 // 手机号密码鉴权数据传输对象
 type AuthWithPhonePasswordDTO struct {
-	Phone    string `validate:"required,numeric,eq=11"`
-	Password string `validate:"required,alphanumunicode"`
+	Phone    string `validate:"required,numeric,eq=11";json:"phone"`
+	Password string `validate:"required,alphanumunicode";json:"password"`
 }
 
 type GetUserInfoDTO struct {
-	ID uint `validate:"required,numeric"`
+	ID uint `validate:"required,numeric";json:"id"`
 }
 
 // 修改用户新息的数据传输对象
 type SetUserInfoDTO struct {
-	ID     uint   `validate:"required,numeric"`
-	Name   string `validate:"alpha"`
-	Age    uint   `validate:"numeric"`
-	Avatar string `validate:"alphanumunicode"`
-	Gender uint   `validate:"numeric"`
-	Status uint   `validate:"numeric"`
+	ID     uint   `validate:"required,numeric";json:"id"`
+	Name   string `validate:"alpha";json:"name"`
+	Age    uint   `validate:"numeric";json:"age"`
+	Avatar string `validate:"alphanumunicode";json:"avatar"`
+	Gender uint   `validate:"numeric";json:"gender"`
+	Status uint   `validate:"numeric";json:"status"`
 }
 
 // 设置用户状态数据传输对象
 type SetStatusDTO struct {
-	ID     uint `validate:"required,numeric"`
-	Status uint `validate:"required,numeric"` // TODO 验证枚举0/1/2
+	ID     uint `validate:"required,numeric";json:"id"`
+	Status uint `validate:"required,numeric";json:"status"` // TODO 验证枚举0/1/2
 }
 
 // 验证邮箱数据传输对象
 type ValidateEmailDTO struct {
-	ID           uint   `validate:"required,numeric"`
-	VerifiedCode string `validate:"required,alphanum"`
+	ID           uint   `validate:"required,numeric";json:"id"`
+	VerifiedCode string `validate:"required,alphanum";json:"verified_code"`
 }
 
 // 验证手机号码数据传输对象
 type ValidatePhoneDTO struct {
-	ID           uint   `validate:"required,numeric"`
-	VerifiedCode string `validate:"required,numeric"`
+	ID           uint   `validate:"required,numeric";json:"id"`
+	VerifiedCode string `validate:"required,alphanum";json:"verified_code"`
 }
 
 // 更改密码数据传输对象
 type ChangePasswordDTO struct {
-	ID    uint   `validate:"required,numeric"`
-	Old   string `validate:"required,alphanumunicode"`
-	New   string `validate:"required,alphanumunicode"`
-	ReNew string `validate:"required,alphanumunicode"`
+	ID    uint   `validate:"required,numeric";json:"id"`
+	Old   string `validate:"required,alphanumunicode";json:"old"`
+	New   string `validate:"required,alphanumunicode";json:"new"`
+	ReNew string `validate:"required,alphanumunicode";json:"renew"`
 }
 
 // 忘记密码数据传输对象
 type ForgetPasswordDTO struct {
-	ID    uint   `validate:"required,numeric"`
-	Code  string `validate:"required,alphanum"` // 允许重设密码的key值，服务端生成后被发往邮箱，用户点击过来后接收
-	New   string `validate:"required,alphanumunicode"`
-	ReNew string `validate:"required,alphanumunicode"`
+	ID    uint   `validate:"required,numeric";json:"id"`
+	Code  string `validate:"required,alphanum";json:"code"` // 允许重设密码的key值，服务端生成后被发往邮箱，用户点击过来后接收
+	New   string `validate:"required,alphanumunicode";json:"new"`
+	ReNew string `validate:"required,alphanumunicode";json:"renew"`
 }

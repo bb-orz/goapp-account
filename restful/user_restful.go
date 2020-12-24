@@ -50,13 +50,13 @@ func (api *UserApi) SetRoutes() {
 /*用户登录*/
 func (api *UserApi) loginHandler(ctx *gin.Context) {
 	// Receive Request ...
-	email := ctx.PostForm("email")
-	passwd := ctx.PostForm("password")
 
+	var dto services.AuthWithEmailPasswordDTO
+	err := ctx.ShouldBindJSON(&dto)
 
 	// Call Services method ...
 	userService := services.GetUserService()
-	token, err := userService.EmailAuth(services.AuthWithEmailPasswordDTO{Email:email,Password:passwd})
+	token, err := userService.EmailAuth(dto)
 	if err != nil {
 		_ = ctx.Error(err)
 		return
