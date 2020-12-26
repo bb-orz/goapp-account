@@ -3,8 +3,9 @@ package restful
 import (
 	"github.com/bb-orz/goinfras/XGin"
 	"github.com/bb-orz/goinfras/XJwt"
-	"github.com/bb-orz/goinfras/XLogger"
 	"github.com/gin-gonic/gin"
+	"goinfras-sample-account/common"
+	"goinfras-sample-account/dtos"
 	"goinfras-sample-account/restful/middleware"
 	"goinfras-sample-account/services"
 	"net/http"
@@ -50,28 +51,25 @@ func (api *UserApi) SetRoutes() {
 
 /*用户登录*/
 func (api *UserApi) loginHandler(ctx *gin.Context) {
-	// Receive Request ...
 
-
-	var dto services.AuthWithEmailPasswordDTO
+	// 接收参数由dto封装验证
+	var dto dtos.AuthWithEmailPasswordDTO
 	err := ctx.ShouldBindJSON(&dto)
 	if err != nil {
 		_ = ctx.Error(err)
 		return
 	}
 
-	// // Call Services method ...
+	// 调用service方法处理核心业务逻辑
 	userService := services.GetUserService()
 	token, err := userService.EmailAuth(dto)
 	if err != nil {
-		_ = ctx.Error(err)
+		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
 		return
 	}
-	XLogger.XCommon().Info(token)
-	ctx.JSON(http.StatusOK,gin.H{"token":token})
 
-	// Send Data to Response Middleware ...
-	// ctx.Set(common.ResponseDataKey,common.ResponseOK(gin.H{"token":token}))
+	// 最后数据传递给响应中间件处理
+	ctx.Set(common.ResponseDataKey,common.ResponseOK(gin.H{"token":token}))
 }
 
 /*用户登出*/

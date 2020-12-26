@@ -21,19 +21,16 @@ func ErrorMiddleware() gin.HandlerFunc {
 		if e != nil {
 			err := e.Err
 			switch err.(type) {
-			case common.SError:  	// 服务端内部业务错误，需记录日志，并返回统一的服务端错误信息，隐藏内部错误
-				XLogger.XCommon().Error(err.(common.SError).Printf())
-				ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
-					"code":common.ServerInnerErrorCode,
-					"message":err.Error(),
-					"error": "server inner error!",
-				})
-
-			case common.CError:    	// 返回统一定制的客户端错误信息
+			case common.SError:
+				XLogger.XCommon().Error(err.(common.SError).Printf()) 						 // 服务端内部业务错误，需记录日志，并返回统一的服务端错误信息，隐藏内部错误
+				ctx.JSON(http.StatusInternalServerError,common.ResponseServerInnerError())	 // 输出统一的服务器错误响应信息
+			case common.CError:
+				// 返回统一定制的客户端错误信息
 				switch err.(common.CError).Err.(type){
-				case validator.ValidationErrors:  // 验证请求相关参数错误
+				case validator.ValidationErrors:  // 请求参数验证错误
+					// TODO 继续优化封装
 					ctx.JSON(http.StatusNotAcceptable,map[string]interface{}{
-						"code":common.ClientErrorOnValidateCode,
+						"code":common.ResponseCodeValidateFail,
 						"message":err.(common.CError).Message,
 						"error":err.(common.CError).Err.(validator.ValidationErrors).Translate(XValidate.XTranslater()),
 					})

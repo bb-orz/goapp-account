@@ -4,6 +4,7 @@ import (
 	"github.com/bb-orz/goinfras/XValidate"
 	"goinfras-sample-account/common"
 	"goinfras-sample-account/core/verified"
+	"goinfras-sample-account/dtos"
 	"goinfras-sample-account/services"
 	"sync"
 )
@@ -26,7 +27,7 @@ func init() {
 type SmsServiceV1 struct {}
 
 // 发送绑定手机短信验证码
-func (service *SmsServiceV1) SendPhoneVerifiedCode(dto services.SendPhoneVerifiedCodeDTO) error {
+func (service *SmsServiceV1) SendPhoneVerifiedCode(dto dtos.SendPhoneVerifiedCodeDTO) error {
 	var err error
 	var verifiedDomain *verified.VerifiedDomain
 	verifiedDomain = verified.NewVerifiedDomain()

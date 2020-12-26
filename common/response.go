@@ -7,14 +7,19 @@ const (
 )
 
 const (
-	CodeOK  = (iota + 1) * 1000
-
-
+	ResponseCodeOK  = (iota + 1) * 1000
+	ResponseCodeAuthFail
+	ResponseCodeValidateFail
+	ResponseCodeVerifiedFail
+	ResponseCodeServerInnerError
 )
 
 const (
-	MessageOK = "OK"
-
+	ResponseMessageOK = "OK"
+	ResponseMessageAuthFail = "Auth Fail"
+	ResponseMessageValidateFail = "Validate Fail"
+	ResponseMessageVerifiedFail = "Verified Fail"
+	ResponseMessageServerInnerError = "Server Inner Error"
 )
 
 
@@ -22,50 +27,64 @@ const (
 type Response struct {
 	Code int			`json:"code"`			// 自定义响应码
 	Message string 		`json:"msg"`			// 自定义码解释
-	Data interface{} 	`json:"data"`			// 放置任何类型的返回数据
+	Data interface{} 	`json:"error"`			// 放置任何类型的返回数据
 }
 
 /* 客户端错误信息响应格式*/
 type CEResponse struct {
 	Code int			`json:"code"`			// 自定义响应码
 	Message string 		`json:"msg"`			// 自定义码解释
-	Error CError 		`json:"data"`			// 客户端错误信息
+	Error CError 		`json:"error"`			// 客户端错误信息
 }
 
 /*服务端错误信息响应格式*/
 type SEResponse struct  {
 	Code int			`json:"code"`			// 自定义响应码
 	Message string 		`json:"msg"`			// 自定义码解释
-	Error error 		`json:"data"`			// 可暴露给用户的服务端错误信息
+	Error string 		`json:"error"`			// 可暴露给用户的服务端错误信息
 }
 
 
 // 正常响应
 func ResponseOK(data interface{}) Response {
 	return Response{
-		Code: CodeOK,
-		Message: MessageOK,
+		Code: ResponseCodeOK,
+		Message: ResponseMessageOK,
 		Data:data,
 	}
 }
 
 // 无访问权限错误响应
-func ResponseNoAuth() CEResponse {
+func ResponseAuthFail(err CError) CEResponse {
 	return CEResponse{
-
+		Code:ResponseCodeAuthFail,
+		Message :ResponseMessageAuthFail,
+		Error : err,
 	}
 }
 
 // 请求参数失败响应
-func ResponseValidateFail() CEResponse {
-	return CEResponse{}
+func ResponseValidateFail(err CError) CEResponse {
+	return CEResponse{
+		Code:ResponseCodeValidateFail,
+		Message :ResponseMessageValidateFail,
+		Error : err,
+	}
 }
 
 // 数据验证失败响应
-func ResponseVerifiedFail() CEResponse  {
-	return CEResponse{}
+func ResponseVerifiedFail(err CError) CEResponse  {
+	return CEResponse{
+		Code:ResponseCodeVerifiedFail,
+		Message :ResponseMessageVerifiedFail,
+		Error : err,
+	}
 }
 
 func ResponseServerInnerError() SEResponse  {
-	return SEResponse{}
+	return SEResponse{
+		Code:ResponseCodeServerInnerError,
+		Message :ResponseMessageServerInnerError,
+		Error : "Server Inner Error,Please contact developer or administrator",
+	}
 }

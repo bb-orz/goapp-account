@@ -4,6 +4,7 @@ import (
 	"github.com/bb-orz/goinfras/XValidate"
 	"goinfras-sample-account/common"
 	"goinfras-sample-account/core/verified"
+	"goinfras-sample-account/dtos"
 	"goinfras-sample-account/services"
 	"sync"
 )
@@ -28,7 +29,7 @@ type MailServiceV1 struct {
 }
 
 // 发送绑定邮箱验证码到指定邮箱
-func (service *MailServiceV1) SendEmailForVerified(dto services.SendEmailForVerifiedDTO) error {
+func (service *MailServiceV1) SendEmailForVerified(dto dtos.SendEmailForVerifiedDTO) error {
 	var err error
 	var verifiedDomain *verified.VerifiedDomain
 	verifiedDomain = verified.NewVerifiedDomain()
@@ -46,7 +47,7 @@ func (service *MailServiceV1) SendEmailForVerified(dto services.SendEmailForVeri
 }
 
 // 发送忘记密码链接到邮箱
-func (service *MailServiceV1) SendEmailForgetPassword(dto services.SendEmailForgetPasswordDTO) error {
+func (service *MailServiceV1) SendEmailForgetPassword(dto dtos.SendEmailForgetPasswordDTO) error {
 	var err error
 	var verifiedDomain *verified.VerifiedDomain
 	verifiedDomain = verified.NewVerifiedDomain()

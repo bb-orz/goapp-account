@@ -8,6 +8,7 @@ import (
 	"goinfras-sample-account/core/oauth2"
 	"goinfras-sample-account/core/user"
 	"goinfras-sample-account/core/verified"
+	"goinfras-sample-account/dtos"
 	"goinfras-sample-account/services"
 	"sync"
 )
@@ -31,10 +32,10 @@ func init() {
 type UserServiceV1 struct {}
 
 // 邮箱创建用户账号
-func (service *UserServiceV1) CreateUserWithEmail(dto services.CreateUserWithEmailDTO) (*services.UserDTO, error) {
+func (service *UserServiceV1) CreateUserWithEmail(dto dtos.CreateUserWithEmailDTO) (*dtos.UserDTO, error) {
 	var err error
 	var isExist bool
-	var userDTO *services.UserDTO
+	var userDTO *dtos.UserDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
@@ -58,10 +59,10 @@ func (service *UserServiceV1) CreateUserWithEmail(dto services.CreateUserWithEma
 }
 
 // 手机号码创建用户账号
-func (service *UserServiceV1) CreateUserWithPhone(dto services.CreateUserWithPhoneDTO) (*services.UserDTO, error) {
+func (service *UserServiceV1) CreateUserWithPhone(dto dtos.CreateUserWithPhoneDTO) (*dtos.UserDTO, error) {
 	var err error
 	var isExist bool
-	var userDTO *services.UserDTO
+	var userDTO *dtos.UserDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
@@ -85,10 +86,10 @@ func (service *UserServiceV1) CreateUserWithPhone(dto services.CreateUserWithPho
 }
 
 // 邮箱账号登录鉴权
-func (service *UserServiceV1) EmailAuth(dto services.AuthWithEmailPasswordDTO) (string, error) {
+func (service *UserServiceV1) EmailAuth(dto dtos.AuthWithEmailPasswordDTO) (string, error) {
 	var err error
 	var token string
-	var userDTO *services.UserDTO
+	var userDTO *dtos.UserDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
@@ -118,10 +119,10 @@ func (service *UserServiceV1) EmailAuth(dto services.AuthWithEmailPasswordDTO) (
 }
 
 // 手机账号登录鉴权
-func (service *UserServiceV1) PhoneAuth(dto services.AuthWithPhonePasswordDTO) (string, error) {
+func (service *UserServiceV1) PhoneAuth(dto dtos.AuthWithPhonePasswordDTO) (string, error) {
 	var err error
 	var token string
-	var userDTO *services.UserDTO
+	var userDTO *dtos.UserDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
@@ -153,9 +154,9 @@ func (service *UserServiceV1) PhoneAuth(dto services.AuthWithPhonePasswordDTO) (
 }
 
 // 获取用户信息
-func (service *UserServiceV1) GetUserInfo(dto services.GetUserInfoDTO) (*services.UserDTO, error) {
+func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserDTO, error) {
 	var err error
-	var userDTO *services.UserDTO
+	var userDTO *dtos.UserDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
@@ -174,7 +175,7 @@ func (service *UserServiceV1) GetUserInfo(dto services.GetUserInfoDTO) (*service
 }
 
 // 批量设置用户信息
-func (service *UserServiceV1) SetUserInfos(dto services.SetUserInfoDTO) error {
+func (service *UserServiceV1) SetUserInfos(dto dtos.SetUserInfoDTO) error {
 	var err error
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
@@ -194,7 +195,7 @@ func (service *UserServiceV1) SetUserInfos(dto services.SetUserInfoDTO) error {
 }
 
 // 验证用户邮箱
-func (service *UserServiceV1) ValidateEmail(dto services.ValidateEmailDTO) (bool, error) {
+func (service *UserServiceV1) ValidateEmail(dto dtos.ValidateEmailDTO) (bool, error) {
 	var err error
 	var pass bool
 	var verifiedDomain *verified.VerifiedDomain
@@ -219,7 +220,7 @@ func (service *UserServiceV1) ValidateEmail(dto services.ValidateEmailDTO) (bool
 }
 
 // 验证手机号码
-func (service *UserServiceV1) ValidatePhone(dto services.ValidatePhoneDTO) (bool, error) {
+func (service *UserServiceV1) ValidatePhone(dto dtos.ValidatePhoneDTO) (bool, error) {
 	var err error
 	var pass bool
 	var verifiedDomain *verified.VerifiedDomain
@@ -244,7 +245,7 @@ func (service *UserServiceV1) ValidatePhone(dto services.ValidatePhoneDTO) (bool
 }
 
 // 设置用户账号状态
-func (service *UserServiceV1) SetStatus(dto services.SetStatusDTO) (int, error) {
+func (service *UserServiceV1) SetStatus(dto dtos.SetStatusDTO) (int, error) {
 	var err error
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
@@ -263,9 +264,9 @@ func (service *UserServiceV1) SetStatus(dto services.SetStatusDTO) (int, error) 
 }
 
 // 修改用户密码
-func (service *UserServiceV1) ChangePassword(dto services.ChangePasswordDTO) error {
+func (service *UserServiceV1) ChangePassword(dto dtos.ChangePasswordDTO) error {
 	var err error
-	var userDTO *services.UserDTO
+	var userDTO *dtos.UserDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
@@ -297,7 +298,7 @@ func (service *UserServiceV1) ChangePassword(dto services.ChangePasswordDTO) err
 }
 
 // 忘记密码重设
-func (service *UserServiceV1) ForgetPassword(dto services.ForgetPasswordDTO) error {
+func (service *UserServiceV1) ForgetPassword(dto dtos.ForgetPasswordDTO) error {
 	var err error
 	var isExist bool
 	var isVerified bool
@@ -341,12 +342,12 @@ func (service *UserServiceV1) UploadAvatar() error {
 }
 
 // qq oauth 鉴权
-func (service *UserServiceV1) QQOAuth(dto services.QQLoginDTO) (string, error) {
+func (service *UserServiceV1) QQOAuth(dto dtos.QQLoginDTO) (string, error) {
 	var err error
 	var token string
 	var qqOauthAccountInfo *XOAuth.OAuthAccountInfo // qq账号鉴权信息
-	var findUserBindingDTO *services.UserOAuthsDTO  // 查找绑定用户
-	var userOAuthsInfo *services.UserOAuthsDTO      // 创建用户后的信息
+	var findUserBindingDTO *dtos.UserOAuthsDTO  // 查找绑定用户
+	var userOAuthsInfo *dtos.UserOAuthsDTO      // 创建用户后的信息
 
 	var oauthDomain *oauth2.OauthDomain
 	var userDomain *user.UserDomain
@@ -401,12 +402,12 @@ func (service *UserServiceV1) QQOAuth(dto services.QQLoginDTO) (string, error) {
 }
 
 // wechat Oauth 鉴权
-func (service *UserServiceV1) WechatOAuth(dto services.WechatLoginDTO) (string, error) {
+func (service *UserServiceV1) WechatOAuth(dto dtos.WechatLoginDTO) (string, error) {
 	var err error
 	var token string
 	var wechatOauthAccountInfo *XOAuth.OAuthAccountInfo // 微信账号鉴权信息
-	var findUserBindingDTO *services.UserOAuthsDTO      // 查找绑定用户
-	var userOAuthsInfo *services.UserOAuthsDTO          // 创建用户后的信息
+	var findUserBindingDTO *dtos.UserOAuthsDTO      // 查找绑定用户
+	var userOAuthsInfo *dtos.UserOAuthsDTO          // 创建用户后的信息
 
 	var oauthDomain *oauth2.OauthDomain
 	var userDomain *user.UserDomain
@@ -461,12 +462,12 @@ func (service *UserServiceV1) WechatOAuth(dto services.WechatLoginDTO) (string, 
 }
 
 // 微博 Oauth 鉴权
-func (service *UserServiceV1) WeiboOAuth(dto services.WeiboLoginDTO) (string, error) {
+func (service *UserServiceV1) WeiboOAuth(dto dtos.WeiboLoginDTO) (string, error) {
 	var err error
 	var token string
 	var weiboOauthAccountInfo *XOAuth.OAuthAccountInfo // 微博账号鉴权信息
-	var findUserBindingDTO *services.UserOAuthsDTO     // 查找绑定用户
-	var userOAuthsInfo *services.UserOAuthsDTO         // 创建用户后的信息
+	var findUserBindingDTO *dtos.UserOAuthsDTO     // 查找绑定用户
+	var userOAuthsInfo *dtos.UserOAuthsDTO         // 创建用户后的信息
 
 	var oauthDomain *oauth2.OauthDomain
 	var userDomain *user.UserDomain

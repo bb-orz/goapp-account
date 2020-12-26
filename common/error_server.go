@@ -140,13 +140,13 @@ func DomainInnerErrorOnNoSqlShamDelete(err error,method string) SError {
 }
 
 // 缓存设置错误包装方法
-func DomainInnerErrorOnCacheSet(err error,command string) SError {
-	return ServerErrorWrapper(err,ErrorOnCacheSetFormat,command)
+func DomainInnerErrorOnCacheSet(err error,method string) SError {
+	return ServerErrorWrapper(err,ErrorOnCacheSetFormat,method)
 }
 
 // 缓存获取错误包装方法
-func DomainInnerErrorOnCacheGet(err error,command string) SError {
-	return ServerErrorWrapper(err,ErrorOnCacheGetFormat,command)
+func DomainInnerErrorOnCacheGet(err error,method string) SError {
+	return ServerErrorWrapper(err,ErrorOnCacheGetFormat,method)
 }
 
 // 网络请求错误包装方法

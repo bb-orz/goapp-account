@@ -1,6 +1,7 @@
 package verified
 
 import (
+	"errors"
 	"fmt"
 	"github.com/bb-orz/goinfras/XGlobal"
 	"github.com/bb-orz/goinfras/XMail"
@@ -71,19 +72,16 @@ func (domain *VerifiedDomain) SendValidateEmail(dto services.SendEmailForVerifie
 
 // 注册时验证邮箱
 func (domain *VerifiedDomain) VerifiedEmail(uid uint, vcode string) (bool, error) {
-	var err error
 	var code string
+	var isExist bool
 	// 缓存取出
-	code, err = domain.cache.GetUserVerifiedEmailCode(uid)
-	if err != nil {
-		return false,common.DomainInnerErrorOnCacheGet(err, "GetUserVerifiedEmailCode")
+	if code, isExist = domain.cache.GetUserVerifiedEmailCode(uid);!isExist {
+		return false,common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"), "GetUserVerifiedEmailCode")
 	}
-
 	// 校验
 	if vcode == code {
 		return true, nil
 	}
-
 	return false, nil
 }
 
@@ -107,42 +105,39 @@ func (domain *VerifiedDomain) genResetPasswordCode(uid uint) (string, error) {
 func (domain *VerifiedDomain) sendResetPasswordCodeEmail(address string, code string) error {
 	from := "no-reply@" + XGlobal.GetHost()
 	subject := "Reset Password Code From " + XGlobal.GetAppName()
-	// TODO 设置重置密码的链接
+	// 设置重置密码的链接
 	url := XGlobal.GetHost() + "?code=" + code
 	body := fmt.Sprintf("Click This link To Reset Your Password: %s", url)
+
+	// 发送邮件
 	err := XMail.XCommonMail().SendSimpleMail(from,"","", subject, body,"text/plain","",[]string{address})
 	if err != nil {
 		return common.DomainInnerErrorOnNetRequest(err, "SendSimpleMail")
 	}
+
 	return nil
 }
 
 // 发送验证码到邮箱
 func (domain *VerifiedDomain) SendResetPasswordCodeEmail(dto services.SendEmailForgetPasswordDTO) error {
-	var err error
-	var code string
 
-	uid := dto.ID
-	email := dto.Email
-
-	code, err = domain.genResetPasswordCode(uid)
+	code, err := domain.genResetPasswordCode(dto.ID)
 	if err != nil {
 		return err
 	}
 
 	// 发送邮件
-	return domain.sendResetPasswordCodeEmail(email, code)
+	return domain.sendResetPasswordCodeEmail(dto.Email, code)
 }
 
 // 忘记密码时验证重置码
 func (domain *VerifiedDomain) VerifiedResetPasswordCode(uid uint, vcode string) (bool, error) {
-	var err error
+	var isExist bool
 	var code string
 
 	// 缓存取出
-	code, err = domain.cache.GetForgetPasswordVerifiedCode(uid)
-	if err != nil {
-		return false, common.DomainInnerErrorOnCacheGet(err, "GetForgetPasswordVerifiedCode")
+	if code, isExist = domain.cache.GetForgetPasswordVerifiedCode(uid);!isExist{
+		return false, common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"), "GetForgetPasswordVerifiedCode")
 	}
 
 	// 校验
@@ -197,19 +192,18 @@ func (domain *VerifiedDomain) SendValidatePhoneMsg(dto services.SendPhoneVerifie
 
 // 注册时验证手机短信
 func (domain *VerifiedDomain) VerifiedPhone(uid uint, vcode string) (bool, error) {
-	var err error
+	var isExist bool
 	var code string
 
 	// 缓存取出
-	code, err = domain.cache.GetUserVerifiedPhoneCode(uid)
-	if err != nil {
-		return false, common.DomainInnerErrorOnCacheGet(err,"GetUserVerifiedPhoneCode")
+	if code, isExist = domain.cache.GetUserVerifiedPhoneCode(uid);!isExist {
+		return false, common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"),"GetUserVerifiedPhoneCode")
 	}
 
 	// 校验
 	if vcode == code {
 		return true, nil
 	}else {
-		return false,common.DomainInnerErrorOnDecodeData(err,fmt.Sprintf("[validating code]:%s | [cache code]:%s",vcode,code))
+		return false,common.DomainInnerErrorOnDecodeData(errors.New("code verified fail"),fmt.Sprintf("[validating code]:%s | [cache code]:%s",vcode,code))
 	}
 }
