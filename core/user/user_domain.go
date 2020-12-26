@@ -58,12 +58,6 @@ func (domain *UserDomain) GenToken(no, name, avatar string) (string, error) {
 		return "", common.DomainInnerErrorOnEncodeData(err, claim)
 	}
 
-	// 缓存
-	err = domain.cache.SetUserToken(no, token)
-	if err != nil {
-		return "", common.DomainInnerErrorOnCacheSet(err,"SetUserToken")
-	}
-
 	return token, nil
 }
 

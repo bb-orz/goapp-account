@@ -15,8 +15,3 @@ const (
 	WechatOauthPlatform
 	WeiboOauthPlatform
 )
-
-const (
-	UserCacheTokenPrefix = "user.token."    // 用户鉴权令牌缓存前缀
-	UserCacheTokenExpire = 60 * 60 * 23 * 7 // 用户鉴权令牌缓存超时
-)

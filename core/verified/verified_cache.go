@@ -1,7 +1,7 @@
 package verified
 
 import (
-	"github.com/bb-orz/goinfras/XStore/XRedis"
+	"github.com/bb-orz/goinfras/XCache/XRedis"
 	"github.com/garyburd/redigo/redis"
 	"strconv"
 )

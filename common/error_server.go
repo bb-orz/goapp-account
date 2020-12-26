@@ -5,6 +5,12 @@ import (
 	"runtime/debug"
 )
 
+// 客户端错误信息格式
+const (
+	ServerInnerErrorCode = 30001
+
+)
+
 // 服务端内部错误信息格式
 const (
 	// 服务端错误顶层包装信息格式
@@ -58,7 +64,14 @@ func (err SError) Error() string {
 
 // 打印包装器的错误信息，供日志记录器写入
 func (err SError) Printf() string {
-	return fmt.Sprintf("[Error Message]:%s | [StackTrace]:%s | [Misc]:%s | \n\t [Inner]:%s",err.Message,err.StackTrace,err.Misc,err.Inner)
+	var innerFormat string
+	switch err.Inner.(type) {
+	case SError:
+		innerFormat = "\t\t" + err.Inner.(SError).Printf()
+	default:
+		innerFormat = "[Final Error]:" + err.Inner.Error() + "\n =======================================[Inner Error End Off]===========================================\n"
+	}
+	return fmt.Sprintf("\n\t %s  | \n\t [StackTrace]:=========>  %s \n | [Inner]:%s ",err.Message,err.StackTrace,innerFormat)
 }
 
 // 工具函数：服务器内部错误信息在系统各模块传递时的“错误包装器”

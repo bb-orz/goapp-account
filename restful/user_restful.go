@@ -3,8 +3,9 @@ package restful
 import (
 	"github.com/bb-orz/goinfras/XGin"
 	"github.com/bb-orz/goinfras/XJwt"
+	"github.com/bb-orz/goinfras/XLogger"
 	"github.com/gin-gonic/gin"
-	"goinfras-sample-account/common"
+	"goinfras-sample-account/restful/middleware"
 	"goinfras-sample-account/services"
 	"net/http"
 )
@@ -27,7 +28,7 @@ func (api *UserApi) SetRoutes() {
 	// 如TokenUtils服务已初始化，添加中间件
 	var authMiddleware gin.HandlerFunc
 	if tku := XJwt.XTokenUtils(); tku == nil {
-		authMiddleware = XGin.JwtAuthMiddleware()
+		authMiddleware = middleware.JwtAuthMiddleware()
 	}
 
 	engine.POST("/login", api.loginHandler)
@@ -51,55 +52,96 @@ func (api *UserApi) SetRoutes() {
 func (api *UserApi) loginHandler(ctx *gin.Context) {
 	// Receive Request ...
 
+
 	var dto services.AuthWithEmailPasswordDTO
 	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
 
-	// Call Services method ...
+	// // Call Services method ...
 	userService := services.GetUserService()
 	token, err := userService.EmailAuth(dto)
 	if err != nil {
 		_ = ctx.Error(err)
 		return
 	}
+	XLogger.XCommon().Info(token)
+	ctx.JSON(http.StatusOK,gin.H{"token":token})
 
 	// Send Data to Response Middleware ...
-	ctx.Set(common.ResponseDataKey,common.ResponseOK(gin.H{"token":token}))
+	// ctx.Set(common.ResponseDataKey,common.ResponseOK(gin.H{"token":token}))
 }
 
 /*用户登出*/
 func (api *UserApi) logoutHandler(ctx *gin.Context) {
+	// TODO Receive Request ...
 
+	// TODO Call Services method ...
+
+	// TODO Send Data to Response Middleware ...
 
 }
 
 /*邮箱注册注册*/
 func (api *UserApi) registerEmailHandler(ctx *gin.Context) {
+	// TODO Receive Request ...
+
+	// TODO Call Services method ...
+
+	// TODO Send Data to Response Middleware ...
 
 }
 
 /*手机号码注册注册*/
 func (api *UserApi) registerPhoneHandler(ctx *gin.Context) {
+	// TODO Receive Request ...
+
+	// TODO Call Services method ...
+
+	// TODO Send Data to Response Middleware ...
 
 }
 
 /*qq oauth 登录*/
 func (api *UserApi) oauthQQHandler(ctx *gin.Context) {
+	// TODO Receive Request ...
+
+	// TODO Call Services method ...
+
+	// TODO Send Data to Response Middleware ...
 
 }
 
 /*微信oauth 登录*/
 func (api *UserApi) oauthWeixinHandler(ctx *gin.Context) {
+	// TODO Receive Request ...
+
+	// TODO Call Services method ...
+
+	// TODO Send Data to Response Middleware ...
 
 }
 
 /*微博oauth登录*/
 func (api *UserApi) oauthWeiboHandler(ctx *gin.Context) {
+	// TODO Receive Request ...
+
+	// TODO Call Services method ...
+
+	// TODO Send Data to Response Middleware ...
 
 }
 
 /*设置用户信息*/
 
 func (api *UserApi) setUserInfoHandler(ctx *gin.Context) {
+	// TODO Receive Request ...
+
+	// TODO Call Services method ...
+
+	// TODO Send Data to Response Middleware ...
 
 }
 
@@ -107,6 +149,11 @@ func (api *UserApi) setUserInfoHandler(ctx *gin.Context) {
 func (api *UserApi) getUserInfoHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 	ctx.JSON(http.StatusOK,gin.H{"id":id})
+	// TODO Receive Request ...
+
+	// TODO Call Services method ...
+
+	// TODO Send Data to Response Middleware ...
 
 
 }
