@@ -5,7 +5,7 @@ import (
 	"runtime/debug"
 )
 
-// 客户端错误信息格式
+// 服务器内部错误类型，不暴露给客户端，服务自身记录日志
 const (
 	ServerInnerErrorCode = 30001
 
