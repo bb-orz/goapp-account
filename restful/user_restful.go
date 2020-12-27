@@ -218,9 +218,10 @@ func (api *UserApi) setUserInfoHandler(ctx *gin.Context) {
 /*获取用户信息*/
 func (api *UserApi) getUserInfoHandler(ctx *gin.Context) {
 	// Receive Request ...
+
 	var dto dtos.GetUserInfoDTO
 	var err error
-	err = ctx.ShouldBindJSON(&dto)
+	err = ctx.ShouldBindUri(&dto)
 	if err != nil {
 		_ = ctx.Error(err)
 		return

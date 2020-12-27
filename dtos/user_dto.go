@@ -90,7 +90,7 @@ type RemoveTokenDTO struct {
 }
 
 type GetUserInfoDTO struct {
-	ID uint `validate:"required,numeric" json:"id"`
+	ID uint `validate:"required,numeric" json:"id" uri:"id"`
 }
 
 // 修改用户新息的数据传输对象

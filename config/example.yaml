@@ -10,7 +10,7 @@ Global:
 Gin:
   Mode:       debug            # 运行模式设置
   ListenHost: "127.0.0.1"      # 服务运行ip
-  ListenPort: 8099             # 服务运行端口
+  ListenPort: 8090             # 服务运行端口
   Tls:        false            # HTTPS相关配置，开关
   CertFile:   ""               # HTTPS相关配置，证书文件
   KeyFile:    ""               # HTTPS相关配置，私匙文件
@@ -33,9 +33,9 @@ Cron:
 # Json Web Token
 Jwt:
   UseCache: true                      # 是否打开redis缓存
-  PrivateKey: keykeykeykey            # jwt编码私钥
+  PrivateKey: "jwt_@key"            # jwt编码私钥
   ExpSeconds: 3600                      # jwt编码超时时间
-  TokenCacheKeyPrefix: user.jwt.token.  # 缓存令牌键名前缀
+  TokenCacheKeyPrefix: "user.jwt.token."  # 缓存令牌键名前缀
 
 # 第三方OAuth配置
 OAuth:

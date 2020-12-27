@@ -9,7 +9,7 @@
   "Gin": {
     "Mode": "debug",
     "ListenHost": "127.0.0.1",
-    "ListenPort": 8099,
+    "ListenPort": 8090,
     "Tls": false,
     "CertFile": "",
     "KeyFile": "",
