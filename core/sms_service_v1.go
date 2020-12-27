@@ -3,7 +3,7 @@ package core
 import (
 	"github.com/bb-orz/goinfras/XValidate"
 	"goinfras-sample-account/common"
-	"goinfras-sample-account/core/verified"
+	"goinfras-sample-account/core/verify"
 	"goinfras-sample-account/dtos"
 	"goinfras-sample-account/services"
 	"sync"
@@ -24,21 +24,21 @@ func init() {
 }
 
 // 短信服务实例V1
-type SmsServiceV1 struct {}
+type SmsServiceV1 struct{}
 
 // 发送绑定手机短信验证码
-func (service *SmsServiceV1) SendPhoneVerifiedCode(dto dtos.SendPhoneVerifiedCodeDTO) error {
+func (service *SmsServiceV1) SendPhoneVerifyCode(dto dtos.SendPhoneVerifyCodeDTO) error {
 	var err error
-	var verifiedDomain *verified.VerifiedDomain
-	verifiedDomain = verified.NewVerifiedDomain()
+	var verifyDomain *verify.VerifyDomain
+	verifyDomain = verify.NewVerifyDomain()
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return  common.ClientErrorOnValidateParameters(err)
+		return common.ClientErrorOnValidateParameters(err)
 	}
 
-	if err = verifiedDomain.SendValidatePhoneMsg(dto); err != nil {
-		return common.ServerInnerError(err, verifiedDomain.DomainName())
+	if err = verifyDomain.SendValidatePhoneMsg(dto); err != nil {
+		return common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}
 
 	return nil

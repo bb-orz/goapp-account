@@ -7,7 +7,7 @@ import (
 	"goinfras-sample-account/common"
 	"goinfras-sample-account/core/oauth2"
 	"goinfras-sample-account/core/user"
-	"goinfras-sample-account/core/verified"
+	"goinfras-sample-account/core/verify"
 	"goinfras-sample-account/dtos"
 	"goinfras-sample-account/services"
 	"sync"
@@ -29,7 +29,7 @@ func init() {
 }
 
 // 用户服务实例 V1
-type UserServiceV1 struct {}
+type UserServiceV1 struct{}
 
 // 邮箱创建用户账号
 func (service *UserServiceV1) CreateUserWithEmail(dto dtos.CreateUserWithEmailDTO) (*dtos.UserDTO, error) {
@@ -41,19 +41,19 @@ func (service *UserServiceV1) CreateUserWithEmail(dto dtos.CreateUserWithEmailDT
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return nil, common.ClientErrorOnValidateParameters(err)
+		return nil, common.ErrorOnValidate(err)
 	}
 
 	// 验证用户邮箱是否存在
 	if isExist, err = userDomain.IsEmailExist(dto.Email); err != nil {
-		return nil, common.ServerInnerError(err,userDomain.DomainName())
+		return nil, common.ErrorOnServerInner(err, userDomain.DomainName())
 	} else if isExist {
-		return nil, common.ClientErrorOnCheckInformation(err,  "Email Account Exist!")
+		return nil, common.ErrorOnVerify("Email Account Exist!")
 	}
 
 	userDTO, err = userDomain.CreateUserForEmail(dto)
 	if err != nil {
-		return nil, common.ServerInnerError(err, userDomain.DomainName())
+		return nil, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 	return userDTO, nil
 }
@@ -68,19 +68,19 @@ func (service *UserServiceV1) CreateUserWithPhone(dto dtos.CreateUserWithPhoneDT
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return nil, common.ClientErrorOnValidateParameters(err)
+		return nil, common.ErrorOnValidate(err)
 	}
 
 	// 验证用户手机号码是否存在
 	if isExist, err = userDomain.IsPhoneExist(dto.Phone); err != nil {
-		return nil, common.ServerInnerError(err,userDomain.DomainName())
+		return nil, common.ErrorOnServerInner(err, userDomain.DomainName())
 	} else if isExist {
-		return nil, common.ClientErrorOnCheckInformation(err, "Phone Account Exist!")
+		return nil, common.ErrorOnVerify("Phone Account Exist!")
 	}
 
 	userDTO, err = userDomain.CreateUserForPhone(dto)
 	if err != nil {
-		return nil, common.ServerInnerError(err, userDomain.DomainName())
+		return nil, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 	return userDTO, nil
 }
@@ -95,24 +95,24 @@ func (service *UserServiceV1) EmailAuth(dto dtos.AuthWithEmailPasswordDTO) (stri
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return "", common.ClientErrorOnValidateParameters(err)
+		return "", common.ErrorOnValidate(err)
 	}
 
 	// 查找邮件账号是否存在
 	if userDTO, err = userDomain.GetUserInfoByEmail(dto.Email); err != nil {
-		return "", common.ServerInnerError(err, userDomain.DomainName())
+		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 	if userDTO == nil {
-		return "", common.ClientErrorOnCheckInformation(err, "Email Account Not Exist!")
+		return "", common.ErrorOnVerify("Email Account Not Exist!")
 	} else if !XGlobal.ValidatePassword(dto.Password, userDTO.Salt, userDTO.Password) {
 		// 校验密码失败
-		return "", common.ClientErrorOnCheckInformation(err, "Password Error!")
+		return "", common.ErrorOnVerify("Password Error!")
 	}
 
 	// JWT token
 	token, err = userDomain.GenToken(userDTO.No, userDTO.Name, userDTO.Avatar)
 	if err != nil {
-		return "", common.ServerInnerError(err,userDomain.DomainName())
+		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
 	return token, nil
@@ -126,29 +126,28 @@ func (service *UserServiceV1) PhoneAuth(dto dtos.AuthWithPhonePasswordDTO) (stri
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
-
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return "", common.ClientErrorOnValidateParameters(err)
+		return "", common.ErrorOnValidate(err)
 	}
 
 	// 查找手机账号是否存在
 	userDTO, err = userDomain.GetUserInfoByPhone(dto.Phone)
 	if err != nil {
-		return "", common.ServerInnerError(err, userDomain.DomainName())
+		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
 	if userDTO == nil {
-		return "", common.ClientErrorOnCheckInformation(err, "Phone Account Not Exist!")
+		return "", common.ErrorOnVerify("Phone Account Not Exist!")
 	} else if !XGlobal.ValidatePassword(dto.Password, userDTO.Salt, userDTO.Password) {
 		// 校验密码失败
-		return "", common.ClientErrorOnCheckInformation(err, "Password Error!")
+		return "", common.ErrorOnVerify("Password Error!")
 	}
 
 	// JWT token
 	token, err = userDomain.GenToken(userDTO.No, userDTO.Name, userDTO.Avatar)
 	if err != nil {
-		return "", common.ServerInnerError(err, user.DomainName)
+		return "", common.ErrorOnServerInner(err, user.DomainName)
 	}
 	return token, nil
 }
@@ -162,13 +161,13 @@ func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserDT
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return nil, common.ClientErrorOnValidateParameters(err)
+		return nil, common.ErrorOnValidate(err)
 	}
 
 	// 查找用户信息
 	userDTO, err = userDomain.GetUserInfo(dto.ID)
 	if err != nil {
-		return nil, common.ServerInnerError(err, userDomain.DomainName())
+		return nil, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
 	return userDTO, nil
@@ -182,13 +181,13 @@ func (service *UserServiceV1) SetUserInfos(dto dtos.SetUserInfoDTO) error {
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return common.ClientErrorOnValidateParameters(err)
+		return common.ErrorOnValidate(err)
 	}
 
 	uid := dto.ID
 	err = userDomain.SetUserInfos(uid, dto)
 	if err != nil {
-		return common.ServerInnerError(err, userDomain.DomainName())
+		return common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
 	return nil
@@ -198,24 +197,24 @@ func (service *UserServiceV1) SetUserInfos(dto dtos.SetUserInfoDTO) error {
 func (service *UserServiceV1) ValidateEmail(dto dtos.ValidateEmailDTO) (bool, error) {
 	var err error
 	var pass bool
-	var verifiedDomain *verified.VerifiedDomain
-	verifiedDomain = verified.NewVerifiedDomain()
+	var verifyDomain *verify.VerifyDomain
+	verifyDomain = verify.NewVerifyDomain()
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return false, common.ClientErrorOnValidateParameters(err)
+		return false, common.ErrorOnValidate(err)
 	}
 
 	// 从cache拿出保存的邮箱验证码
-	pass, err = verifiedDomain.VerifiedEmail(dto.ID, dto.VerifiedCode)
+	pass, err = verifyDomain.VerifyEmail(dto.ID, dto.VerifyCode)
 	if err != nil {
-		return false, common.ServerInnerError(err, verifiedDomain.DomainName())
+		return false, common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}
 
 	if pass {
 		return true, nil
-	}else {
-		return false, common.ClientErrorOnCheckInformation(err,"Email Verified Code Error!")
+	} else {
+		return false, common.ErrorOnVerify("Email Verify Code Error!")
 	}
 }
 
@@ -223,24 +222,24 @@ func (service *UserServiceV1) ValidateEmail(dto dtos.ValidateEmailDTO) (bool, er
 func (service *UserServiceV1) ValidatePhone(dto dtos.ValidatePhoneDTO) (bool, error) {
 	var err error
 	var pass bool
-	var verifiedDomain *verified.VerifiedDomain
-	verifiedDomain = verified.NewVerifiedDomain()
+	var verifyDomain *verify.VerifyDomain
+	verifyDomain = verify.NewVerifyDomain()
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return false, common.ClientErrorOnValidateParameters(err)
+		return false, common.ErrorOnValidate(err)
 	}
 
 	// 从cache拿出保存的短信验证码
-	pass, err = verifiedDomain.VerifiedPhone(dto.ID, dto.VerifiedCode)
+	pass, err = verifyDomain.VerifyPhone(dto.ID, dto.VerifyCode)
 	if err != nil {
-		return false, common.ServerInnerError(err, verifiedDomain.DomainName())
+		return false, common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}
 
 	if pass {
 		return true, nil
-	}else {
-		return false, common.ClientErrorOnCheckInformation(err,"Sms Verified Code Error!")
+	} else {
+		return false, common.ErrorOnVerify("Sms Verify Code Error!")
 	}
 }
 
@@ -252,12 +251,12 @@ func (service *UserServiceV1) SetStatus(dto dtos.SetStatusDTO) (int, error) {
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return -1, common.ClientErrorOnValidateParameters(err)
+		return -1, common.ErrorOnValidate(err)
 	}
 
 	err = userDomain.SetStatus(dto.ID, dto.Status)
 	if err != nil {
-		return -1, common.ServerInnerError(err, userDomain.DomainName())
+		return -1, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
 	return 0, nil
@@ -272,26 +271,26 @@ func (service *UserServiceV1) ChangePassword(dto dtos.ChangePasswordDTO) error {
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return common.ClientErrorOnValidateParameters(err)
+		return common.ErrorOnValidate(err)
 	}
 
 	// 查找账号是否存在
 	userDTO, err = userDomain.GetUserInfo(dto.ID)
 	if err != nil {
-		return common.ServerInnerError(err, userDomain.DomainName())
+		return common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
 	// 校验旧密码
 	if userDTO == nil {
-		return common.ClientErrorOnCheckInformation(err, "Account Not Exist!")
+		return common.ErrorOnVerify("Account Not Exist!")
 	} else if !XGlobal.ValidatePassword(dto.Old, userDTO.Salt, userDTO.Password) {
 		// 校验旧密码失败
-		return common.ClientErrorOnCheckInformation(err, "Old Password Is Wrong!")
+		return common.ErrorOnVerify("Old Password Is Wrong!")
 	}
 
 	// 设置新密码
 	if err = userDomain.ReSetPassword(dto.ID, dto.New); err != nil {
-		return common.ServerInnerError(err, userDomain.DomainName())
+		return common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
 	return nil
@@ -301,34 +300,34 @@ func (service *UserServiceV1) ChangePassword(dto dtos.ChangePasswordDTO) error {
 func (service *UserServiceV1) ForgetPassword(dto dtos.ForgetPasswordDTO) error {
 	var err error
 	var isExist bool
-	var isVerified bool
+	var isVerify bool
 	var userDomain *user.UserDomain
-	var verifiedDomain *verified.VerifiedDomain
+	var verifyDomain *verify.VerifyDomain
 	userDomain = user.NewUserDomain()
-	verifiedDomain = verified.NewVerifiedDomain()
+	verifyDomain = verify.NewVerifyDomain()
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return common.ClientErrorOnValidateParameters(err)
+		return common.ErrorOnValidate(err)
 	}
 
 	// 查找账号是否存在
 	isExist, err = userDomain.IsUserExist(dto.ID)
 	if err != nil {
-		return common.ServerInnerError(err, userDomain.DomainName())
+		return common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 	if !isExist {
-		return common.ClientErrorOnCheckInformation(err, "Account Not Exist!")
+		return common.ErrorOnVerify("Account Not Exist!")
 	}
 
 	// 校验Code
-	isVerified, err = verifiedDomain.VerifiedResetPasswordCode(dto.ID, dto.Code)
+	isVerify, err = verifyDomain.VerifyResetPasswordCode(dto.ID, dto.Code)
 	if err != nil {
-		return common.ServerInnerError(err, verifiedDomain.DomainName())
+		return common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}
 
-	if !isVerified {
-		return common.ClientErrorOnCheckInformation(nil, "Reset Password Fail,Please Retry!")
+	if !isVerify {
+		return common.ErrorOnVerify("Reset Password Fail,Please Retry!")
 	}
 
 	return nil
@@ -346,8 +345,8 @@ func (service *UserServiceV1) QQOAuth(dto dtos.QQLoginDTO) (string, error) {
 	var err error
 	var token string
 	var qqOauthAccountInfo *XOAuth.OAuthAccountInfo // qq账号鉴权信息
-	var findUserBindingDTO *dtos.UserOAuthsDTO  // 查找绑定用户
-	var userOAuthsInfo *dtos.UserOAuthsDTO      // 创建用户后的信息
+	var findUserBindingDTO *dtos.UserOAuthsDTO      // 查找绑定用户
+	var userOAuthsInfo *dtos.UserOAuthsDTO          // 创建用户后的信息
 
 	var oauthDomain *oauth2.OauthDomain
 	var userDomain *user.UserDomain
@@ -356,19 +355,19 @@ func (service *UserServiceV1) QQOAuth(dto dtos.QQLoginDTO) (string, error) {
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return "", common.ClientErrorOnValidateParameters(err)
+		return "", common.ErrorOnValidate(err)
 	}
 
 	// oauth domain：使用qq回调授权码code开始鉴权流程并获取QQ用户信息
 	qqOauthAccountInfo, err = oauthDomain.GetQQOauthUserInfo(dto.AccessCode)
 	if err != nil {
-		return "", common.ServerInnerError(err, oauthDomain.DomainName())
+		return "", common.ErrorOnServerInner(err, oauthDomain.DomainName())
 	}
 
 	// oauth domain: 使用OpenId UnionId查找user oauth表查看用户是否存在
 	findUserBindingDTO, err = userDomain.GetUserOauths(user.QQOauthPlatform, qqOauthAccountInfo.OpenId, qqOauthAccountInfo.UnionId)
 	if err != nil {
-		return "", common.ServerInnerError(err, userDomain.DomainName())
+		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
 	// 如不存在进入创建用户流程,否则进登录流程
@@ -381,11 +380,11 @@ func (service *UserServiceV1) QQOAuth(dto dtos.QQLoginDTO) (string, error) {
 				userOAuthsInfo.User.Name,
 				userOAuthsInfo.User.Avatar)
 			if err != nil {
-				return "", common.ServerInnerError(err, userDomain.DomainName())
+				return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 			}
 			return token, nil
 		} else {
-			return "", common.ServerInnerError(err,userDomain.DomainName())
+			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
 	}
 
@@ -395,7 +394,7 @@ func (service *UserServiceV1) QQOAuth(dto dtos.QQLoginDTO) (string, error) {
 		findUserBindingDTO.User.Name,
 		findUserBindingDTO.User.Avatar)
 	if err != nil {
-		return "", common.ServerInnerError(err, userDomain.DomainName())
+		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
 	return token, nil
@@ -406,8 +405,8 @@ func (service *UserServiceV1) WechatOAuth(dto dtos.WechatLoginDTO) (string, erro
 	var err error
 	var token string
 	var wechatOauthAccountInfo *XOAuth.OAuthAccountInfo // 微信账号鉴权信息
-	var findUserBindingDTO *dtos.UserOAuthsDTO      // 查找绑定用户
-	var userOAuthsInfo *dtos.UserOAuthsDTO          // 创建用户后的信息
+	var findUserBindingDTO *dtos.UserOAuthsDTO          // 查找绑定用户
+	var userOAuthsInfo *dtos.UserOAuthsDTO              // 创建用户后的信息
 
 	var oauthDomain *oauth2.OauthDomain
 	var userDomain *user.UserDomain
@@ -416,19 +415,19 @@ func (service *UserServiceV1) WechatOAuth(dto dtos.WechatLoginDTO) (string, erro
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return "", common.ClientErrorOnValidateParameters(err)
+		return "", common.ErrorOnValidate(err)
 	}
 
 	// oauth domain：使用wechat回调授权码code开始鉴权流程并获取微信用户信息
 	wechatOauthAccountInfo, err = oauthDomain.GetQQOauthUserInfo(dto.AccessCode)
 	if err != nil {
-		return "", common.ServerInnerError(err, oauthDomain.DomainName())
+		return "", common.ErrorOnServerInner(err, oauthDomain.DomainName())
 	}
 
 	// oauth domain: 使用OpenId UnionId查找user oauth表查看用户是否存在
 	findUserBindingDTO, err = userDomain.GetUserOauths(user.WechatOauthPlatform, wechatOauthAccountInfo.OpenId, wechatOauthAccountInfo.UnionId)
 	if err != nil {
-		return "", common.ServerInnerError(err, userDomain.DomainName())
+		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
 	// 如不存在进入创建用户流程,否则进登录流程
@@ -441,11 +440,11 @@ func (service *UserServiceV1) WechatOAuth(dto dtos.WechatLoginDTO) (string, erro
 				userOAuthsInfo.User.Name,
 				userOAuthsInfo.User.Avatar)
 			if err != nil {
-				return "", common.ServerInnerError(err, userDomain.DomainName())
+				return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 			}
 			return token, nil
 		} else {
-			return "", common.ServerInnerError(err, userDomain.DomainName())
+			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
 	}
 
@@ -455,7 +454,7 @@ func (service *UserServiceV1) WechatOAuth(dto dtos.WechatLoginDTO) (string, erro
 		findUserBindingDTO.User.Name,
 		findUserBindingDTO.User.Avatar)
 	if err != nil {
-		return "", common.ServerInnerError(err, userDomain.DomainName())
+		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
 	return token, nil
@@ -466,8 +465,8 @@ func (service *UserServiceV1) WeiboOAuth(dto dtos.WeiboLoginDTO) (string, error)
 	var err error
 	var token string
 	var weiboOauthAccountInfo *XOAuth.OAuthAccountInfo // 微博账号鉴权信息
-	var findUserBindingDTO *dtos.UserOAuthsDTO     // 查找绑定用户
-	var userOAuthsInfo *dtos.UserOAuthsDTO         // 创建用户后的信息
+	var findUserBindingDTO *dtos.UserOAuthsDTO         // 查找绑定用户
+	var userOAuthsInfo *dtos.UserOAuthsDTO             // 创建用户后的信息
 
 	var oauthDomain *oauth2.OauthDomain
 	var userDomain *user.UserDomain
@@ -476,19 +475,19 @@ func (service *UserServiceV1) WeiboOAuth(dto dtos.WeiboLoginDTO) (string, error)
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return "", common.ClientErrorOnValidateParameters(err)
+		return "", common.ErrorOnValidate(err)
 	}
 
 	// oauth domain：使用wechat回调授权码code开始鉴权流程并获取微信用户信息
 	weiboOauthAccountInfo, err = oauthDomain.GetQQOauthUserInfo(dto.AccessCode)
 	if err != nil {
-		return "", common.ServerInnerError(err, oauthDomain.DomainName())
+		return "", common.ErrorOnServerInner(err, oauthDomain.DomainName())
 	}
 
 	// oauth domain: 使用OpenId UnionId查找user oauth表查看用户是否存在
 	findUserBindingDTO, err = userDomain.GetUserOauths(user.WeiboOauthPlatform, weiboOauthAccountInfo.OpenId, weiboOauthAccountInfo.UnionId)
 	if err != nil {
-		return "", common.ServerInnerError(err, userDomain.DomainName())
+		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
 	// 如不存在进入创建用户流程,否则进登录流程
@@ -501,11 +500,11 @@ func (service *UserServiceV1) WeiboOAuth(dto dtos.WeiboLoginDTO) (string, error)
 				userOAuthsInfo.User.Name,
 				userOAuthsInfo.User.Avatar)
 			if err != nil {
-				return "", common.ServerInnerError(err, userDomain.DomainName())
+				return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 			}
 			return token, nil
 		} else {
-			return "", common.ServerInnerError(err, userDomain.DomainName())
+			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
 	}
 
@@ -515,7 +514,7 @@ func (service *UserServiceV1) WeiboOAuth(dto dtos.WeiboLoginDTO) (string, error)
 		findUserBindingDTO.User.Name,
 		findUserBindingDTO.User.Avatar)
 	if err != nil {
-		return "", common.ServerInnerError(err, userDomain.DomainName())
+		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
 	return token, nil

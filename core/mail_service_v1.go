@@ -3,7 +3,7 @@ package core
 import (
 	"github.com/bb-orz/goinfras/XValidate"
 	"goinfras-sample-account/common"
-	"goinfras-sample-account/core/verified"
+	"goinfras-sample-account/core/verify"
 	"goinfras-sample-account/dtos"
 	"goinfras-sample-account/services"
 	"sync"
@@ -25,22 +25,22 @@ func init() {
 
 // 邮件服务实例V1
 type MailServiceV1 struct {
-	verifiedDomain *verified.VerifiedDomain
+	verifyDomain *verify.VerifyDomain
 }
 
 // 发送绑定邮箱验证码到指定邮箱
-func (service *MailServiceV1) SendEmailForVerified(dto dtos.SendEmailForVerifiedDTO) error {
+func (service *MailServiceV1) SendEmailForVerify(dto dtos.SendEmailForVerifyDTO) error {
 	var err error
-	var verifiedDomain *verified.VerifiedDomain
-	verifiedDomain = verified.NewVerifiedDomain()
+	var verifyDomain *verify.VerifyDomain
+	verifyDomain = verify.NewVerifyDomain()
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return  common.ClientErrorOnValidateParameters(err)
+		return common.ClientErrorOnValidateParameters(err)
 	}
 
-	if err = verifiedDomain.SendValidateEmail(dto); err != nil {
-		return common.ServerInnerError(err, verifiedDomain.DomainName())
+	if err = verifyDomain.SendValidateEmail(dto); err != nil {
+		return common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}
 
 	return nil
@@ -49,16 +49,16 @@ func (service *MailServiceV1) SendEmailForVerified(dto dtos.SendEmailForVerified
 // 发送忘记密码链接到邮箱
 func (service *MailServiceV1) SendEmailForgetPassword(dto dtos.SendEmailForgetPasswordDTO) error {
 	var err error
-	var verifiedDomain *verified.VerifiedDomain
-	verifiedDomain = verified.NewVerifiedDomain()
+	var verifyDomain *verify.VerifyDomain
+	verifyDomain = verify.NewVerifyDomain()
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return  common.ClientErrorOnValidateParameters(err)
+		return common.ClientErrorOnValidateParameters(err)
 	}
 
-	if err = verifiedDomain.SendResetPasswordCodeEmail(dto); err != nil {
-		return common.ServerInnerError(err, verifiedDomain.DomainName())
+	if err = verifyDomain.SendResetPasswordCodeEmail(dto); err != nil {
+		return common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}
 
 	return nil

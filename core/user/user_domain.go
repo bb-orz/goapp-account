@@ -6,7 +6,7 @@ import (
 	"github.com/bb-orz/goinfras/XOAuth"
 	"github.com/segmentio/ksuid"
 	"goinfras-sample-account/common"
-	"goinfras-sample-account/services"
+	"goinfras-sample-account/dtos"
 )
 
 /*
@@ -17,8 +17,6 @@ type UserDomain struct {
 	dao   *userDAO
 	cache *userCache
 }
-
-
 
 func NewUserDomain() *UserDomain {
 	domain := new(UserDomain)
@@ -48,7 +46,7 @@ func (domain *UserDomain) GenToken(no, name, avatar string) (string, error) {
 	var err error
 	var token string
 	// 生成
-	var claim =XJwt.UserClaim{
+	var claim = XJwt.UserClaim{
 		Id:     no,
 		Name:   name,
 		Avatar: avatar,
@@ -67,7 +65,7 @@ func (domain *UserDomain) IsUserExist(uid uint) (bool, error) {
 	var isExist bool
 
 	if isExist, err = domain.dao.IsUserIdExist(uid); err != nil {
-		return false, common.DomainInnerErrorOnSqlQuery(err,"IsUserIdExist")
+		return false, common.DomainInnerErrorOnSqlQuery(err, "IsUserIdExist")
 	} else if isExist {
 		return true, nil
 	}
@@ -80,7 +78,7 @@ func (domain *UserDomain) IsEmailExist(email string) (bool, error) {
 	var err error
 	var isExist bool
 	if isExist, err = domain.dao.IsEmailExist(email); err != nil {
-		return false, common.DomainInnerErrorOnSqlQuery(err,  "IsEmailExist")
+		return false, common.DomainInnerErrorOnSqlQuery(err, "IsEmailExist")
 	} else if isExist {
 		return true, nil
 	}
@@ -101,16 +99,16 @@ func (domain *UserDomain) IsPhoneExist(phone string) (bool, error) {
 }
 
 // 邮箱账号创建用户
-func (domain *UserDomain) CreateUserForEmail(dto services.CreateUserWithEmailDTO) (*services.UserDTO, error) {
+func (domain *UserDomain) CreateUserForEmail(dto dtos.CreateUserWithEmailDTO) (*dtos.UserDTO, error) {
 	var err error
-	var userDTO *services.UserDTO
+	var userDTO *dtos.UserDTO
 
-	createUserData := services.UserDTO{}
+	createUserData := dtos.UserDTO{}
 	createUserData.Name = dto.Name
 	createUserData.Email = dto.Email
 	createUserData.No = domain.generateUserNo()
 	createUserData.Password, createUserData.Salt = domain.encryptPassword(dto.Password)
-	createUserData.Status = UserStatusNotVerified // 初始创建时未验证状态
+	createUserData.Status = UserStatusNotVerify // 初始创建时未验证状态
 
 	if userDTO, err = domain.dao.Create(&createUserData); err != nil {
 		return nil, common.DomainInnerErrorOnSqlInsert(err, "Create")
@@ -119,16 +117,16 @@ func (domain *UserDomain) CreateUserForEmail(dto services.CreateUserWithEmailDTO
 }
 
 // 手机号码创建用户
-func (domain *UserDomain) CreateUserForPhone(dto services.CreateUserWithPhoneDTO) (*services.UserDTO, error) {
+func (domain *UserDomain) CreateUserForPhone(dto dtos.CreateUserWithPhoneDTO) (*dtos.UserDTO, error) {
 	var err error
-	var userDTO *services.UserDTO
+	var userDTO *dtos.UserDTO
 
-	createUserData := services.UserDTO{}
+	createUserData := dtos.UserDTO{}
 	createUserData.Name = dto.Name
 	createUserData.Phone = dto.Phone
 	createUserData.No = domain.generateUserNo()
 	createUserData.Password, createUserData.Salt = domain.encryptPassword(dto.Password)
-	createUserData.Status = UserStatusNotVerified // 初始创建时未验证状态
+	createUserData.Status = UserStatusNotVerify // 初始创建时未验证状态
 
 	if userDTO, err = domain.dao.Create(&createUserData); err != nil {
 		return nil, common.DomainInnerErrorOnSqlInsert(err, "Create")
@@ -137,16 +135,16 @@ func (domain *UserDomain) CreateUserForPhone(dto services.CreateUserWithPhoneDTO
 }
 
 // Oauth三方账号绑定创建用户
-func (domain *UserDomain) CreateUserOAuthBinding(platform uint, oauthInfo *XOAuth.OAuthAccountInfo) (*services.UserOAuthsDTO, error) {
+func (domain *UserDomain) CreateUserOAuthBinding(platform uint, oauthInfo *XOAuth.OAuthAccountInfo) (*dtos.UserOAuthsDTO, error) {
 	var err error
-	var userOAuthsResult *services.UserOAuthsDTO
+	var userOAuthsResult *dtos.UserOAuthsDTO
 
 	// 插入用户信息
-	createUserData := services.UserOAuthsDTO{}
+	createUserData := dtos.UserOAuthsDTO{}
 	createUserData.User.Name = oauthInfo.NickName
 	createUserData.User.No = domain.generateUserNo()
-	createUserData.User.Status = UserStatusNotVerified // 初始创建时未验证状态
-	createUserData.UserOAuths = []services.OAuthDTO{
+	createUserData.User.Status = UserStatusNotVerify // 初始创建时未验证状态
+	createUserData.UserOAuths = []dtos.OAuthDTO{
 		{
 			AccessToken: oauthInfo.AccessToken,
 			UnionId:     oauthInfo.UnionId,
@@ -166,9 +164,9 @@ func (domain *UserDomain) CreateUserOAuthBinding(platform uint, oauthInfo *XOAut
 }
 
 // 获取整个关联的用户信息和三方平台绑定信息
-func (domain *UserDomain) GetUserOauths(platform uint, openId, unionId string) (*services.UserOAuthsDTO, error) {
+func (domain *UserDomain) GetUserOauths(platform uint, openId, unionId string) (*dtos.UserOAuthsDTO, error) {
 	var err error
-	var userOAuthsResult *services.UserOAuthsDTO
+	var userOAuthsResult *dtos.UserOAuthsDTO
 
 	if userOAuthsResult, err = domain.dao.GetUserOAuths(platform, openId, unionId); err != nil {
 		return nil, common.DomainInnerErrorOnSqlQuery(err, "GetUserOAuths")
@@ -177,27 +175,27 @@ func (domain *UserDomain) GetUserOauths(platform uint, openId, unionId string) (
 	return userOAuthsResult, nil
 }
 
-func (domain *UserDomain) GetUserInfo(uid uint) (*services.UserDTO, error) {
+func (domain *UserDomain) GetUserInfo(uid uint) (*dtos.UserDTO, error) {
 	var err error
-	var userDTO *services.UserDTO
+	var userDTO *dtos.UserDTO
 	if userDTO, err = domain.dao.GetById(uid); err != nil {
 		return nil, common.DomainInnerErrorOnSqlQuery(err, "GetById")
 	}
 	return userDTO, nil
 }
 
-func (domain *UserDomain) GetUserInfoByEmail(email string) (*services.UserDTO, error) {
+func (domain *UserDomain) GetUserInfoByEmail(email string) (*dtos.UserDTO, error) {
 	var err error
-	var userDTO *services.UserDTO
+	var userDTO *dtos.UserDTO
 	if userDTO, err = domain.dao.GetByEmail(email); err != nil {
 		return nil, common.DomainInnerErrorOnSqlQuery(err, "GetByEmail")
 	}
 	return userDTO, nil
 }
 
-func (domain *UserDomain) GetUserInfoByPhone(phone string) (*services.UserDTO, error) {
+func (domain *UserDomain) GetUserInfoByPhone(phone string) (*dtos.UserDTO, error) {
 	var err error
-	var userDTO *services.UserDTO
+	var userDTO *dtos.UserDTO
 	if userDTO, err = domain.dao.GetByPhone(phone); err != nil {
 		return nil, common.DomainInnerErrorOnSqlQuery(err, "GetByPhone")
 	}
@@ -223,7 +221,7 @@ func (domain *UserDomain) SetUserInfo(uid uint, field string, value interface{})
 }
 
 // 设置多个用户信息
-func (domain *UserDomain) SetUserInfos(uid uint, dto services.SetUserInfoDTO) error {
+func (domain *UserDomain) SetUserInfos(uid uint, dto dtos.SetUserInfoDTO) error {
 	var err error
 	if err = domain.dao.SetUserInfos(uid, dto); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetUserInfos")

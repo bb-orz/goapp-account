@@ -3,38 +3,33 @@ package middleware
 import (
 	"github.com/bb-orz/goinfras/XJwt"
 	"github.com/gin-gonic/gin"
-	"net/http"
+	"goinfras-sample-account/common"
 )
 
 // 用户鉴权中间件
 func JwtAuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(ctx *gin.Context) {
 		// 1.从http头获取token string
-		tkStr := c.GetHeader("Authorization")
+		tkStr := ctx.GetHeader("Authorization")
 		// fmt.Println("token string:",tkStr)
 		if tkStr == "" {
-			c.Abort()
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"message": "token string on http header is required!",
-			})
+			_ = ctx.Error(common.ErrorOnAuthenticate("Token Parameter on http header is required")) // 所有错误最后传递给错误中间件处理
+			ctx.Abort()
 			return
 		}
 
 		// 2.解码校验token是否合法
 		customerClaim, err := XJwt.XTokenUtils().Decode(tkStr)
 		if err != nil {
-			c.Abort()
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"message": err.Error(),
-			})
+			_ = ctx.Error(common.ErrorOnAuthenticate("Verified Token Fail"))
+			ctx.Abort()
 			return
 		}
 
 		// 鉴权通过后设置用户信息
-		c.Set("tkStr", tkStr)
-		c.Set("userClaim", customerClaim.UserClaim)
+		ctx.Set("tkStr", tkStr)
+		ctx.Set("userClaim", customerClaim.UserClaim)
 
-		c.Next()
+		ctx.Next()
 	}
 }
-

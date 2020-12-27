@@ -11,9 +11,9 @@ type UserDTO struct {
 	Avatar        string
 	Gender        uint
 	Email         string
-	EmailVerified bool
+	EmailVerify bool
 	Phone         string
-	PhoneVerified bool
+	PhoneVerify bool
 	Password      string
 	Salt          string
 	Status        uint
@@ -107,13 +107,13 @@ type SetStatusDTO struct {
 // 验证邮箱数据传输对象
 type ValidateEmailDTO struct {
 	ID           uint   `validate:"required,numeric" json:"id"`
-	VerifiedCode string `validate:"required,alphanum" json:"verified_code"`
+	VerifyCode string `validate:"required,alphanum" json:"verify_code"`
 }
 
 // 验证手机号码数据传输对象
 type ValidatePhoneDTO struct {
 	ID           uint   `validate:"required,numeric" json:"id"`
-	VerifiedCode string `validate:"required,alphanum" json:"verified_code"`
+	VerifyCode string `validate:"required,alphanum" json:"verify_code"`
 }
 
 // 更改密码数据传输对象
