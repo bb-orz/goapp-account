@@ -12,14 +12,19 @@ func ResponseMiddleware() gin.HandlerFunc {
 		// 响应在所有请求业务逻辑之后
 		ctx.Next()
 
-		// 设置头部信息
-		headers := ctx.GetStringMapString(common.ResponseHeaderKey)
-		for k,v := range headers {
-			ctx.Header(k,v)
-		}
+		if len(ctx.Errors.Errors()) == 0 {
+			// 设置头部信息
+			headers := ctx.GetStringMapString(common.ResponseHeaderKey)
+			for k, v := range headers {
+				ctx.Header(k, v)
+			}
 
-		// 封装响应信息
-		data ,_ := ctx.Get(common.ResponseDataKey)
-		ctx.JSON(http.StatusOK,data)
+			// 有数据正常响应信息
+			data, _ := ctx.Get(common.ResponseDataKey)
+			if data != nil {
+				ctx.JSON(http.StatusOK, data)
+			}
+
+		}
 	}
 }

@@ -3,13 +3,13 @@
     "Env": "debug",
     "Host": "example.com",
     "Endpoint": "localhost",
-    "AppName": "goinfras_app",
+    "AppName": "goinfras_application",
     "Version": "v1.0.0"
   },
   "Gin": {
     "Mode": "debug",
     "ListenHost": "127.0.0.1",
-    "ListenPort": 8090,
+    "ListenPort": 8099,
     "Tls": false,
     "CertFile": "",
     "KeyFile": "",
@@ -27,8 +27,14 @@
   "Cron": {
     "Location": "Local"
   },
+  "Jwt": {
+    "UseCache": true,
+    "PrivateKey": "jwt_@key",
+    "ExpSeconds": 3600,
+    "TokenCacheKeyPrefix": "user.jwt.token."
+  },
   "OAuth": {
-    "WechatSignSwitch": false,
+    "WechatSignSwitch": true,
     "WechatOAuth2AppKey": "",
     "WechatOAuth2AppSecret": "",
     "WeiboSignSwitch": false,
@@ -55,8 +61,8 @@
     "MaxCallSendMsgSize": 0
   },
   "Logger": {
-    "AppName": "",
-    "AppVersion": "",
+    "AppName": "goinfras-sample-account",
+    "AppVersion": "v1.0.0",
     "DevEnv": true,
     "AddCaller": true,
     "DisableDebugLevelSwitch": false,
@@ -245,11 +251,5 @@
     "Port": null,
     "User": "",
     "Password": ""
-  },
-  "Jwt": {
-    "UseCache": true,
-    "PrivateKey": "keykeykeykey",
-    "ExpSeconds": 3600,
-    "TokenCacheKeyPrefix": "user.jwt.token."
   }
 }

@@ -21,7 +21,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		// 2.解码校验token是否合法
 		customerClaim, err := XJwt.XTokenUtils().Decode(tkStr)
 		if err != nil {
-			_ = ctx.Error(common.ErrorOnAuthenticate("Verified Token Fail"))
+			_ = ctx.Error(common.ErrorOnAuthenticate(err.Error()))
 			ctx.Abort()
 			return
 		}

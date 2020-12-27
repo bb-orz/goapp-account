@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/jinzhu/gorm"
-	"goinfras-sample-account/services"
+	"goinfras-sample-account/dtos"
 )
 
 /* User 单表模型 */
@@ -27,7 +27,7 @@ func (UserModel) TableName() string {
 }
 
 // DTO => Model
-func (model *UserModel) FromDTO(dto *services.UserDTO) {
+func (model *UserModel) FromDTO(dto *dtos.UserDTO) {
 	model.ID = dto.Uid
 	model.No = dto.No
 	model.Name = dto.Name
@@ -47,8 +47,8 @@ func (model *UserModel) FromDTO(dto *services.UserDTO) {
 }
 
 // Model => DTO
-func (model *UserModel) ToDTO() *services.UserDTO {
-	userDTO := services.UserDTO{}
+func (model *UserModel) ToDTO() *dtos.UserDTO {
+	userDTO := dtos.UserDTO{}
 	userDTO.Uid = model.ID
 	userDTO.No = model.No
 	userDTO.Name = model.Name
@@ -94,8 +94,8 @@ func (model *OAuthModel) FromDTO(dto dtos.OAuthDTO) {
 }
 
 // Model => DTO
-func (model *OAuthModel) ToDTO() services.OAuthDTO {
-	oauthDTO := services.OAuthDTO{}
+func (model *OAuthModel) ToDTO() dtos.OAuthDTO {
+	oauthDTO := dtos.OAuthDTO{}
 	oauthDTO.UserId = model.UserId
 	oauthDTO.Platform = model.Platform
 	oauthDTO.OpenId = model.OpenId
@@ -125,7 +125,7 @@ type UserOAuthsModel struct {
 	OAuths      []OAuthModel // Has-Many
 }
 
-func (model *UserOAuthsModel) FromDTO(dto *services.UserOAuthsDTO) {
+func (model *UserOAuthsModel) FromDTO(dto *dtos.UserOAuthsDTO) {
 	model.ID = dto.User.Uid
 	model.No = dto.User.No
 	model.Name = dto.User.Name
@@ -151,8 +151,8 @@ func (model *UserOAuthsModel) FromDTO(dto *services.UserOAuthsDTO) {
 	model.OAuths = oAuths
 }
 
-func (model *UserOAuthsModel) ToDTO() *services.UserOAuthsDTO {
-	userOAuthsDTO := services.UserOAuthsDTO{}
+func (model *UserOAuthsModel) ToDTO() *dtos.UserOAuthsDTO {
+	userOAuthsDTO := dtos.UserOAuthsDTO{}
 	userOAuthsDTO.User.Uid = model.ID
 	userOAuthsDTO.User.No = model.No
 	userOAuthsDTO.User.Name = model.Name
@@ -169,7 +169,7 @@ func (model *UserOAuthsModel) ToDTO() *services.UserOAuthsDTO {
 	userOAuthsDTO.User.CreatedAt = model.CreatedAt
 	userOAuthsDTO.User.UpdatedAt = model.UpdatedAt
 	userOAuthsDTO.User.DeletedAt = model.DeletedAt
-	oAuths := make([]services.OAuthDTO, 0)
+	oAuths := make([]dtos.OAuthDTO, 0)
 	for _, item := range model.OAuths {
 		oAuthDTO := item.ToDTO()
 		oAuths = append(oAuths, oAuthDTO)

@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/bb-orz/goinfras"
-	"github.com/bb-orz/goinfras/XCache/XGocache"
+	"github.com/bb-orz/goinfras/XCache/XRedis"
 	"github.com/bb-orz/goinfras/XGin"
 	"github.com/bb-orz/goinfras/XGlobal"
 	"github.com/bb-orz/goinfras/XJwt"
@@ -22,18 +22,15 @@ func RegisterStarter() {
 
 	goinfras.RegisterStarter(XLogger.NewStarter())
 
-
-
 	// 注册mongodb启动器
 	goinfras.RegisterStarter(XMongo.NewStarter())
 
 	// 注册mysql启动器
 	goinfras.RegisterStarter(XGorm.NewStarter())
 	// 注册Redis连接池
-	// goinfras.RegisterStarter(XRedis.NewStarter())
+	goinfras.RegisterStarter(XRedis.NewStarter())
 	// 本地缓存
-	goinfras.RegisterStarter(XGocache.NewStarter())
-
+	// goinfras.RegisterStarter(XGocache.NewStarter())
 
 	// 注册Oauth Manager
 	goinfras.RegisterStarter(XOAuth.NewStarter())

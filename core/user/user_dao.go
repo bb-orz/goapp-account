@@ -2,8 +2,8 @@ package user
 
 import (
 	"github.com/bb-orz/goinfras/XStore/XGorm"
-	"goinfras-sample-account/services"
 	"github.com/jinzhu/gorm"
+	"goinfras-sample-account/dtos"
 )
 
 /*
@@ -77,9 +77,9 @@ func (d *userDAO) isExist(where *UserModel) (bool, error) {
 }
 
 // 插入单个用户信息
-func (d *userDAO) Create(dto *services.UserDTO) (*services.UserDTO, error) {
+func (d *userDAO) Create(dto *dtos.UserDTO) (*dtos.UserDTO, error) {
 	var err error
-	var userDTO *services.UserDTO
+	var userDTO *dtos.UserDTO
 	var userModel UserModel
 
 	userModel.FromDTO(dto)
@@ -91,9 +91,9 @@ func (d *userDAO) Create(dto *services.UserDTO) (*services.UserDTO, error) {
 }
 
 // 插入单个用户信息并关联三方平台账户
-func (d *userDAO) CreateUserWithOAuth(dto *services.UserOAuthsDTO) (*services.UserOAuthsDTO, error) {
+func (d *userDAO) CreateUserWithOAuth(dto *dtos.UserOAuthsDTO) (*dtos.UserOAuthsDTO, error) {
 	var err error
-	var userOAuthsDTO *services.UserOAuthsDTO
+	var userOAuthsDTO *dtos.UserOAuthsDTO
 	var userOAuthsModel UserOAuthsModel
 
 	userOAuthsModel.FromDTO(dto)
@@ -105,12 +105,12 @@ func (d *userDAO) CreateUserWithOAuth(dto *services.UserOAuthsDTO) (*services.Us
 	return userOAuthsDTO, nil
 }
 
-func (d *userDAO) GetUserOAuths(platform uint, openId, unionId string) (*services.UserOAuthsDTO, error) {
+func (d *userDAO) GetUserOAuths(platform uint, openId, unionId string) (*dtos.UserOAuthsDTO, error) {
 	var err error
 	var oAuthResult OAuthModel
 	var userResult UserModel
-	var userOAuthDTO *services.UserOAuthsDTO
-	var authDTOs []services.OAuthDTO
+	var userOAuthDTO *dtos.UserOAuthsDTO
+	var authDTOs []dtos.OAuthDTO
 
 	if err = XGorm.XDB().Where(&OAuthModel{Platform: platform, OpenId: openId, UnionId: unionId}).Find(&oAuthResult).Error; err != nil {
 		return nil, err
@@ -120,10 +120,10 @@ func (d *userDAO) GetUserOAuths(platform uint, openId, unionId string) (*service
 		return nil, err
 	}
 
-	authDTOs = make([]services.OAuthDTO, 0)
+	authDTOs = make([]dtos.OAuthDTO, 0)
 	authDTOs = append(authDTOs, oAuthResult.ToDTO())
 
-	userOAuthDTO = &services.UserOAuthsDTO{}
+	userOAuthDTO = &dtos.UserOAuthsDTO{}
 	userOAuthDTO.UserOAuths = authDTOs
 	userOAuthDTO.User = *userResult.ToDTO()
 
@@ -131,7 +131,7 @@ func (d *userDAO) GetUserOAuths(platform uint, openId, unionId string) (*service
 }
 
 // 通过Id查找
-func (d *userDAO) GetById(id uint) (*services.UserDTO, error) {
+func (d *userDAO) GetById(id uint) (*dtos.UserDTO, error) {
 	var err error
 	var userResult UserModel
 	err = XGorm.XDB().Where(id).First(&userResult).Error
@@ -149,7 +149,7 @@ func (d *userDAO) GetById(id uint) (*services.UserDTO, error) {
 }
 
 // 通过邮箱账号查找
-func (d *userDAO) GetByEmail(email string) (*services.UserDTO, error) {
+func (d *userDAO) GetByEmail(email string) (*dtos.UserDTO, error) {
 	var err error
 	var userResult UserModel
 	err = XGorm.XDB().Where(&UserModel{Email: email}).First(&userResult).Error
@@ -168,7 +168,7 @@ func (d *userDAO) GetByEmail(email string) (*services.UserDTO, error) {
 }
 
 // 通过邮箱账号查找
-func (d *userDAO) GetByPhone(phone string) (*services.UserDTO, error) {
+func (d *userDAO) GetByPhone(phone string) (*dtos.UserDTO, error) {
 	var err error
 	var userResult UserModel
 	err = XGorm.XDB().Where(&UserModel{Phone: phone}).First(&userResult).Error
@@ -195,7 +195,7 @@ func (d *userDAO) SetUserInfo(uid uint, field string, value interface{}) error {
 }
 
 // 设置多个用户信息字段
-func (d *userDAO) SetUserInfos(uid uint, dto services.SetUserInfoDTO) error {
+func (d *userDAO) SetUserInfos(uid uint, dto dtos.SetUserInfoDTO) error {
 	var err error
 	var updater UserModel
 	updater.Name = dto.Name

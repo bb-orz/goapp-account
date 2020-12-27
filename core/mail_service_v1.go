@@ -36,7 +36,7 @@ func (service *MailServiceV1) SendEmailForVerify(dto dtos.SendEmailForVerifyDTO)
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return common.ClientErrorOnValidateParameters(err)
+		return common.ErrorOnValidate(err)
 	}
 
 	if err = verifyDomain.SendValidateEmail(dto); err != nil {
@@ -54,7 +54,7 @@ func (service *MailServiceV1) SendEmailForgetPassword(dto dtos.SendEmailForgetPa
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return common.ClientErrorOnValidateParameters(err)
+		return common.ErrorOnValidate(err)
 	}
 
 	if err = verifyDomain.SendResetPasswordCodeEmail(dto); err != nil {

@@ -4,22 +4,22 @@ import "time"
 
 // 用户数据传输对象
 type UserDTO struct {
-	Uid           uint
-	No            string
-	Name          string
-	Age           uint
-	Avatar        string
-	Gender        uint
-	Email         string
+	Uid         uint
+	No          string
+	Name        string
+	Age         uint
+	Avatar      string
+	Gender      uint
+	Email       string
 	EmailVerify bool
-	Phone         string
+	Phone       string
 	PhoneVerify bool
-	Password      string
-	Salt          string
-	Status        uint
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	DeletedAt     *time.Time
+	Password    string
+	Salt        string
+	Status      uint
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   *time.Time
 }
 
 // 第三方平台授权账号信息传输对象
@@ -84,6 +84,11 @@ type AuthWithPhonePasswordDTO struct {
 	Password string `validate:"required,alphanumunicode" json:"password"`
 }
 
+// 移除登录鉴权token的缓存
+type RemoveTokenDTO struct {
+	Token string `validate:"required" json:"phone"`
+}
+
 type GetUserInfoDTO struct {
 	ID uint `validate:"required,numeric" json:"id"`
 }
@@ -106,13 +111,13 @@ type SetStatusDTO struct {
 
 // 验证邮箱数据传输对象
 type ValidateEmailDTO struct {
-	ID           uint   `validate:"required,numeric" json:"id"`
+	ID         uint   `validate:"required,numeric" json:"id"`
 	VerifyCode string `validate:"required,alphanum" json:"verify_code"`
 }
 
 // 验证手机号码数据传输对象
 type ValidatePhoneDTO struct {
-	ID           uint   `validate:"required,numeric" json:"id"`
+	ID         uint   `validate:"required,numeric" json:"id"`
 	VerifyCode string `validate:"required,alphanum" json:"verify_code"`
 }
 
@@ -131,4 +136,3 @@ type ForgetPasswordDTO struct {
 	New   string `validate:"required,alphanumunicode" json:"new"`
 	ReNew string `validate:"required,alphanumunicode" json:"renew"`
 }
-

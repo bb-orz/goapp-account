@@ -152,6 +152,23 @@ func (service *UserServiceV1) PhoneAuth(dto dtos.AuthWithPhonePasswordDTO) (stri
 	return token, nil
 }
 
+// 移除登录令牌缓存信息
+func (service *UserServiceV1) RemoveToken(dto dtos.RemoveTokenDTO) error {
+	var err error
+	var userDomain *user.UserDomain
+	userDomain = user.NewUserDomain()
+	// 校验传输参数
+	if err = XValidate.V(dto); err != nil {
+		return common.ErrorOnValidate(err)
+	}
+
+	err = userDomain.RemoveTokenCache(dto.Token)
+	if err != nil {
+		return common.ErrorOnServerInner(err, userDomain.DomainName())
+	}
+	return nil
+}
+
 // 获取用户信息
 func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserDTO, error) {
 	var err error

@@ -59,6 +59,15 @@ func (domain *UserDomain) GenToken(no, name, avatar string) (string, error) {
 	return token, nil
 }
 
+// 移除JWT Token 缓存
+func (domain *UserDomain) RemoveTokenCache(token string) error {
+	err := XJwt.XTokenUtils().Remove(token)
+	if err != nil {
+		return common.DomainInnerErrorOnCacheDelete(err, "XJwt.XTokenUtils().Remove(token)")
+	}
+	return nil
+}
+
 // 查找用户id是否已存在
 func (domain *UserDomain) IsUserExist(uid uint) (bool, error) {
 	var err error

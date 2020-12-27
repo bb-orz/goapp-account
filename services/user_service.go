@@ -25,6 +25,8 @@ type IUserService interface {
 	EmailAuth(dto dtos.AuthWithEmailPasswordDTO) (string, error) // 邮箱账号鉴权
 	PhoneAuth(dto dtos.AuthWithPhonePasswordDTO) (string, error) // 手机号码鉴权
 
+	RemoveToken(dto dtos.RemoveTokenDTO) error // 移除登录token缓存
+
 	QQOAuth(dto dtos.QQLoginDTO) (string, error)         // qq三方账号鉴权
 	WechatOAuth(dto dtos.WechatLoginDTO) (string, error) // 微信三方账号鉴权
 	WeiboOAuth(dto dtos.WeiboLoginDTO) (string, error)   // 微博三方账号鉴权

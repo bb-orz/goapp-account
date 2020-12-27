@@ -34,7 +34,7 @@ func (service *SmsServiceV1) SendPhoneVerifyCode(dto dtos.SendPhoneVerifyCodeDTO
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return common.ClientErrorOnValidateParameters(err)
+		return common.ErrorOnValidate(err)
 	}
 
 	if err = verifyDomain.SendValidatePhoneMsg(dto); err != nil {

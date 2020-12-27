@@ -25,8 +25,9 @@ const (
 	ErrorOnNoSqlShamDeleteFormat = "[Domain Inner Error]: NoSQL ShamDelete Error | [CALL]:dao.%s" // nosql更新deleted_at字段错误，假删除
 
 	// 缓存执行错误信息格式
-	ErrorOnCacheSetFormat = "[Domain Inner Error]: Cache Set Error | [command]:%s" // 缓存设置错误
-	ErrorOnCacheGetFormat = "[Domain Inner Error]: Cache Get Error | [command]:%s" // 缓存获取错误
+	ErrorOnCacheSetFormat    = "[Domain Inner Error]: Cache Set Error | [command]:%s"    // 缓存设置错误
+	ErrorOnCacheGetFormat    = "[Domain Inner Error]: Cache Get Error | [command]:%s"    // 缓存获取错误
+	ErrorOnCacheDeleteFormat = "[Domain Inner Error]: Cache Delete Error | [command]:%s" // 缓存删除错误
 
 	// 服务端内部网络请求报错
 	ErrorOnNetRequestFormat = "[Domain Inner Error]: Network Request Error | [Request]:%v"   // 网络请求相关错误
@@ -139,6 +140,11 @@ func DomainInnerErrorOnCacheSet(err error, method string) InnerError {
 // 缓存获取错误包装方法
 func DomainInnerErrorOnCacheGet(err error, method string) InnerError {
 	return ServerErrorWrapper(err, ErrorOnCacheGetFormat, method)
+}
+
+// 缓存获取错误包装方法
+func DomainInnerErrorOnCacheDelete(err error, method string) InnerError {
+	return ServerErrorWrapper(err, ErrorOnCacheDeleteFormat, method)
 }
 
 // 网络请求错误包装方法
