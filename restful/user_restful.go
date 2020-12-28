@@ -24,19 +24,22 @@ type UserApi struct{}
 func (api *UserApi) SetRoutes() {
 	engine := XGin.XEngine()
 
+	// 登录登出接口
 	engine.POST("/login", api.loginHandler)
-	engine.POST("/logout", api.logoutHandler)
+	engine.POST("/logout", api.logoutHandler, middleware.JwtAuthMiddleware())
 
+	// 邮箱或手机号注册账号接口
 	registerGroup := engine.Group("/register")
 	registerGroup.POST("/email", api.registerEmailHandler)
 	registerGroup.POST("/phone", api.registerPhoneHandler)
 
+	// 第三方平台登录或注册接口
 	oauthGroup := engine.Group("/oauth")
 	oauthGroup.GET("/qq", api.oauthQQHandler)
 	oauthGroup.GET("/weixin", api.oauthWechatHandler)
 	oauthGroup.GET("/weibo", api.oauthWeiboHandler)
 
-	// 用户鉴权访问路由组
+	// 用户鉴权访问路由组接口
 	userGroup := engine.Group("/user", middleware.JwtAuthMiddleware())
 	userGroup.GET("/:id", api.getUserInfoHandler)
 	userGroup.POST("/set", api.setUserInfoHandler)
@@ -67,12 +70,20 @@ func (api *UserApi) loginHandler(ctx *gin.Context) {
 
 /*用户登出*/
 func (api *UserApi) logoutHandler(ctx *gin.Context) {
-	// TODO Receive Request ...
+	// Receive Request ...
+	token := ctx.GetString(common.ContextTokenStringKey)
+	var dto = dtos.RemoveTokenDTO{Token: token}
 
-	// TODO Call Services method ...
+	// Call Services method ...
+	userService := services.GetUserService()
+	err := userService.RemoveToken(dto)
+	if err != nil {
+		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
+		return
+	}
 
-	// TODO Send Data to Response Middleware ...
-
+	// Send Data to Response Middleware ...
+	ctx.Set(common.ResponseDataKey, nil)
 }
 
 /*邮箱注册注册*/

@@ -99,7 +99,7 @@ func (service *UserServiceV1) EmailAuth(dto dtos.AuthWithEmailPasswordDTO) (stri
 	}
 
 	// 查找邮件账号是否存在
-	if userDTO, err = userDomain.GetUserInfoByEmail(dto.Email); err != nil {
+	if userDTO, err = userDomain.GetUserByEmail(dto.Email); err != nil {
 		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 	if userDTO == nil {
@@ -132,7 +132,7 @@ func (service *UserServiceV1) PhoneAuth(dto dtos.AuthWithPhonePasswordDTO) (stri
 	}
 
 	// 查找手机账号是否存在
-	userDTO, err = userDomain.GetUserInfoByPhone(dto.Phone)
+	userDTO, err = userDomain.GetUserByPhone(dto.Phone)
 	if err != nil {
 		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
@@ -170,7 +170,7 @@ func (service *UserServiceV1) RemoveToken(dto dtos.RemoveTokenDTO) error {
 }
 
 // 获取用户信息
-func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserDTO, error) {
+func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserInfoDTO, error) {
 	var err error
 	var userDTO *dtos.UserDTO
 	var userDomain *user.UserDomain
@@ -182,12 +182,12 @@ func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserDT
 	}
 
 	// 查找用户信息
-	userDTO, err = userDomain.GetUserInfo(dto.ID)
+	userDTO, err = userDomain.GetUser(dto.ID)
 	if err != nil {
 		return nil, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
-	return userDTO, nil
+	return userDTO.TransToUserInfoDTO(), nil
 }
 
 // 批量设置用户信息
@@ -292,7 +292,7 @@ func (service *UserServiceV1) ChangePassword(dto dtos.ChangePasswordDTO) error {
 	}
 
 	// 查找账号是否存在
-	userDTO, err = userDomain.GetUserInfo(dto.ID)
+	userDTO, err = userDomain.GetUser(dto.ID)
 	if err != nil {
 		return common.ErrorOnServerInner(err, userDomain.DomainName())
 	}

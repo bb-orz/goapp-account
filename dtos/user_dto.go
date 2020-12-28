@@ -22,6 +22,39 @@ type UserDTO struct {
 	DeletedAt   *time.Time
 }
 
+// 用户数据传输对象
+type UserInfoDTO struct {
+	Uid       uint
+	No        string
+	Name      string
+	Age       uint
+	Avatar    string
+	Gender    uint
+	Email     string
+	Phone     string
+	Status    uint
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
+}
+
+func (d *UserDTO) TransToUserInfoDTO() *UserInfoDTO {
+	return &UserInfoDTO{
+		Uid:       d.Uid,
+		No:        d.No,
+		Name:      d.Name,
+		Age:       d.Age,
+		Avatar:    d.Avatar,
+		Gender:    d.Gender,
+		Email:     d.Email,
+		Phone:     d.Phone,
+		Status:    d.Status,
+		CreatedAt: d.CreatedAt,
+		UpdatedAt: d.UpdatedAt,
+		DeletedAt: d.DeletedAt,
+	}
+}
+
 // 第三方平台授权账号信息传输对象
 type OAuthDTO struct {
 	Platform    uint

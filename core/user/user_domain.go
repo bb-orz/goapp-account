@@ -184,7 +184,7 @@ func (domain *UserDomain) GetUserOauths(platform uint, openId, unionId string) (
 	return userOAuthsResult, nil
 }
 
-func (domain *UserDomain) GetUserInfo(uid uint) (*dtos.UserDTO, error) {
+func (domain *UserDomain) GetUser(uid uint) (*dtos.UserDTO, error) {
 	var err error
 	var userDTO *dtos.UserDTO
 	if userDTO, err = domain.dao.GetById(uid); err != nil {
@@ -193,7 +193,7 @@ func (domain *UserDomain) GetUserInfo(uid uint) (*dtos.UserDTO, error) {
 	return userDTO, nil
 }
 
-func (domain *UserDomain) GetUserInfoByEmail(email string) (*dtos.UserDTO, error) {
+func (domain *UserDomain) GetUserByEmail(email string) (*dtos.UserDTO, error) {
 	var err error
 	var userDTO *dtos.UserDTO
 	if userDTO, err = domain.dao.GetByEmail(email); err != nil {
@@ -202,7 +202,7 @@ func (domain *UserDomain) GetUserInfoByEmail(email string) (*dtos.UserDTO, error
 	return userDTO, nil
 }
 
-func (domain *UserDomain) GetUserInfoByPhone(phone string) (*dtos.UserDTO, error) {
+func (domain *UserDomain) GetUserByPhone(phone string) (*dtos.UserDTO, error) {
 	var err error
 	var userDTO *dtos.UserDTO
 	if userDTO, err = domain.dao.GetByPhone(phone); err != nil {

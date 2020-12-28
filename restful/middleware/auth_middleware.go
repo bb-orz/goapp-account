@@ -27,8 +27,8 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		}
 
 		// 鉴权通过后设置用户信息
-		ctx.Set("tkStr", tkStr)
-		ctx.Set("userClaim", customerClaim.UserClaim)
+		ctx.Set(common.ContextTokenStringKey, tkStr)
+		ctx.Set(common.ContextTokenUserClaimKey, customerClaim.UserClaim)
 
 		ctx.Next()
 	}
