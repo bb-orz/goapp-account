@@ -1,6 +1,6 @@
 package services
 
-import "goinfras-sample-account/dtos"
+import "goapp-account/dtos"
 
 /* 定义邮件服务模块的服务层方法，并定义数据传输对象DTO*/
 var mailService IMailService
@@ -17,7 +17,6 @@ func SetMailService(service IMailService) {
 }
 
 type IMailService interface {
-	SendEmailForVerify(dto dtos.SendEmailForVerifyDTO) error   // 绑定邮箱时，发送邮件验证码到指定邮箱
+	SendEmailForVerify(dto dtos.SendEmailForVerifyDTO) error       // 绑定邮箱时，发送邮件验证码到指定邮箱
 	SendEmailForgetPassword(dtos.SendEmailForgetPasswordDTO) error // 忘记密码时，发送邮件重置链接到用户绑定的邮箱
 }
-

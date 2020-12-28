@@ -1,6 +1,6 @@
 package services
 
-import "goinfras-sample-account/dtos"
+import "goapp-account/dtos"
 
 /* 定义短信服务模块的服务层方法，并定义数据传输对象DTO*/
 var smsService ISmsService
@@ -18,4 +18,3 @@ func SetSmsService(service ISmsService) {
 type ISmsService interface {
 	SendPhoneVerifyCode(dto dtos.SendPhoneVerifyCodeDTO) error // 绑定手机时，发送短信验证码
 }
-

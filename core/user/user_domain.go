@@ -5,8 +5,8 @@ import (
 	"github.com/bb-orz/goinfras/XJwt"
 	"github.com/bb-orz/goinfras/XOAuth"
 	"github.com/segmentio/ksuid"
-	"goinfras-sample-account/common"
-	"goinfras-sample-account/dtos"
+	"goapp-account/common"
+	"goapp-account/dtos"
 )
 
 /*

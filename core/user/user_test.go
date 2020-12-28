@@ -4,8 +4,8 @@ import (
 	"github.com/bb-orz/goinfras/XStore/XGorm"
 	"github.com/bb-orz/goinfras/XValidate"
 	. "github.com/smartystreets/goconvey/convey"
-	"goinfras-sample-account/core"
-	"goinfras-sample-account/services"
+	"goapp-account/core"
+	"goapp-account/services"
 	"testing"
 )
 

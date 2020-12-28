@@ -3,7 +3,7 @@ package user
 import (
 	"github.com/bb-orz/goinfras/XStore/XGorm"
 	"github.com/jinzhu/gorm"
-	"goinfras-sample-account/dtos"
+	"goapp-account/dtos"
 )
 
 /*

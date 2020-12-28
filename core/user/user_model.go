@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/jinzhu/gorm"
-	"goinfras-sample-account/dtos"
+	"goapp-account/dtos"
 )
 
 /* User 单表模型 */

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/bb-orz/goinfras/XGlobal"
 	"github.com/bb-orz/goinfras/XMail"
-	"goinfras-sample-account/common"
-	"goinfras-sample-account/dtos"
+	"goapp-account/common"
+	"goapp-account/dtos"
 	"strconv"
 )
 
@@ -21,7 +21,7 @@ func NewVerifyDomain() *VerifyDomain {
 	return domain
 }
 
-func  (domain *VerifyDomain)DomainName() string {
+func (domain *VerifyDomain) DomainName() string {
 	return "VerifyDomain"
 }
 
@@ -35,7 +35,7 @@ func (domain *VerifyDomain) genEmailVerifyCode(uid uint) (string, error) {
 	// 保存到缓存
 	err = domain.cache.SetUserVerifyEmailCode(uid, code)
 	if err != nil {
-		return "",common.DomainInnerErrorOnCacheSet(err, "SetUserVerifyEmailCode")
+		return "", common.DomainInnerErrorOnCacheSet(err, "SetUserVerifyEmailCode")
 	}
 
 	return code, nil
@@ -46,7 +46,7 @@ func (domain *VerifyDomain) sendValidateEmail(address string, code string) error
 	from := "no-reply@" + XGlobal.GetHost()
 	subject := "Verify Email Code From " + XGlobal.GetAppName()
 	body := fmt.Sprintf("Verify Code: %s", code)
-	err := XMail.XCommonMail().SendSimpleMail(from,"","", subject, body,"text/plain","",[]string{address})
+	err := XMail.XCommonMail().SendSimpleMail(from, "", "", subject, body, "text/plain", "", []string{address})
 	if err != nil {
 		return common.DomainInnerErrorOnNetRequest(err, "SendSimpleMail")
 	}
@@ -75,8 +75,8 @@ func (domain *VerifyDomain) VerifyEmail(uid uint, vcode string) (bool, error) {
 	var code string
 	var isExist bool
 	// 缓存取出
-	if code, isExist = domain.cache.GetUserVerifyEmailCode(uid);!isExist {
-		return false,common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"), "GetUserVerifyEmailCode")
+	if code, isExist = domain.cache.GetUserVerifyEmailCode(uid); !isExist {
+		return false, common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"), "GetUserVerifyEmailCode")
 	}
 	// 校验
 	if vcode == code {
@@ -95,7 +95,7 @@ func (domain *VerifyDomain) genResetPasswordCode(uid uint) (string, error) {
 	// 保存到缓存
 	err = domain.cache.SetForgetPasswordVerifyCode(uid, code)
 	if err != nil {
-		return "",common.DomainInnerErrorOnCacheSet(err, "SetForgetPasswordVerifyCode")
+		return "", common.DomainInnerErrorOnCacheSet(err, "SetForgetPasswordVerifyCode")
 	}
 
 	return code, nil
@@ -110,7 +110,7 @@ func (domain *VerifyDomain) sendResetPasswordCodeEmail(address string, code stri
 	body := fmt.Sprintf("Click This link To Reset Your Password: %s", url)
 
 	// 发送邮件
-	err := XMail.XCommonMail().SendSimpleMail(from,"","", subject, body,"text/plain","",[]string{address})
+	err := XMail.XCommonMail().SendSimpleMail(from, "", "", subject, body, "text/plain", "", []string{address})
 	if err != nil {
 		return common.DomainInnerErrorOnNetRequest(err, "SendSimpleMail")
 	}
@@ -136,7 +136,7 @@ func (domain *VerifyDomain) VerifyResetPasswordCode(uid uint, vcode string) (boo
 	var code string
 
 	// 缓存取出
-	if code, isExist = domain.cache.GetForgetPasswordVerifyCode(uid);!isExist{
+	if code, isExist = domain.cache.GetForgetPasswordVerifyCode(uid); !isExist {
 		return false, common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"), "GetForgetPasswordVerifyCode")
 	}
 
@@ -156,7 +156,7 @@ func (domain *VerifyDomain) genPhoneVerifyCode(uid uint) (string, error) {
 	// 生成4位随机数字
 	code, err = XGlobal.RandomNumber(4)
 	if err != nil {
-		return "", common.DomainInnerErrorOnAlgorithm(err,  "XGlobal.RandomNumber(4)")
+		return "", common.DomainInnerErrorOnAlgorithm(err, "XGlobal.RandomNumber(4)")
 	}
 
 	// 保存到缓存
@@ -196,14 +196,14 @@ func (domain *VerifyDomain) VerifyPhone(uid uint, vcode string) (bool, error) {
 	var code string
 
 	// 缓存取出
-	if code, isExist = domain.cache.GetUserVerifyPhoneCode(uid);!isExist {
-		return false, common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"),"GetUserVerifyPhoneCode")
+	if code, isExist = domain.cache.GetUserVerifyPhoneCode(uid); !isExist {
+		return false, common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"), "GetUserVerifyPhoneCode")
 	}
 
 	// 校验
 	if vcode == code {
 		return true, nil
-	}else {
-		return false,common.DomainInnerErrorOnDecodeData(errors.New("code verify fail"),fmt.Sprintf("[validating code]:%s | [cache code]:%s",vcode,code))
+	} else {
+		return false, common.DomainInnerErrorOnDecodeData(errors.New("code verify fail"), fmt.Sprintf("[validating code]:%s | [cache code]:%s", vcode, code))
 	}
 }

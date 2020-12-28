@@ -4,12 +4,12 @@ import (
 	"github.com/bb-orz/goinfras/XGlobal"
 	"github.com/bb-orz/goinfras/XOAuth"
 	"github.com/bb-orz/goinfras/XValidate"
-	"goinfras-sample-account/common"
-	"goinfras-sample-account/core/oauth2"
-	"goinfras-sample-account/core/user"
-	"goinfras-sample-account/core/verify"
-	"goinfras-sample-account/dtos"
-	"goinfras-sample-account/services"
+	"goapp-account/common"
+	"goapp-account/core/oauth2"
+	"goapp-account/core/user"
+	"goapp-account/core/verify"
+	"goapp-account/dtos"
+	"goapp-account/services"
 	"sync"
 )
 

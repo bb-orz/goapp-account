@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/bb-orz/goinfras/XJwt"
 	"github.com/gin-gonic/gin"
-	"goinfras-sample-account/common"
+	"goapp-account/common"
 )
 
 // 用户鉴权中间件

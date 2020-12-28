@@ -3,7 +3,7 @@ package oauth2
 import (
 	"fmt"
 	"github.com/bb-orz/goinfras/XOAuth"
-	"goinfras-sample-account/common"
+	"goapp-account/common"
 )
 
 /*
@@ -16,7 +16,7 @@ func NewOauthDomain() *OauthDomain {
 	return domain
 }
 
-func (domain *OauthDomain)DomainName() string {
+func (domain *OauthDomain) DomainName() string {
 	return "OauthDomain"
 
 }
@@ -27,7 +27,7 @@ func (domain *OauthDomain) GetQQOauthUserInfo(accessCode string) (*XOAuth.OAuthA
 	oAuthResult = XOAuth.XQQOAuthManager().Authorize(accessCode)
 
 	if oAuthResult.Error != nil || !oAuthResult.Result {
-		return nil, common.DomainInnerErrorOnThirdPartRequest(oAuthResult.Error, fmt.Sprintf("QQ OAuth AccessCode:%s",accessCode))
+		return nil, common.DomainInnerErrorOnThirdPartRequest(oAuthResult.Error, fmt.Sprintf("QQ OAuth AccessCode:%s", accessCode))
 	}
 
 	return oAuthResult.UserInfo, nil
@@ -39,7 +39,7 @@ func (domain *OauthDomain) GetWechatOauthUserInfo(accessCode string) (*XOAuth.OA
 	oAuthResult = XOAuth.XWechatOAuthManager().Authorize(accessCode)
 
 	if oAuthResult.Error != nil || !oAuthResult.Result {
-		return nil, common.DomainInnerErrorOnThirdPartRequest(oAuthResult.Error, fmt.Sprintf("Wechat OAuth AccessCode:%s",accessCode))
+		return nil, common.DomainInnerErrorOnThirdPartRequest(oAuthResult.Error, fmt.Sprintf("Wechat OAuth AccessCode:%s", accessCode))
 	}
 
 	return oAuthResult.UserInfo, nil
@@ -51,7 +51,7 @@ func (domain *OauthDomain) GetWeiboOauthUserInfo(accessCode string) (*XOAuth.OAu
 	oAuthResult = XOAuth.XWeiboOAuthManager().Authorize(accessCode)
 
 	if oAuthResult.Error != nil || !oAuthResult.Result {
-		return nil, common.DomainInnerErrorOnThirdPartRequest(oAuthResult.Error, fmt.Sprintf("Weibo OAuth AccessCode:%s",accessCode))
+		return nil, common.DomainInnerErrorOnThirdPartRequest(oAuthResult.Error, fmt.Sprintf("Weibo OAuth AccessCode:%s", accessCode))
 	}
 
 	return oAuthResult.UserInfo, nil

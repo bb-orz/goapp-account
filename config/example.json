@@ -9,11 +9,36 @@
   "Gin": {
     "Mode": "debug",
     "ListenHost": "127.0.0.1",
-    "ListenPort": 8090,
+    "ListenPort": 8099,
     "Tls": false,
     "CertFile": "",
     "KeyFile": "",
     "RecoveryDebugStack": true
+  },
+  "GinCors": {
+    "AllowAllOrigins": true,
+    "AllowOrigins": [
+      ""
+    ],
+    "AllowMethods": [
+      "PUT",
+      "POST",
+      "GET",
+      "PATCH",
+      "DELETE"
+    ],
+    "AllowHeaders": [
+      "Origin"
+    ],
+    "AllowCredentials": false,
+    "ExposeHeaders": [
+      "Content-Length"
+    ],
+    "MaxAge": 60,
+    "AllowWildcard": true,
+    "AllowBrowserExtensions": false,
+    "AllowWebSockets": false,
+    "AllowFiles": true
   },
   "Echo": {
     "Debug": true,
@@ -61,7 +86,7 @@
     "MaxCallSendMsgSize": 0
   },
   "Logger": {
-    "AppName": "goinfras-sample-account",
+    "AppName": "goapp-account",
     "AppVersion": "v1.0.0",
     "DevEnv": true,
     "AddCaller": true,
@@ -217,7 +242,7 @@
     "Password": "",
     "CloudID": "",
     "APIKey": "",
-    "CACert": null,
+    "CACert": "",
     "RetryOnStatus": [
       502,
       503,
@@ -248,7 +273,7 @@
     "NoAuth": true,
     "NoSmtp": false,
     "Server": "",
-    "Port": null,
+    "Port": 0,
     "User": "",
     "Password": ""
   }

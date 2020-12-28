@@ -2,10 +2,10 @@ package core
 
 import (
 	"github.com/bb-orz/goinfras/XValidate"
-	"goinfras-sample-account/common"
-	"goinfras-sample-account/core/verify"
-	"goinfras-sample-account/dtos"
-	"goinfras-sample-account/services"
+	"goapp-account/common"
+	"goapp-account/core/verify"
+	"goapp-account/dtos"
+	"goapp-account/services"
 	"sync"
 )
 

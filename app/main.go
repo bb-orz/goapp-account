@@ -14,7 +14,7 @@ func main() {
 
 	// 注册应用组件启动器
 	fmt.Println("Register Starters  ......")
-	RegisterStarter()
+	RegisterStarter(viperCfg)
 
 	// 创建应用程序启动管理器
 	app = goinfras.NewApplication(viperCfg)
