@@ -20,11 +20,14 @@ func ResponseMiddleware() gin.HandlerFunc {
 			}
 
 			// 有数据正常响应信息
-			data, _ := ctx.Get(common.ResponseDataKey)
-			if data != nil {
-				ctx.JSON(http.StatusOK, data)
+			data, isExist := ctx.Get(common.ResponseDataKey)
+			if isExist {
+				if data != nil {
+					ctx.JSON(http.StatusOK, data)
+				} else {
+					ctx.JSON(http.StatusOK, common.ResponseOK(nil))
+				}
 			}
-
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package restful
 
 import (
+	"errors"
 	"github.com/bb-orz/goinfras/XGin"
 	"github.com/gin-gonic/gin"
 	"goinfras-sample-account/common"
@@ -26,7 +27,7 @@ func (api *UserApi) SetRoutes() {
 
 	// 登录登出接口
 	engine.POST("/login", api.loginHandler)
-	engine.POST("/logout", api.logoutHandler, middleware.JwtAuthMiddleware())
+	engine.GET("/logout", middleware.JwtAuthMiddleware(), api.logoutHandler)
 
 	// 邮箱或手机号注册账号接口
 	registerGroup := engine.Group("/register")
@@ -72,6 +73,11 @@ func (api *UserApi) loginHandler(ctx *gin.Context) {
 func (api *UserApi) logoutHandler(ctx *gin.Context) {
 	// Receive Request ...
 	token := ctx.GetString(common.ContextTokenStringKey)
+	if token == "" {
+		_ = ctx.Error(errors.New("Token is not set in context ")) // 所有错误最后传递给错误中间件处理
+		return
+	}
+
 	var dto = dtos.RemoveTokenDTO{Token: token}
 
 	// Call Services method ...

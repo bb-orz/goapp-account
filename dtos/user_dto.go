@@ -119,7 +119,7 @@ type AuthWithPhonePasswordDTO struct {
 
 // 移除登录鉴权token的缓存
 type RemoveTokenDTO struct {
-	Token string `validate:"required" json:"phone"`
+	Token string `validate:"required" json:"token"`
 }
 
 type GetUserInfoDTO struct {
