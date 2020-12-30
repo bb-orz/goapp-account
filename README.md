@@ -5,7 +5,7 @@ go web 应用脚手架
 #### 目录结构
 
 ```
-simple       项目
+goapp       项目
 |-- app             构建程序目录：应用主包，资源组件注册，makefile、dockerfile、sh等皆放置于此；
 |-- common          常量定义，错误处理定义、响应定义等；
 |-- config          配置文件；
