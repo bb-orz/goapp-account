@@ -3,7 +3,7 @@ package oauth2
 import (
 	"fmt"
 	"github.com/bb-orz/goinfras/XOAuth"
-	"goapp-account/common"
+	"goapp/common"
 )
 
 /*

@@ -1,4 +1,4 @@
-module goapp-account
+module goapp
 
 go 1.15
 

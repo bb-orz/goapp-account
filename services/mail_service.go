@@ -1,6 +1,6 @@
 package services
 
-import "goapp-account/dtos"
+import "goapp/dtos"
 
 /* 定义邮件服务模块的服务层方法，并定义数据传输对象DTO*/
 var mailService IMailService

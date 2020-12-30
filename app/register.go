@@ -12,9 +12,9 @@ import (
 	"github.com/bb-orz/goinfras/XStore/XMongo"
 	"github.com/bb-orz/goinfras/XValidate"
 	"github.com/spf13/viper"
-	_ "goapp-account/core"    // 自动载入业务核心，注册service实例
-	_ "goapp-account/restful" // 自动载入Restful API模块
-	"goapp-account/restful/middleware"
+	_ "goapp/core"    // 自动载入业务核心，注册service实例
+	_ "goapp/restful" // 自动载入Restful API模块
+	"goapp/restful/middleware"
 )
 
 // 注册应用组件启动器，把基础设施各资源组件化

@@ -2,10 +2,10 @@ package core
 
 import (
 	"github.com/bb-orz/goinfras/XValidate"
-	"goapp-account/common"
-	"goapp-account/core/verify"
-	"goapp-account/dtos"
-	"goapp-account/services"
+	"goapp/common"
+	"goapp/core/verify"
+	"goapp/dtos"
+	"goapp/services"
 	"sync"
 )
 

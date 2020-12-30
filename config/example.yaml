@@ -120,7 +120,7 @@ Etcd:
 
 # zap日志配置
 Logger:
-  AppName:    "goapp-account"
+  AppName:    "goapp"
   AppVersion: "v1.0.0"
   DevEnv:     true
   AddCaller:  true

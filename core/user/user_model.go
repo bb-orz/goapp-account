@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/jinzhu/gorm"
-	"goapp-account/dtos"
+	"goapp/dtos"
 )
 
 /* User 单表模型 */

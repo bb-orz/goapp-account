@@ -1,7 +1,7 @@
 package services
 
 import (
-	"goapp-account/dtos"
+	"goapp/dtos"
 )
 
 /* 定义用户模块的服务层方法，并定义数据传输对象DTO*/

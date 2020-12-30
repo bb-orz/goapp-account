@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/bb-orz/goinfras/XGlobal"
 	"github.com/bb-orz/goinfras/XMail"
-	"goapp-account/common"
-	"goapp-account/dtos"
+	"goapp/common"
+	"goapp/dtos"
 	"strconv"
 )
 

@@ -4,10 +4,10 @@ import (
 	"errors"
 	"github.com/bb-orz/goinfras/XGin"
 	"github.com/gin-gonic/gin"
-	"goapp-account/common"
-	"goapp-account/dtos"
-	"goapp-account/restful/middleware"
-	"goapp-account/services"
+	"goapp/common"
+	"goapp/dtos"
+	"goapp/restful/middleware"
+	"goapp/services"
 )
 
 /*
