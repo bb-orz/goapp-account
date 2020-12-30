@@ -33,7 +33,7 @@ replace (
 )
 
 require (
-	github.com/bb-orz/goinfras v1.1.6
+	github.com/bb-orz/goinfras v1.2.0
 	github.com/garyburd/redigo v1.6.2
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
