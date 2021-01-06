@@ -8,6 +8,7 @@ import (
 	"goapp/dtos"
 	"goapp/restful/middleware"
 	"goapp/services"
+	"sync"
 )
 
 /*
@@ -15,8 +16,11 @@ API层，调用相关Service，封装响应返回，并记录日志
 */
 
 func init() {
-	// 初始化时注册该模块API
-	XGin.RegisterApi(new(UserApi))
+	var once sync.Once
+	once.Do(func() {
+		// 初始化时注册该模块API
+		XGin.RegisterApi(new(UserApi))
+	})
 }
 
 type UserApi struct{}
