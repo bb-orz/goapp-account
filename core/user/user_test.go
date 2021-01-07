@@ -4,8 +4,8 @@ import (
 	"github.com/bb-orz/goinfras/XStore/XGorm"
 	"github.com/bb-orz/goinfras/XValidate"
 	. "github.com/smartystreets/goconvey/convey"
-	"goapp/core"
 	"goapp/dtos"
+	"goapp/services"
 	"testing"
 )
 
@@ -23,7 +23,7 @@ func TestUserService_CreateUser(t *testing.T) {
 			Password:   "123456",
 			RePassword: "123456",
 		}
-		service := new(core.UserServiceV1)
+		service := new(services.UserServiceV1)
 		userDTO, err := service.CreateUserWithEmail(dto)
 		So(err, ShouldBeNil)
 
@@ -39,7 +39,7 @@ func TestUserService_GetUserInfo(t *testing.T) {
 		err = XGorm.CreateDefaultDB(nil)
 		So(err, ShouldBeNil)
 
-		service := new(core.UserServiceV1)
+		service := new(services.UserServiceV1)
 		userDTO, err := service.GetUserInfo(dtos.GetUserInfoDTO{1})
 		So(err, ShouldBeNil)
 		Println("Get User Info:", userDTO)

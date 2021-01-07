@@ -1,4 +1,4 @@
-package core
+package services
 
 import (
 	"github.com/bb-orz/goinfras/XGlobal"
@@ -9,7 +9,6 @@ import (
 	"goapp/core/user"
 	"goapp/core/verify"
 	"goapp/dtos"
-	"goapp/services"
 	"sync"
 )
 
@@ -17,14 +16,14 @@ import (
 // 需在服务实现的方法中验证DTO传输参数并调用具体的领域层业务逻辑
 // 接收领域层和dao层的错误包装处理
 
-var _ services.IUserService = new(UserServiceV1)
+var _ IUserService = new(UserServiceV1)
 
 func init() {
 	// 初始化该业务模块时实例化服务
 	var once sync.Once
 	once.Do(func() {
 		userService := new(UserServiceV1)
-		services.SetUserService(userService)
+		SetUserService(userService)
 	})
 }
 

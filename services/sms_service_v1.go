@@ -1,25 +1,24 @@
-package core
+package services
 
 import (
 	"github.com/bb-orz/goinfras/XValidate"
 	"goapp/common"
 	"goapp/core/verify"
 	"goapp/dtos"
-	"goapp/services"
 	"sync"
 )
 
 // 服务层，实现services包定义的服务并设置该服务的实例，
 // 需在服务实现的方法中验证DTO传输参数并调用具体的领域层业务逻辑
 
-var _ services.ISmsService = new(SmsServiceV1)
+var _ ISmsService = new(SmsServiceV1)
 
 func init() {
 	// 初始化该业务模块时实例化服务
 	var once sync.Once
 	once.Do(func() {
 		smsService := new(SmsServiceV1)
-		services.SetSmsService(smsService)
+		SetSmsService(smsService)
 	})
 }
 
