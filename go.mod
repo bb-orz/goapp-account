@@ -1,6 +1,6 @@
 module goapp
 
-go 1.15
+go 1.14
 
 replace (
 	cloud.google.com/go => github.com/googleapis/google-cloud-go v0.47.0
