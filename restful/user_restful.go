@@ -217,7 +217,7 @@ func (api *UserApi) oauthWeiboHandler(ctx *gin.Context) {
 
 func (api *UserApi) setUserInfoHandler(ctx *gin.Context) {
 	// Receive Request ...
-	var dto dtos.SetUserInfoDTO
+	var dto dtos.UserInfoDTO
 	var err error
 	err = ctx.ShouldBindJSON(&dto)
 	if err != nil {

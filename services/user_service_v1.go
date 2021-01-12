@@ -5,7 +5,7 @@ import (
 	"github.com/bb-orz/goinfras/XOAuth"
 	"github.com/bb-orz/goinfras/XValidate"
 	"goapp/common"
-	"goapp/core/oauth2"
+	"goapp/core/third"
 	"goapp/core/user"
 	"goapp/core/verify"
 	"goapp/dtos"
@@ -31,10 +31,10 @@ func init() {
 type UserServiceV1 struct{}
 
 // 邮箱创建用户账号
-func (service *UserServiceV1) CreateUserWithEmail(dto dtos.CreateUserWithEmailDTO) (*dtos.UserDTO, error) {
+func (service *UserServiceV1) CreateUserWithEmail(dto dtos.CreateUserWithEmailDTO) (*dtos.UsersDTO, error) {
 	var err error
 	var isExist bool
-	var userDTO *dtos.UserDTO
+	var userDTO *dtos.UsersDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
@@ -58,10 +58,10 @@ func (service *UserServiceV1) CreateUserWithEmail(dto dtos.CreateUserWithEmailDT
 }
 
 // 手机号码创建用户账号
-func (service *UserServiceV1) CreateUserWithPhone(dto dtos.CreateUserWithPhoneDTO) (*dtos.UserDTO, error) {
+func (service *UserServiceV1) CreateUserWithPhone(dto dtos.CreateUserWithPhoneDTO) (*dtos.UsersDTO, error) {
 	var err error
 	var isExist bool
-	var userDTO *dtos.UserDTO
+	var userDTO *dtos.UsersDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
@@ -88,7 +88,7 @@ func (service *UserServiceV1) CreateUserWithPhone(dto dtos.CreateUserWithPhoneDT
 func (service *UserServiceV1) EmailAuth(dto dtos.AuthWithEmailPasswordDTO) (string, error) {
 	var err error
 	var token string
-	var userDTO *dtos.UserDTO
+	var userDTO *dtos.UsersDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
@@ -121,7 +121,7 @@ func (service *UserServiceV1) EmailAuth(dto dtos.AuthWithEmailPasswordDTO) (stri
 func (service *UserServiceV1) PhoneAuth(dto dtos.AuthWithPhonePasswordDTO) (string, error) {
 	var err error
 	var token string
-	var userDTO *dtos.UserDTO
+	var userDTO *dtos.UsersDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
@@ -171,7 +171,7 @@ func (service *UserServiceV1) RemoveToken(dto dtos.RemoveTokenDTO) error {
 // 获取用户信息
 func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserInfoDTO, error) {
 	var err error
-	var userDTO *dtos.UserDTO
+	var userDTO *dtos.UsersDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
@@ -190,7 +190,7 @@ func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserIn
 }
 
 // 批量设置用户信息
-func (service *UserServiceV1) SetUserInfos(dto dtos.SetUserInfoDTO) error {
+func (service *UserServiceV1) SetUserInfos(dto dtos.UserInfoDTO) error {
 	var err error
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
@@ -200,8 +200,8 @@ func (service *UserServiceV1) SetUserInfos(dto dtos.SetUserInfoDTO) error {
 		return common.ErrorOnValidate(err)
 	}
 
-	uid := dto.ID
-	err = userDomain.SetUserInfos(uid, dto)
+	uid := dto.Id
+	err = userDomain.UpdateUsers(uid, dto)
 	if err != nil {
 		return common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
@@ -214,8 +214,9 @@ func (service *UserServiceV1) ValidateEmail(dto dtos.ValidateEmailDTO) (bool, er
 	var err error
 	var pass bool
 	var verifyDomain *verify.VerifyDomain
+	var userDomain *user.UserDomain
 	verifyDomain = verify.NewVerifyDomain()
-
+	userDomain = user.NewUserDomain()
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
 		return false, common.ErrorOnValidate(err)
@@ -228,6 +229,10 @@ func (service *UserServiceV1) ValidateEmail(dto dtos.ValidateEmailDTO) (bool, er
 	}
 
 	if pass {
+		// 设置email_verify字段
+		if err = userDomain.SetEmailVerify(dto.ID, 1); err != nil {
+			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
 		return true, nil
 	} else {
 		return false, common.ErrorOnVerify("Email Verify Code Error!")
@@ -239,7 +244,9 @@ func (service *UserServiceV1) ValidatePhone(dto dtos.ValidatePhoneDTO) (bool, er
 	var err error
 	var pass bool
 	var verifyDomain *verify.VerifyDomain
+	var userDomain *user.UserDomain
 	verifyDomain = verify.NewVerifyDomain()
+	userDomain = user.NewUserDomain()
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
@@ -247,12 +254,15 @@ func (service *UserServiceV1) ValidatePhone(dto dtos.ValidatePhoneDTO) (bool, er
 	}
 
 	// 从cache拿出保存的短信验证码
-	pass, err = verifyDomain.VerifyPhone(dto.ID, dto.VerifyCode)
-	if err != nil {
+	if pass, err = verifyDomain.VerifyPhone(dto.ID, dto.VerifyCode); err != nil {
 		return false, common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}
 
 	if pass {
+		// 设置phone_verify字段
+		if err = userDomain.SetPhoneVerify(dto.ID, 1); err != nil {
+			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
 		return true, nil
 	} else {
 		return false, common.ErrorOnVerify("Sms Verify Code Error!")
@@ -270,8 +280,7 @@ func (service *UserServiceV1) SetStatus(dto dtos.SetStatusDTO) (int, error) {
 		return -1, common.ErrorOnValidate(err)
 	}
 
-	err = userDomain.SetStatus(dto.ID, dto.Status)
-	if err != nil {
+	if err = userDomain.SetStatus(dto.ID, dto.Status); err != nil {
 		return -1, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
@@ -281,7 +290,7 @@ func (service *UserServiceV1) SetStatus(dto dtos.SetStatusDTO) (int, error) {
 // 修改用户密码
 func (service *UserServiceV1) ChangePassword(dto dtos.ChangePasswordDTO) error {
 	var err error
-	var userDTO *dtos.UserDTO
+	var userDTO *dtos.UsersDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
@@ -360,13 +369,13 @@ func (service *UserServiceV1) UploadAvatar() error {
 func (service *UserServiceV1) QQOAuth(dto dtos.QQLoginDTO) (string, error) {
 	var err error
 	var token string
+	var isQQBinding bool
 	var qqOauthAccountInfo *XOAuth.OAuthAccountInfo // qq账号鉴权信息
-	var findUserBindingDTO *dtos.UserOAuthsDTO      // 查找绑定用户
-	var userOAuthsInfo *dtos.UserOAuthsDTO          // 创建用户后的信息
+	var userOAuthsInfo *dtos.UserOAuthInfoDTO       // 创建用户后的信息
 
-	var oauthDomain *oauth2.OauthDomain
+	var thirdOauthDomain *third.ThirdOAuthDomain
 	var userDomain *user.UserDomain
-	oauthDomain = oauth2.NewOauthDomain()
+	thirdOauthDomain = third.NewThirdOAuthDomain()
 	userDomain = user.NewUserDomain()
 
 	// 校验传输参数
@@ -374,27 +383,25 @@ func (service *UserServiceV1) QQOAuth(dto dtos.QQLoginDTO) (string, error) {
 		return "", common.ErrorOnValidate(err)
 	}
 
-	// oauth domain：使用qq回调授权码code开始鉴权流程并获取QQ用户信息
-	qqOauthAccountInfo, err = oauthDomain.GetQQOauthUserInfo(dto.AccessCode)
-	if err != nil {
-		return "", common.ErrorOnServerInner(err, oauthDomain.DomainName())
+	// third oauth domain：使用qq回调授权码code开始鉴权流程并获取QQ用户信息
+	if qqOauthAccountInfo, err = thirdOauthDomain.GetQQOauthUserInfo(dto.AccessCode); err != nil {
+		return "", common.ErrorOnServerInner(err, thirdOauthDomain.DomainName())
 	}
 
-	// oauth domain: 使用OpenId UnionId查找user oauth表查看用户是否存在
-	findUserBindingDTO, err = userDomain.GetUserOauths(user.QQOauthPlatform, qqOauthAccountInfo.OpenId, qqOauthAccountInfo.UnionId)
-	if err != nil {
+	// user domain: 使用OpenId UnionId查找 oauth表查看用户是否存在
+	if isQQBinding, err = userDomain.IsQQAccountBinding(qqOauthAccountInfo.OpenId, qqOauthAccountInfo.UnionId); err != nil {
 		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
-	// 如不存在进入创建用户流程,否则进登录流程
-	if findUserBindingDTO == nil {
+	if !isQQBinding {
+		// 未绑定，进入创建用户流程
 		userOAuthsInfo, err = userDomain.CreateUserOAuthBinding(user.QQOauthPlatform, qqOauthAccountInfo)
 		// JWT token
 		if userOAuthsInfo != nil {
 			token, err = userDomain.GenToken(
-				userOAuthsInfo.User.No,
-				userOAuthsInfo.User.Name,
-				userOAuthsInfo.User.Avatar)
+				userOAuthsInfo.No,
+				userOAuthsInfo.Name,
+				userOAuthsInfo.Avatar)
 			if err != nil {
 				return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 			}
@@ -402,15 +409,16 @@ func (service *UserServiceV1) QQOAuth(dto dtos.QQLoginDTO) (string, error) {
 		} else {
 			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
-	}
 
-	// 跳过创建，直接返回token，登录成功
-	token, err = userDomain.GenToken(
-		findUserBindingDTO.User.No,
-		findUserBindingDTO.User.Name,
-		findUserBindingDTO.User.Avatar)
-	if err != nil {
-		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
+	} else {
+		// 已绑定，获取用户信息，进入登录流程
+		if userOAuthsInfo, err = userDomain.GetUserOauths(user.QQOauthPlatform, qqOauthAccountInfo.OpenId, qqOauthAccountInfo.UnionId); err != nil {
+			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
+
+		if token, err = userDomain.GenToken(userOAuthsInfo.No, userOAuthsInfo.Name, userOAuthsInfo.Avatar); err != nil {
+			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
 	}
 
 	return token, nil
@@ -420,13 +428,13 @@ func (service *UserServiceV1) QQOAuth(dto dtos.QQLoginDTO) (string, error) {
 func (service *UserServiceV1) WechatOAuth(dto dtos.WechatLoginDTO) (string, error) {
 	var err error
 	var token string
+	var isWechatBinding bool
 	var wechatOauthAccountInfo *XOAuth.OAuthAccountInfo // 微信账号鉴权信息
-	var findUserBindingDTO *dtos.UserOAuthsDTO          // 查找绑定用户
-	var userOAuthsInfo *dtos.UserOAuthsDTO              // 创建用户后的信息
+	var userOAuthsInfo *dtos.UserOAuthInfoDTO           // 创建用户后的信息
 
-	var oauthDomain *oauth2.OauthDomain
+	var thirdOauthDomain *third.ThirdOAuthDomain
 	var userDomain *user.UserDomain
-	oauthDomain = oauth2.NewOauthDomain()
+	thirdOauthDomain = third.NewThirdOAuthDomain()
 	userDomain = user.NewUserDomain()
 
 	// 校验传输参数
@@ -434,27 +442,25 @@ func (service *UserServiceV1) WechatOAuth(dto dtos.WechatLoginDTO) (string, erro
 		return "", common.ErrorOnValidate(err)
 	}
 
-	// oauth domain：使用wechat回调授权码code开始鉴权流程并获取微信用户信息
-	wechatOauthAccountInfo, err = oauthDomain.GetQQOauthUserInfo(dto.AccessCode)
-	if err != nil {
-		return "", common.ErrorOnServerInner(err, oauthDomain.DomainName())
+	// third oauth domain：使用wechat回调授权码code开始鉴权流程并获取微信用户信息
+	if wechatOauthAccountInfo, err = thirdOauthDomain.GetWechatOauthUserInfo(dto.AccessCode); err != nil {
+		return "", common.ErrorOnServerInner(err, thirdOauthDomain.DomainName())
 	}
 
-	// oauth domain: 使用OpenId UnionId查找user oauth表查看用户是否存在
-	findUserBindingDTO, err = userDomain.GetUserOauths(user.WechatOauthPlatform, wechatOauthAccountInfo.OpenId, wechatOauthAccountInfo.UnionId)
-	if err != nil {
+	// user domain: 使用OpenId UnionId查找 oauth表查看用户是否存在
+	if isWechatBinding, err = userDomain.IsWechatAccountBinding(wechatOauthAccountInfo.OpenId, wechatOauthAccountInfo.UnionId); err != nil {
 		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
-	// 如不存在进入创建用户流程,否则进登录流程
-	if findUserBindingDTO == nil {
+	if !isWechatBinding {
+		// 未绑定，进入创建用户流程
 		userOAuthsInfo, err = userDomain.CreateUserOAuthBinding(user.WechatOauthPlatform, wechatOauthAccountInfo)
 		// JWT token
 		if userOAuthsInfo != nil {
 			token, err = userDomain.GenToken(
-				userOAuthsInfo.User.No,
-				userOAuthsInfo.User.Name,
-				userOAuthsInfo.User.Avatar)
+				userOAuthsInfo.No,
+				userOAuthsInfo.Name,
+				userOAuthsInfo.Avatar)
 			if err != nil {
 				return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 			}
@@ -462,15 +468,16 @@ func (service *UserServiceV1) WechatOAuth(dto dtos.WechatLoginDTO) (string, erro
 		} else {
 			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
-	}
 
-	// 跳过创建，直接返回token，登录成功
-	token, err = userDomain.GenToken(
-		findUserBindingDTO.User.No,
-		findUserBindingDTO.User.Name,
-		findUserBindingDTO.User.Avatar)
-	if err != nil {
-		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
+	} else {
+		// 已绑定，获取用户信息，进入登录流程
+		if userOAuthsInfo, err = userDomain.GetUserOauths(user.WechatOauthPlatform, wechatOauthAccountInfo.OpenId, wechatOauthAccountInfo.UnionId); err != nil {
+			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
+
+		if token, err = userDomain.GenToken(userOAuthsInfo.No, userOAuthsInfo.Name, userOAuthsInfo.Avatar); err != nil {
+			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
 	}
 
 	return token, nil
@@ -480,13 +487,13 @@ func (service *UserServiceV1) WechatOAuth(dto dtos.WechatLoginDTO) (string, erro
 func (service *UserServiceV1) WeiboOAuth(dto dtos.WeiboLoginDTO) (string, error) {
 	var err error
 	var token string
+	var isWeiboBinding bool
 	var weiboOauthAccountInfo *XOAuth.OAuthAccountInfo // 微博账号鉴权信息
-	var findUserBindingDTO *dtos.UserOAuthsDTO         // 查找绑定用户
-	var userOAuthsInfo *dtos.UserOAuthsDTO             // 创建用户后的信息
+	var userOAuthsInfo *dtos.UserOAuthInfoDTO          // 创建用户后的信息
 
-	var oauthDomain *oauth2.OauthDomain
+	var thirdOauthDomain *third.ThirdOAuthDomain
 	var userDomain *user.UserDomain
-	oauthDomain = oauth2.NewOauthDomain()
+	thirdOauthDomain = third.NewThirdOAuthDomain()
 	userDomain = user.NewUserDomain()
 
 	// 校验传输参数
@@ -494,27 +501,25 @@ func (service *UserServiceV1) WeiboOAuth(dto dtos.WeiboLoginDTO) (string, error)
 		return "", common.ErrorOnValidate(err)
 	}
 
-	// oauth domain：使用wechat回调授权码code开始鉴权流程并获取微信用户信息
-	weiboOauthAccountInfo, err = oauthDomain.GetQQOauthUserInfo(dto.AccessCode)
-	if err != nil {
-		return "", common.ErrorOnServerInner(err, oauthDomain.DomainName())
+	// third oauth domain：使用weibo回调授权码code开始鉴权流程并获取微博用户信息
+	if weiboOauthAccountInfo, err = thirdOauthDomain.GetQQOauthUserInfo(dto.AccessCode); err != nil {
+		return "", common.ErrorOnServerInner(err, thirdOauthDomain.DomainName())
 	}
 
-	// oauth domain: 使用OpenId UnionId查找user oauth表查看用户是否存在
-	findUserBindingDTO, err = userDomain.GetUserOauths(user.WeiboOauthPlatform, weiboOauthAccountInfo.OpenId, weiboOauthAccountInfo.UnionId)
-	if err != nil {
+	// user domain: 使用OpenId UnionId查找 oauth表查看用户是否存在
+	if isWeiboBinding, err = userDomain.IsQQAccountBinding(weiboOauthAccountInfo.OpenId, weiboOauthAccountInfo.UnionId); err != nil {
 		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
-	// 如不存在进入创建用户流程,否则进登录流程
-	if findUserBindingDTO == nil {
+	if !isWeiboBinding {
+		// 未绑定，进入创建用户流程
 		userOAuthsInfo, err = userDomain.CreateUserOAuthBinding(user.WeiboOauthPlatform, weiboOauthAccountInfo)
 		// JWT token
 		if userOAuthsInfo != nil {
 			token, err = userDomain.GenToken(
-				userOAuthsInfo.User.No,
-				userOAuthsInfo.User.Name,
-				userOAuthsInfo.User.Avatar)
+				userOAuthsInfo.No,
+				userOAuthsInfo.Name,
+				userOAuthsInfo.Avatar)
 			if err != nil {
 				return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 			}
@@ -522,15 +527,16 @@ func (service *UserServiceV1) WeiboOAuth(dto dtos.WeiboLoginDTO) (string, error)
 		} else {
 			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
-	}
 
-	// 跳过创建，直接返回token，登录成功
-	token, err = userDomain.GenToken(
-		findUserBindingDTO.User.No,
-		findUserBindingDTO.User.Name,
-		findUserBindingDTO.User.Avatar)
-	if err != nil {
-		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
+	} else {
+		// 已绑定，获取用户信息，进入登录流程
+		if userOAuthsInfo, err = userDomain.GetUserOauths(user.WeiboOauthPlatform, weiboOauthAccountInfo.OpenId, weiboOauthAccountInfo.UnionId); err != nil {
+			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
+
+		if token, err = userDomain.GenToken(userOAuthsInfo.No, userOAuthsInfo.Name, userOAuthsInfo.Avatar); err != nil {
+			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
 	}
 
 	return token, nil

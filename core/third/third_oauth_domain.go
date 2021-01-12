@@ -1,4 +1,4 @@
-package oauth2
+package third
 
 import (
 	"fmt"
@@ -9,20 +9,20 @@ import (
 /*
 Oauth 领域层：实现第三方平台鉴权相关具体业务逻辑，主要为通过accessCode获取用户在第三方平台账号的信息
 */
-type OauthDomain struct{}
+type ThirdOAuthDomain struct{}
 
-func NewOauthDomain() *OauthDomain {
-	domain := new(OauthDomain)
+func NewThirdOAuthDomain() *ThirdOAuthDomain {
+	domain := new(ThirdOAuthDomain)
 	return domain
 }
 
-func (domain *OauthDomain) DomainName() string {
+func (domain *ThirdOAuthDomain) DomainName() string {
 	return "OauthDomain"
 
 }
 
 // 通过accessCode获取qq user info
-func (domain *OauthDomain) GetQQOauthUserInfo(accessCode string) (*XOAuth.OAuthAccountInfo, error) {
+func (domain *ThirdOAuthDomain) GetQQOauthUserInfo(accessCode string) (*XOAuth.OAuthAccountInfo, error) {
 	var oAuthResult XOAuth.OAuthResult
 	oAuthResult = XOAuth.XQQOAuthManager().Authorize(accessCode)
 
@@ -34,7 +34,7 @@ func (domain *OauthDomain) GetQQOauthUserInfo(accessCode string) (*XOAuth.OAuthA
 }
 
 // 通过accessCode获取wechat user info
-func (domain *OauthDomain) GetWechatOauthUserInfo(accessCode string) (*XOAuth.OAuthAccountInfo, error) {
+func (domain *ThirdOAuthDomain) GetWechatOauthUserInfo(accessCode string) (*XOAuth.OAuthAccountInfo, error) {
 	var oAuthResult XOAuth.OAuthResult
 	oAuthResult = XOAuth.XWechatOAuthManager().Authorize(accessCode)
 
@@ -46,7 +46,7 @@ func (domain *OauthDomain) GetWechatOauthUserInfo(accessCode string) (*XOAuth.OA
 }
 
 // 通过accessCode获取weibo user info
-func (domain *OauthDomain) GetWeiboOauthUserInfo(accessCode string) (*XOAuth.OAuthAccountInfo, error) {
+func (domain *ThirdOAuthDomain) GetWeiboOauthUserInfo(accessCode string) (*XOAuth.OAuthAccountInfo, error) {
 	var oAuthResult XOAuth.OAuthResult
 	oAuthResult = XOAuth.XWeiboOAuthManager().Authorize(accessCode)
 

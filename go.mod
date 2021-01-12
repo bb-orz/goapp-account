@@ -4,7 +4,7 @@ go 1.14
 
 replace (
 	cloud.google.com/go => github.com/googleapis/google-cloud-go v0.47.0
-	// github.com/bb-orz/goinfras => /Users/fun/Code/MyProject/goinfras
+	// github.com/bb-orz/goinfras => /Users/fun/Code/GoProjects/goinfras
 	github.com/coreos/bbolt => go.etcd.io/bbolt v1.3.4
 	github.com/coreos/go-systemd => github.com/coreos/go-systemd/v22 v22.0.0
 	go.uber.org/atomic => github.com/uber-go/atomic v1.5.0
@@ -43,4 +43,5 @@ require (
 	github.com/spf13/viper v1.7.1
 	go.uber.org/zap v1.16.0
 	gopkg.in/go-playground/validator.v9 v9.31.0
+	gorm.io/gorm v1.20.8
 )

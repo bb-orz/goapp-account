@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-/*Verify 校验领域层：实现邮件绑定、手机短信绑定相关的校验业务逻辑*/
+/*Verify 校验领域层：实现邮件验证码校验、手机短信验证码校验等相关的校验业务逻辑*/
 type VerifyDomain struct {
 	cache *verifyCache
 }

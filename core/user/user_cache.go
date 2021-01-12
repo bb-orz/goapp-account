@@ -4,15 +4,14 @@ import (
 	"github.com/bb-orz/goinfras/XCache"
 )
 
-type userCache struct {
+type UsersCache struct {
 	CommonCache XCache.ICommonCache
 }
 
-func NewUserCache() *userCache {
-	cache := new(userCache)
+func NewUserCache() *UsersCache {
+	cache := new(UsersCache)
 	cache.CommonCache = XCache.XCommon()
 	return cache
 }
-
 
 // TODO Some User Cache Biz

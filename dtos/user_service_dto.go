@@ -2,80 +2,45 @@ package dtos
 
 import "time"
 
-// 用户数据传输对象
-type UserDTO struct {
-	Uid         uint
-	No          string
-	Name        string
-	Age         uint
-	Avatar      string
-	Gender      uint
-	Email       string
-	EmailVerify bool
-	Phone       string
-	PhoneVerify bool
-	Password    string
-	Salt        string
-	Status      uint
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   *time.Time
-}
-
-// 用户数据传输对象
-type UserInfoDTO struct {
-	Uid       uint
-	No        string
-	Name      string
-	Age       uint
-	Avatar    string
-	Gender    uint
-	Email     string
-	Phone     string
-	Status    uint
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt *time.Time
-}
-
-func (d *UserDTO) TransToUserInfoDTO() *UserInfoDTO {
-	return &UserInfoDTO{
-		Uid:       d.Uid,
-		No:        d.No,
-		Name:      d.Name,
-		Age:       d.Age,
-		Avatar:    d.Avatar,
-		Gender:    d.Gender,
-		Email:     d.Email,
-		Phone:     d.Phone,
-		Status:    d.Status,
-		CreatedAt: d.CreatedAt,
-		UpdatedAt: d.UpdatedAt,
-		DeletedAt: d.DeletedAt,
-	}
-}
-
-// 第三方平台授权账号信息传输对象
-type OAuthDTO struct {
-	Platform    uint
-	UserId      uint
-	AccessToken string
-	OpenId      string
-	UnionId     string
-	NickName    string
-	Gender      uint
-	Avatar      string
-}
-
-// 包含第三方账号绑定信息的用户信息传输对象
-type UserOAuthsDTO struct {
-	User       UserDTO
-	UserOAuths []OAuthDTO
-}
-
 /*
 以下为服务方法的待校验传输参数对象
 */
+
+// 用户数据传输对象
+type UserInfoDTO struct {
+	Id            uint      `validate:"required,numeric" json:"id"`             // 用户id
+	No            string    `validate:"required,alphanumunicode" json:"no"`     // 用户生成编号
+	Name          string    `validate:"required,alphanumunicode" json:"name"`   // 用户名
+	Age           int       `validate:"required,numeric" json:"age"`            // 用户年龄
+	Gender        int       `validate:"required,numeric" json:"gender"`         // 用户性别
+	Avatar        string    `validate:"required,alphanumunicode" json:"avatar"` // 用户头像
+	Email         string    `validate:"required,alphanumunicode" json:"email"`  // 账户邮箱
+	EmailVerified int       `validate:"required,numeric" json:"email_verified"` // 邮箱是否已验证
+	Phone         string    `validate:"required,alphanumunicode" json:"phone"`  // 账户手机号码
+	PhoneVerified int       `validate:"required,numeric" json:"phone_verified"` // 手机号码是否已验证
+	Status        int       `validate:"required,numeric" json:"status"`         // 账户状态：1：启用，0：停用
+	CreatedAt     time.Time `validate:"required,numeric" json:"created_at"`     //
+	UpdatedAt     time.Time `validate:"required,numeric" json:"updated_at"`     //
+	DeletedAt     time.Time `validate:"required,numeric" json:"deleted_at"`     //
+}
+
+type UserOAuthInfoDTO struct {
+	Id            uint      `validate:"required,numeric" json:"id"`             // 用户id
+	No            string    `validate:"required,alphanumunicode" json:"no"`     // 用户生成编号
+	Name          string    `validate:"required,alphanumunicode" json:"name"`   // 用户名
+	Age           int       `validate:"required,numeric" json:"age"`            // 用户年龄
+	Gender        int       `validate:"required,numeric" json:"gender"`         // 用户性别
+	Avatar        string    `validate:"required,alphanumunicode" json:"avatar"` // 用户头像
+	Email         string    `validate:"required,alphanumunicode" json:"email"`  // 账户邮箱
+	EmailVerified int       `validate:"required,numeric" json:"email_verified"` // 邮箱是否已验证
+	Phone         string    `validate:"required,alphanumunicode" json:"phone"`  // 账户手机号码
+	PhoneVerified int       `validate:"required,numeric" json:"phone_verified"` // 手机号码是否已验证
+	Status        int       `validate:"required,numeric" json:"status"`         // 账户状态：1：启用，0：停用
+	CreatedAt     time.Time `validate:"required,numeric" json:"created_at"`     //
+	UpdatedAt     time.Time `validate:"required,numeric" json:"updated_at"`     //
+	DeletedAt     time.Time `validate:"required,numeric" json:"deleted_at"`     //
+	OAuths        []OauthsDTO
+}
 
 type QQLoginDTO struct {
 	AccessCode string `validate:"required" json:"access_code"`
