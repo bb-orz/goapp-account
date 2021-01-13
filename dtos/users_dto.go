@@ -10,8 +10,8 @@ type UsersDTO struct {
 	Id            uint      `validate:"required,numeric" json:"id"`               // 用户id
 	No            string    `validate:"required,alphanumunicode" json:"no"`       // 用户生成编号
 	Name          string    `validate:"required,alphanumunicode" json:"name"`     // 用户名
-	Age           int       `validate:"required,numeric" json:"age"`              // 用户年龄
-	Gender        int       `validate:"required,numeric" json:"gender"`           // 用户性别
+	Age           uint      `validate:"required,numeric" json:"age"`              // 用户年龄
+	Gender        uint      `validate:"required,numeric" json:"gender"`           // 用户性别
 	Avatar        string    `validate:"required,alphanumunicode" json:"avatar"`   // 用户头像
 	Email         string    `validate:"required,alphanumunicode" json:"email"`    // 账户邮箱
 	EmailVerified int       `validate:"required,numeric" json:"email_verified"`   // 邮箱是否已验证

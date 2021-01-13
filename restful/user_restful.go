@@ -2,7 +2,6 @@ package restful
 
 import (
 	"errors"
-	"fmt"
 	"github.com/bb-orz/goinfras/XGin"
 	"github.com/gin-gonic/gin"
 	"goapp/common"
@@ -50,7 +49,7 @@ func (api *UserApi) SetRoutes() {
 
 	// 用户鉴权访问路由组接口
 	userGroup := engine.Group("/user", middleware.JwtAuthMiddleware())
-	userGroup.GET("/:id", api.getUserInfoHandler)
+	userGroup.GET("/info", api.getUserInfoHandler)
 	userGroup.POST("/set", api.setUserInfoHandler)
 }
 
@@ -239,12 +238,21 @@ func (api *UserApi) oauthWeiboHandler(ctx *gin.Context) {
 
 func (api *UserApi) setUserInfoHandler(ctx *gin.Context) {
 	// Receive Request ...
-	var dto dtos.UserInfoDTO
+	var dto dtos.SetUserInfoDTO
+	var userId uint
 	var err error
 	err = ctx.ShouldBindJSON(&dto)
 	if err != nil {
 		_ = ctx.Error(err)
 		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
 	}
 
 	// Call Services method ...
@@ -260,20 +268,17 @@ func (api *UserApi) setUserInfoHandler(ctx *gin.Context) {
 
 /*获取用户信息*/
 func (api *UserApi) getUserInfoHandler(ctx *gin.Context) {
-	// Receive Request ...
-
 	var dto dtos.GetUserInfoDTO
+	var userId uint
 	var err error
-	err = ctx.ShouldBindUri(&dto)
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
 
 	// 校验登录用户id是否有获取信息权限
-	userClaim := common.GetUserClaim(ctx)
-	fmt.Println(userClaim)
-
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
 	// Call Services method ...
 	userService := services.GetUserService()
 	userDTO, err := userService.GetUserInfo(dto)

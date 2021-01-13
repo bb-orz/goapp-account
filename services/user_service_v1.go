@@ -181,7 +181,7 @@ func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserIn
 	}
 
 	// 查找用户信息
-	userDTO, err = userDomain.GetUser(dto.ID)
+	userDTO, err = userDomain.GetUser(dto.Id)
 	if err != nil {
 		return nil, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
@@ -190,7 +190,7 @@ func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserIn
 }
 
 // 批量设置用户信息
-func (service *UserServiceV1) SetUserInfos(dto dtos.UserInfoDTO) error {
+func (service *UserServiceV1) SetUserInfos(dto dtos.SetUserInfoDTO) error {
 	var err error
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
@@ -223,14 +223,14 @@ func (service *UserServiceV1) ValidateEmail(dto dtos.ValidateEmailDTO) (bool, er
 	}
 
 	// 从cache拿出保存的邮箱验证码
-	pass, err = verifyDomain.VerifyEmail(dto.ID, dto.VerifyCode)
+	pass, err = verifyDomain.VerifyEmail(dto.Id, dto.VerifyCode)
 	if err != nil {
 		return false, common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}
 
 	if pass {
 		// 设置email_verify字段
-		if err = userDomain.SetEmailVerify(dto.ID, 1); err != nil {
+		if err = userDomain.SetEmailVerify(dto.Id, 1); err != nil {
 			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
 		return true, nil
@@ -254,13 +254,13 @@ func (service *UserServiceV1) ValidatePhone(dto dtos.ValidatePhoneDTO) (bool, er
 	}
 
 	// 从cache拿出保存的短信验证码
-	if pass, err = verifyDomain.VerifyPhone(dto.ID, dto.VerifyCode); err != nil {
+	if pass, err = verifyDomain.VerifyPhone(dto.Id, dto.VerifyCode); err != nil {
 		return false, common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}
 
 	if pass {
 		// 设置phone_verify字段
-		if err = userDomain.SetPhoneVerify(dto.ID, 1); err != nil {
+		if err = userDomain.SetPhoneVerify(dto.Id, 1); err != nil {
 			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
 		return true, nil
@@ -280,7 +280,7 @@ func (service *UserServiceV1) SetStatus(dto dtos.SetStatusDTO) (int, error) {
 		return -1, common.ErrorOnValidate(err)
 	}
 
-	if err = userDomain.SetStatus(dto.ID, dto.Status); err != nil {
+	if err = userDomain.SetStatus(dto.Id, dto.Status); err != nil {
 		return -1, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
@@ -300,7 +300,7 @@ func (service *UserServiceV1) ChangePassword(dto dtos.ChangePasswordDTO) error {
 	}
 
 	// 查找账号是否存在
-	userDTO, err = userDomain.GetUser(dto.ID)
+	userDTO, err = userDomain.GetUser(dto.Id)
 	if err != nil {
 		return common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
@@ -314,7 +314,7 @@ func (service *UserServiceV1) ChangePassword(dto dtos.ChangePasswordDTO) error {
 	}
 
 	// 设置新密码
-	if err = userDomain.ReSetPassword(dto.ID, dto.New); err != nil {
+	if err = userDomain.ReSetPassword(dto.Id, dto.New); err != nil {
 		return common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
@@ -337,7 +337,7 @@ func (service *UserServiceV1) ForgetPassword(dto dtos.ForgetPasswordDTO) error {
 	}
 
 	// 查找账号是否存在
-	isExist, err = userDomain.IsUserExist(dto.ID)
+	isExist, err = userDomain.IsUserExist(dto.Id)
 	if err != nil {
 		return common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
@@ -346,7 +346,7 @@ func (service *UserServiceV1) ForgetPassword(dto dtos.ForgetPasswordDTO) error {
 	}
 
 	// 校验Code
-	isVerify, err = verifyDomain.VerifyResetPasswordCode(dto.ID, dto.Code)
+	isVerify, err = verifyDomain.VerifyResetPasswordCode(dto.Id, dto.Code)
 	if err != nil {
 		return common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}

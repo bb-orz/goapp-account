@@ -3,14 +3,13 @@ package main
 import (
 	"fmt"
 	"github.com/bb-orz/goinfras"
-	"github.com/bb-orz/goinfras/XCache/XRedis"
+	"github.com/bb-orz/goinfras/XCache/XGocache"
 	"github.com/bb-orz/goinfras/XGin"
 	"github.com/bb-orz/goinfras/XGlobal"
 	"github.com/bb-orz/goinfras/XJwt"
 	"github.com/bb-orz/goinfras/XLogger"
 	"github.com/bb-orz/goinfras/XOAuth"
 	"github.com/bb-orz/goinfras/XStore/XGorm"
-	"github.com/bb-orz/goinfras/XStore/XMongo"
 	"github.com/bb-orz/goinfras/XValidate"
 	"github.com/spf13/viper"
 	_ "goapp/restful" // 自动载入Restful API模块
@@ -39,19 +38,24 @@ func main() {
 
 // 注册应用组件启动器，把基础设施各资源组件化
 func RegisterStarter(viperConfig *viper.Viper) {
+	// 全局配置
 	goinfras.RegisterStarter(XGlobal.NewStarter())
+
+	// 日志记录器
 
 	goinfras.RegisterStarter(XLogger.NewStarter())
 
-	// 注册mongodb启动器
-	goinfras.RegisterStarter(XMongo.NewStarter())
-
 	// 注册mysql启动器
 	goinfras.RegisterStarter(XGorm.NewStarter())
+
+	// 注册mongodb启动器
+	// goinfras.RegisterStarter(XMongo.NewStarter())
+
 	// 注册Redis连接池
-	goinfras.RegisterStarter(XRedis.NewStarter())
+	// goinfras.RegisterStarter(XRedis.NewStarter())
+
 	// 本地缓存
-	// goinfras.RegisterStarter(XGocache.NewStarter())
+	goinfras.RegisterStarter(XGocache.NewStarter())
 
 	// 注册Oauth Manager
 	goinfras.RegisterStarter(XOAuth.NewStarter())

@@ -32,7 +32,7 @@ type IUserService interface {
 	WeiboOAuth(dto dtos.WeiboLoginDTO) (string, error)   // 微博三方账号鉴权
 
 	GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserInfoDTO, error) // 获取用户信息
-	SetUserInfos(dto dtos.UserInfoDTO) error                        // 修改用户信息
+	SetUserInfos(dto dtos.SetUserInfoDTO) error                     // 修改用户信息
 	ValidateEmail(dto dtos.ValidateEmailDTO) (bool, error)          // 绑定邮箱，验证邮箱链接
 	ValidatePhone(dto dtos.ValidatePhoneDTO) (bool, error)          // 绑定手机，验证短信验证码
 	SetStatus(dto dtos.SetStatusDTO) (int, error)                   // 设置用户状态

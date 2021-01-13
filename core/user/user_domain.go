@@ -207,8 +207,15 @@ func (domain *UserDomain) SetUserInfo(uid uint, field string, value interface{})
 }
 
 // 设置多个用户信息
-func (domain *UserDomain) UpdateUsers(uid uint, dto dtos.UserInfoDTO) error {
-	if err := domain.userDao.UpdateUsers(uid, dto); err != nil {
+func (domain *UserDomain) UpdateUsers(uid uint, dto dtos.SetUserInfoDTO) error {
+	updateData := dtos.UserInfoDTO{
+		Id:     dto.Id,
+		Name:   dto.Name,
+		Avatar: dto.Avatar,
+		Gender: dto.Gender,
+		Age:    dto.Age,
+	}
+	if err := domain.userDao.UpdateUsers(uid, updateData); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "UpdateUsers")
 	}
 

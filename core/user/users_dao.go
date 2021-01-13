@@ -156,8 +156,9 @@ func (d *UsersDAO) SetUsers(id uint, field string, value interface{}) error {
 // 设置多个信息字段
 func (d *UsersDAO) UpdateUsers(id uint, dto dtos.UserInfoDTO) error {
 	var err error
-
-	if err = XGorm.XDB().Model(&UsersModel{}).Where("id", id).Updates(&dto).Error; err != nil {
+	var usersModel UsersModel
+	usersModel.FromInfoDTO(&dto)
+	if err = XGorm.XDB().Model(&UsersModel{}).Where("id", id).Updates(&usersModel).Error; err != nil {
 		return err
 	}
 	return nil
