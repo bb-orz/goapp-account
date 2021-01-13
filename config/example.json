@@ -172,7 +172,7 @@
   },
   "Gocache": {
     "DefaultExpiration": 0,
-    "CleanupInterval": -1,
+    "CleanupInterval": 0,
     "DumpFileName": "./cache/keys.json"
   },
   "Redis": {
