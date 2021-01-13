@@ -109,7 +109,7 @@ func (service *UserServiceV1) EmailAuth(dto dtos.AuthWithEmailPasswordDTO) (stri
 	}
 
 	// JWT token
-	token, err = userDomain.GenToken(userDTO.No, userDTO.Name, userDTO.Avatar)
+	token, err = userDomain.GenToken(userDTO.Id, userDTO.No, userDTO.Name, userDTO.Avatar)
 	if err != nil {
 		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
@@ -144,7 +144,7 @@ func (service *UserServiceV1) PhoneAuth(dto dtos.AuthWithPhonePasswordDTO) (stri
 	}
 
 	// JWT token
-	token, err = userDomain.GenToken(userDTO.No, userDTO.Name, userDTO.Avatar)
+	token, err = userDomain.GenToken(userDTO.Id, userDTO.No, userDTO.Name, userDTO.Avatar)
 	if err != nil {
 		return "", common.ErrorOnServerInner(err, user.DomainName)
 	}
@@ -399,6 +399,7 @@ func (service *UserServiceV1) QQOAuth(dto dtos.QQLoginDTO) (string, error) {
 		// JWT token
 		if userOAuthsInfo != nil {
 			token, err = userDomain.GenToken(
+				userOAuthsInfo.Id,
 				userOAuthsInfo.No,
 				userOAuthsInfo.Name,
 				userOAuthsInfo.Avatar)
@@ -416,7 +417,7 @@ func (service *UserServiceV1) QQOAuth(dto dtos.QQLoginDTO) (string, error) {
 			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
 
-		if token, err = userDomain.GenToken(userOAuthsInfo.No, userOAuthsInfo.Name, userOAuthsInfo.Avatar); err != nil {
+		if token, err = userDomain.GenToken(userOAuthsInfo.Id, userOAuthsInfo.No, userOAuthsInfo.Name, userOAuthsInfo.Avatar); err != nil {
 			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
 	}
@@ -458,6 +459,7 @@ func (service *UserServiceV1) WechatOAuth(dto dtos.WechatLoginDTO) (string, erro
 		// JWT token
 		if userOAuthsInfo != nil {
 			token, err = userDomain.GenToken(
+				userOAuthsInfo.Id,
 				userOAuthsInfo.No,
 				userOAuthsInfo.Name,
 				userOAuthsInfo.Avatar)
@@ -475,7 +477,7 @@ func (service *UserServiceV1) WechatOAuth(dto dtos.WechatLoginDTO) (string, erro
 			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
 
-		if token, err = userDomain.GenToken(userOAuthsInfo.No, userOAuthsInfo.Name, userOAuthsInfo.Avatar); err != nil {
+		if token, err = userDomain.GenToken(userOAuthsInfo.Id, userOAuthsInfo.No, userOAuthsInfo.Name, userOAuthsInfo.Avatar); err != nil {
 			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
 	}
@@ -517,6 +519,7 @@ func (service *UserServiceV1) WeiboOAuth(dto dtos.WeiboLoginDTO) (string, error)
 		// JWT token
 		if userOAuthsInfo != nil {
 			token, err = userDomain.GenToken(
+				userOAuthsInfo.Id,
 				userOAuthsInfo.No,
 				userOAuthsInfo.Name,
 				userOAuthsInfo.Avatar)
@@ -534,7 +537,7 @@ func (service *UserServiceV1) WeiboOAuth(dto dtos.WeiboLoginDTO) (string, error)
 			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
 
-		if token, err = userDomain.GenToken(userOAuthsInfo.No, userOAuthsInfo.Name, userOAuthsInfo.Avatar); err != nil {
+		if token, err = userDomain.GenToken(userOAuthsInfo.Id, userOAuthsInfo.No, userOAuthsInfo.Name, userOAuthsInfo.Avatar); err != nil {
 			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
 	}

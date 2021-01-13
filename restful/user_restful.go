@@ -2,6 +2,7 @@ package restful
 
 import (
 	"errors"
+	"fmt"
 	"github.com/bb-orz/goinfras/XGin"
 	"github.com/gin-gonic/gin"
 	"goapp/common"
@@ -29,9 +30,12 @@ type UserApi struct{}
 func (api *UserApi) SetRoutes() {
 	engine := XGin.XEngine()
 
-	// 登录登出接口
-	engine.POST("/login", api.loginHandler)
 	engine.GET("/logout", middleware.JwtAuthMiddleware(), api.logoutHandler)
+
+	// 登录登出接口
+	loginGroup := engine.Group("/login")
+	loginGroup.POST("/email", api.loginEmailHandler)
+	loginGroup.POST("/phone", api.loginPhoneHandler)
 
 	// 邮箱或手机号注册账号接口
 	registerGroup := engine.Group("/register")
@@ -50,8 +54,8 @@ func (api *UserApi) SetRoutes() {
 	userGroup.POST("/set", api.setUserInfoHandler)
 }
 
-/*用户登录*/
-func (api *UserApi) loginHandler(ctx *gin.Context) {
+/*邮箱账号登录*/
+func (api *UserApi) loginEmailHandler(ctx *gin.Context) {
 
 	// 接收参数由dto封装验证
 	var dto dtos.AuthWithEmailPasswordDTO
@@ -60,7 +64,6 @@ func (api *UserApi) loginHandler(ctx *gin.Context) {
 		_ = ctx.Error(err)
 		return
 	}
-
 	// 调用service方法处理核心业务逻辑
 	userService := services.GetUserService()
 	token, err := userService.EmailAuth(dto)
@@ -68,7 +71,26 @@ func (api *UserApi) loginHandler(ctx *gin.Context) {
 		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
 		return
 	}
+	// 最后数据传递给响应中间件处理
+	ctx.Set(common.ResponseDataKey, common.ResponseOK(gin.H{"token": token}))
+}
 
+/*手机号码账号登录*/
+func (api *UserApi) loginPhoneHandler(ctx *gin.Context) {
+	// 接收参数由dto封装验证
+	var dto dtos.AuthWithPhonePasswordDTO
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+	// 调用service方法处理核心业务逻辑
+	userService := services.GetUserService()
+	token, err := userService.PhoneAuth(dto)
+	if err != nil {
+		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
+		return
+	}
 	// 最后数据传递给响应中间件处理
 	ctx.Set(common.ResponseDataKey, common.ResponseOK(gin.H{"token": token}))
 }
@@ -247,6 +269,10 @@ func (api *UserApi) getUserInfoHandler(ctx *gin.Context) {
 		_ = ctx.Error(err)
 		return
 	}
+
+	// 校验登录用户id是否有获取信息权限
+	userClaim := common.GetUserClaim(ctx)
+	fmt.Println(userClaim)
 
 	// Call Services method ...
 	userService := services.GetUserService()

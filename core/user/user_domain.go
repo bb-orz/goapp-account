@@ -45,12 +45,13 @@ func (domain *UserDomain) encryptPassword(password string) (hashStr, salt string
 }
 
 // 鉴权后生成token
-func (domain *UserDomain) GenToken(no, name, avatar string) (string, error) {
+func (domain *UserDomain) GenToken(id uint, no, name, avatar string) (string, error) {
 	var err error
 	var token string
 	// 生成
 	var claim = XJwt.UserClaim{
-		Id:     no,
+		Id:     id,
+		No:     no,
 		Name:   name,
 		Avatar: avatar,
 	}

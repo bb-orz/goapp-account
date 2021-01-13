@@ -56,29 +56,29 @@ type WeiboLoginDTO struct {
 
 // 创建用户的数据传输对象
 type CreateUserWithEmailDTO struct {
-	Name       string `validate:"required,alphanum" json:"name"`
+	Name       string `validate:"required,alphanum,max=16,min=4" json:"name"`
 	Email      string `validate:"required,email" json:"email"`
-	Password   string `validate:"required,alphanumunicode" json:"password"`
-	RePassword string `validate:"required,alphanumunicode,eqfield=Password" json:"repassword"`
+	Password   string `validate:"required,alphanumunicode,max=20,min=8" json:"password"`
+	RePassword string `validate:"required,alphanumunicode,eqfield=Password,max=20,min=8" json:"repassword"`
 }
 
 // 创建用户的数据传输对象
 type CreateUserWithPhoneDTO struct {
-	Name       string `validate:"required,alphanum" json:"name"`
-	Phone      string `validate:"required,numeric,eq=11" json:"phone"`
-	Password   string `validate:"required,alphanumunicode" json:"password"`
-	RePassword string `validate:"required,alphanumunicode,eqfield=Password" json:"repassword"`
+	Name       string `validate:"required,alphanum,max=16,min=4" json:"name"`
+	Phone      string `validate:"required,numeric,len=11" json:"phone"`
+	Password   string `validate:"required,alphanumunicode,max=20,min=8" json:"password"`
+	RePassword string `validate:"required,alphanumunicode,max=20,min=8,eqfield=Password" json:"repassword"`
 }
 
 // 邮箱密码鉴权数据传输对象
 type AuthWithEmailPasswordDTO struct {
 	Email    string `validate:"required,email" json:"email"`
-	Password string `validate:"required,alphanumunicode" json:"password"`
+	Password string `validate:"required,alphanumunicode,max=20,min=8" json:"password"`
 }
 
 // 手机号密码鉴权数据传输对象
 type AuthWithPhonePasswordDTO struct {
-	Phone    string `validate:"required,numeric,eq=11" json:"phone"`
+	Phone    string `validate:"required,numeric,len=11" json:"phone"`
 	Password string `validate:"required,alphanumunicode" json:"password"`
 }
 
@@ -98,39 +98,38 @@ type SetUserInfoDTO struct {
 	Age    uint   `validate:"numeric" json:"age"`
 	Avatar string `validate:"alphanumunicode" json:"avatar"`
 	Gender uint   `validate:"numeric" json:"gender"`
-	Status uint   `validate:"numeric" json:"status"`
 }
 
 // 设置用户状态数据传输对象
 type SetStatusDTO struct {
 	ID     uint `validate:"required,numeric" json:"id"`
-	Status uint `validate:"required,numeric" json:"status"` // TODO 验证枚举0/1/2
+	Status uint `validate:"required,numeric,oneof=0 1 2" json:"status"` // 验证枚举0/1/2
 }
 
 // 验证邮箱数据传输对象
 type ValidateEmailDTO struct {
 	ID         uint   `validate:"required,numeric" json:"id"`
-	VerifyCode string `validate:"required,alphanum" json:"verify_code"`
+	VerifyCode string `validate:"required,alphanum,len=6" json:"verify_code"`
 }
 
 // 验证手机号码数据传输对象
 type ValidatePhoneDTO struct {
 	ID         uint   `validate:"required,numeric" json:"id"`
-	VerifyCode string `validate:"required,alphanum" json:"verify_code"`
+	VerifyCode string `validate:"required,numeric,len=6" json:"verify_code"`
 }
 
 // 更改密码数据传输对象
 type ChangePasswordDTO struct {
 	ID    uint   `validate:"required,numeric" json:"id"`
-	Old   string `validate:"required,alphanumunicode" json:"old"`
-	New   string `validate:"required,alphanumunicode" json:"new"`
-	ReNew string `validate:"required,alphanumunicode" json:"renew"`
+	Old   string `validate:"required,alphanumunicode,max=20,min=8" json:"old"`
+	New   string `validate:"required,alphanumunicode,max=20,min=8" json:"new"`
+	ReNew string `validate:"required,alphanumunicode,max=20,min=8,eqfield=New" json:"renew"`
 }
 
 // 忘记密码数据传输对象
 type ForgetPasswordDTO struct {
 	ID    uint   `validate:"required,numeric" json:"id"`
-	Code  string `validate:"required,alphanum" json:"code"` // 允许重设密码的key值，服务端生成后被发往邮箱，用户点击过来后接收
-	New   string `validate:"required,alphanumunicode" json:"new"`
-	ReNew string `validate:"required,alphanumunicode" json:"renew"`
+	Code  string `validate:"required,alphanum,len=6" json:"code"` // 允许重设密码的key值，服务端生成后被发往邮箱，用户点击过来后接收
+	New   string `validate:"required,alphanumunicode,max=20,min=8" json:"new"`
+	ReNew string `validate:"required,alphanumunicode,max=20,min=8,eqfield=New" json:"renew"`
 }

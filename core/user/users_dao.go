@@ -21,7 +21,7 @@ func NewUsersDAO() *UsersDAO {
 func (d *UsersDAO) isExist(where *UsersModel) (bool, error) {
 	var err error
 	var count int64
-	err = XGorm.XDB().Model(&OAuthsModel{}).Where(where).First(&UsersModel{}).Count(&count).Error
+	err = XGorm.XDB().Model(&UsersModel{}).Where(where).Count(&count).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// 无记录
@@ -79,7 +79,7 @@ func (d *UsersDAO) IsPhoneExist(phone string) (bool, error) {
 func (d *UsersDAO) GetById(id uint) (*dtos.UsersDTO, error) {
 	var err error
 	var usersResult UsersModel
-	err = XGorm.XDB().Where(id).First(&usersResult).Error
+	err = XGorm.XDB().Model(&UsersModel{}).Where(id).First(&usersResult).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// 无记录

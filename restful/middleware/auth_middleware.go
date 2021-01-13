@@ -13,7 +13,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		tkStr := ctx.GetHeader("Authorization")
 		// fmt.Println("token string:",tkStr)
 		if tkStr == "" {
-			_ = ctx.Error(common.ErrorOnAuthenticate("Token Parameter on http header is required")) // 所有错误最后传递给错误中间件处理
+			_ = ctx.Error(common.ErrorOnAuthenticate("Authorization field on http header is required")) // 所有错误最后传递给错误中间件处理
 			ctx.Abort()
 			return
 		}
