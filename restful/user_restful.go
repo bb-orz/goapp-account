@@ -51,6 +51,7 @@ func (api *UserApi) SetRoutes() {
 	userGroup := engine.Group("/user", middleware.JwtAuthMiddleware())
 	userGroup.GET("/info", api.getUserInfoHandler)
 	userGroup.POST("/set", api.setUserInfoHandler)
+	// TODO 上传头像，修改密码，忘记密码，验证邮箱验证码，验证手机短信验证码，上传头像，
 }
 
 /*邮箱账号登录*/
