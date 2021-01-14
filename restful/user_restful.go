@@ -43,15 +43,24 @@ func (api *UserApi) SetRoutes() {
 
 	// 第三方平台登录或注册接口
 	oauthGroup := engine.Group("/oauth")
-	oauthGroup.GET("/qq", api.oauthQQHandler)
-	oauthGroup.GET("/weixin", api.oauthWechatHandler)
-	oauthGroup.GET("/weibo", api.oauthWeiboHandler)
+	oauthGroup.GET("/qq", api.qqOAuthLoginHandler)
+	oauthGroup.GET("/weixin", api.wechatOAuthLoginHandler)
+	oauthGroup.GET("/weibo", api.weiboOAuthLoginHandler)
 
 	// 用户鉴权访问路由组接口
 	userGroup := engine.Group("/user", middleware.JwtAuthMiddleware())
 	userGroup.GET("/info", api.getUserInfoHandler)
 	userGroup.POST("/set", api.setUserInfoHandler)
-	// TODO 上传头像，修改密码，忘记密码，验证邮箱验证码，验证手机短信验证码，上传头像，
+	userGroup.POST("/modified_password", api.modifiedPassword)
+	userGroup.POST("/forget_password", api.resetForgetPassword)
+	userGroup.POST("/verify_mail", api.verifyEmail)
+	userGroup.POST("/verify_phone", api.verifyPhone)
+	userGroup.POST("/set_avatar", api.setAvatarHandler)
+	oauthGroup.GET("/qq_binding", api.qqOAuthBindingHandler)
+	oauthGroup.GET("/weixin_binding", api.wechatOAuthBindingHandler)
+	oauthGroup.GET("/weibo_binding", api.weiboOAuthBindingHandler)
+
+	// TODO 绑定微信、QQ、微博三方账号，上传头像，
 }
 
 /*邮箱账号登录*/
@@ -164,7 +173,7 @@ func (api *UserApi) registerPhoneHandler(ctx *gin.Context) {
 }
 
 /*qq oauth 登录*/
-func (api *UserApi) oauthQQHandler(ctx *gin.Context) {
+func (api *UserApi) qqOAuthLoginHandler(ctx *gin.Context) {
 	// Receive Request ...
 	var dto dtos.QQLoginDTO
 
@@ -176,7 +185,7 @@ func (api *UserApi) oauthQQHandler(ctx *gin.Context) {
 
 	// Call Services method ...
 	userService := services.GetUserService()
-	token, err := userService.QQOAuth(dto)
+	token, err := userService.QQOAuthLogin(dto)
 	if err != nil {
 		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
 		return
@@ -188,7 +197,7 @@ func (api *UserApi) oauthQQHandler(ctx *gin.Context) {
 }
 
 /*微信oauth 登录*/
-func (api *UserApi) oauthWechatHandler(ctx *gin.Context) {
+func (api *UserApi) wechatOAuthLoginHandler(ctx *gin.Context) {
 	// Receive Request ...
 	var dto dtos.WechatLoginDTO
 
@@ -200,7 +209,7 @@ func (api *UserApi) oauthWechatHandler(ctx *gin.Context) {
 
 	// Call Services method ...
 	userService := services.GetUserService()
-	token, err := userService.WechatOAuth(dto)
+	token, err := userService.WechatOAuthLogin(dto)
 	if err != nil {
 		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
 		return
@@ -212,7 +221,7 @@ func (api *UserApi) oauthWechatHandler(ctx *gin.Context) {
 }
 
 /*微博oauth登录*/
-func (api *UserApi) oauthWeiboHandler(ctx *gin.Context) {
+func (api *UserApi) weiboOAuthLoginHandler(ctx *gin.Context) {
 	// Receive Request ...
 	var dto dtos.WeiboLoginDTO
 
@@ -224,7 +233,7 @@ func (api *UserApi) oauthWeiboHandler(ctx *gin.Context) {
 
 	// Call Services method ...
 	userService := services.GetUserService()
-	token, err := userService.WeiboOAuth(dto)
+	token, err := userService.WeiboOAuthLogin(dto)
 	if err != nil {
 		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
 		return
@@ -290,4 +299,146 @@ func (api *UserApi) getUserInfoHandler(ctx *gin.Context) {
 
 	// Send Data to Response Middleware ...
 	ctx.Set(common.ResponseDataKey, *userDTO)
+}
+
+// 修改密码
+func (api *UserApi) modifiedPassword(ctx *gin.Context) {
+	// Receive Request ...
+	var userId uint
+	var dto dtos.ModifiedPasswordDTO
+
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	userService := services.GetUserService()
+	if isPass, err := userService.ModifiedPassword(dto); !isPass || err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Send Data to Response Middleware ...
+	ctx.Set(common.ResponseDataKey, nil)
+}
+
+// 忘记密码:先发送邮箱验证码，用户接收后和新密码一起提交
+func (api *UserApi) resetForgetPassword(ctx *gin.Context) {
+	// Receive Request ...
+	var userId uint
+	var dto dtos.ResetForgetPasswordDTO
+
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	userService := services.GetUserService()
+	if isPass, err := userService.ResetForgetPassword(dto); !isPass || err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Send Data to Response Middleware ...
+	ctx.Set(common.ResponseDataKey, nil)
+}
+
+// 验证账号邮箱
+func (api *UserApi) verifyEmail(ctx *gin.Context) {
+	// Receive Request ...
+	var userId uint
+	var dto dtos.ValidateEmailDTO
+
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	userService := services.GetUserService()
+	if isPass, err := userService.ValidateEmail(dto); !isPass || err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("Email Verify Code Error"))
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, nil)
+}
+
+// 验证账号手机号码
+func (api *UserApi) verifyPhone(ctx *gin.Context) {
+	// Receive Request ...
+	var userId uint
+	var dto dtos.ValidatePhoneDTO
+
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	userService := services.GetUserService()
+	if isPass, err := userService.ValidatePhone(dto); !isPass || err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("Phone Sms Verify Code Error"))
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, nil)
+}
+
+// TODO 绑定微信、QQ、微博三方账号，上传头像
+
+func (api *UserApi) setAvatarHandler(ctx *gin.Context) {
+
+}
+
+/*qq 账号绑定*/
+func (api *UserApi) qqOAuthBindingHandler(ctx *gin.Context) {
+	// Receive Request ...
+
+}
+
+/*微信 账号绑定*/
+func (api *UserApi) wechatOAuthBindingHandler(ctx *gin.Context) {
+	// Receive Request ...
+
+}
+
+/*微博账号绑定*/
+func (api *UserApi) weiboOAuthBindingHandler(ctx *gin.Context) {
+	// Receive Request ...
+
 }

@@ -30,7 +30,7 @@ func (domain *VerifyDomain) genEmailVerifyCode(uid uint) (string, error) {
 	var err error
 	var code string
 	// 生成6位随机字符串
-	code = XGlobal.RandomString(6)
+	code = common.RandomString(6)
 
 	// 保存到缓存
 	err = domain.cache.SetUserVerifyEmailCode(uid, code)
@@ -58,7 +58,7 @@ func (domain *VerifyDomain) SendValidateEmail(dto dtos.SendEmailForVerifyDTO) er
 	var err error
 	var code string
 
-	uid := dto.ID
+	uid := dto.Id
 	email := dto.Email
 
 	code, err = domain.genEmailVerifyCode(uid)
@@ -90,7 +90,7 @@ func (domain *VerifyDomain) genResetPasswordCode(uid uint) (string, error) {
 	var err error
 	var code string
 	// 生成6位随机字符串
-	code = XGlobal.RandomString(40)
+	code = common.RandomString(40)
 
 	// 保存到缓存
 	err = domain.cache.SetForgetPasswordVerifyCode(uid, code)
@@ -121,7 +121,7 @@ func (domain *VerifyDomain) sendResetPasswordCodeEmail(address string, code stri
 // 发送验证码到邮箱
 func (domain *VerifyDomain) SendResetPasswordCodeEmail(dto dtos.SendEmailForgetPasswordDTO) error {
 
-	code, err := domain.genResetPasswordCode(dto.ID)
+	code, err := domain.genResetPasswordCode(dto.Id)
 	if err != nil {
 		return err
 	}
@@ -154,7 +154,7 @@ func (domain *VerifyDomain) genPhoneVerifyCode(uid uint) (string, error) {
 	var code string
 
 	// 生成4位随机数字
-	code, err = XGlobal.RandomNumber(4)
+	code, err = common.RandomNumber(4)
 	if err != nil {
 		return "", common.DomainInnerErrorOnAlgorithm(err, "XGlobal.RandomNumber(4)")
 	}
@@ -179,7 +179,7 @@ func (domain *VerifyDomain) SendValidatePhoneMsg(dto dtos.SendPhoneVerifyCodeDTO
 	var err error
 	var code string
 
-	uid := dto.ID
+	uid := dto.Id
 	phone := strconv.Itoa(int(dto.Phone))
 
 	code, err = domain.genPhoneVerifyCode(uid)

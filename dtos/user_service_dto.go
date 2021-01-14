@@ -119,7 +119,7 @@ type ValidatePhoneDTO struct {
 }
 
 // 更改密码数据传输对象
-type ChangePasswordDTO struct {
+type ModifiedPasswordDTO struct {
 	Id    uint   `validate:"required,numeric" json:"id"`
 	Old   string `validate:"required,alphanumunicode,max=20,min=8" json:"old"`
 	New   string `validate:"required,alphanumunicode,max=20,min=8" json:"new"`
@@ -127,7 +127,7 @@ type ChangePasswordDTO struct {
 }
 
 // 忘记密码数据传输对象
-type ForgetPasswordDTO struct {
+type ResetForgetPasswordDTO struct {
 	Id    uint   `validate:"required,numeric" json:"id"`
 	Code  string `validate:"required,alphanum,len=6" json:"code"` // 允许重设密码的key值，服务端生成后被发往邮箱，用户点击过来后接收
 	New   string `validate:"required,alphanumunicode,max=20,min=8" json:"new"`

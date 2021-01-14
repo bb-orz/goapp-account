@@ -1,7 +1,6 @@
 package user
 
 import (
-	"github.com/bb-orz/goinfras/XGlobal"
 	"github.com/bb-orz/goinfras/XJwt"
 	"github.com/bb-orz/goinfras/XOAuth"
 	"github.com/segmentio/ksuid"
@@ -40,8 +39,53 @@ func (domain *UserDomain) generateUserNo() string {
 
 // 加密密码，设置密文和盐值
 func (domain *UserDomain) encryptPassword(password string) (hashStr, salt string) {
-	hashStr, salt = XGlobal.HashPassword(password)
+	hashStr, salt = common.HashPassword(password)
 	return
+}
+
+// 用户密码验证
+func (domain *UserDomain) VerifyPassword(id uint, passwordStr string) (*dtos.UsersDTO, bool, error) {
+	// 查找账号是否存在
+	userDTO, err := domain.GetUser(id)
+	if err != nil {
+		return nil, false, common.DomainInnerErrorOnSqlQuery(err, domain.DomainName())
+	}
+
+	if userDTO == nil {
+		return nil, false, nil
+	}
+
+	return userDTO, common.ValidatePassword(passwordStr, userDTO.Salt, userDTO.Password), nil
+}
+
+// 用户密码验证ForEmail
+func (domain *UserDomain) VerifyPasswordForEmail(email, passwordStr string) (*dtos.UsersDTO, bool, error) {
+	// 查找账号是否存在
+	userDTO, err := domain.GetUserByEmail(email)
+	if err != nil {
+		return nil, false, common.DomainInnerErrorOnSqlQuery(err, domain.DomainName())
+	}
+
+	if userDTO == nil {
+		return nil, false, nil
+	}
+
+	return userDTO, common.ValidatePassword(passwordStr, userDTO.Salt, userDTO.Password), nil
+}
+
+// 用户密码验证ForPhone
+func (domain *UserDomain) VerifyPasswordForPhone(phone, passwordStr string) (*dtos.UsersDTO, bool, error) {
+	// 查找账号是否存在
+	userDTO, err := domain.GetUserByPhone(phone)
+	if err != nil {
+		return nil, false, common.DomainInnerErrorOnSqlQuery(err, domain.DomainName())
+	}
+
+	if userDTO == nil {
+		return nil, false, nil
+	}
+
+	return userDTO, common.ValidatePassword(passwordStr, userDTO.Salt, userDTO.Password), nil
 }
 
 // 鉴权后生成token
@@ -223,9 +267,9 @@ func (domain *UserDomain) UpdateUsers(uid uint, dto dtos.SetUserInfoDTO) error {
 }
 
 // 改变密码
-func (domain *UserDomain) ReSetPassword(uid uint, password string) error {
+func (domain *UserDomain) ReSetPassword(id uint, password string) error {
 	hashStr, salt := domain.encryptPassword(password)
-	if err := domain.userDao.SetPasswordAndSalt(uid, hashStr, salt); err != nil {
+	if err := domain.userDao.SetPasswordAndSalt(id, hashStr, salt); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetPasswordAndSalt")
 	}
 	return nil

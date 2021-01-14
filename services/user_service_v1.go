@@ -1,7 +1,6 @@
 package services
 
 import (
-	"github.com/bb-orz/goinfras/XGlobal"
 	"github.com/bb-orz/goinfras/XOAuth"
 	"github.com/bb-orz/goinfras/XValidate"
 	"goapp/common"
@@ -88,6 +87,7 @@ func (service *UserServiceV1) CreateUserWithPhone(dto dtos.CreateUserWithPhoneDT
 func (service *UserServiceV1) EmailAuth(dto dtos.AuthWithEmailPasswordDTO) (string, error) {
 	var err error
 	var token string
+	var isPass bool
 	var userDTO *dtos.UsersDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
@@ -97,21 +97,19 @@ func (service *UserServiceV1) EmailAuth(dto dtos.AuthWithEmailPasswordDTO) (stri
 		return "", common.ErrorOnValidate(err)
 	}
 
-	// 查找邮件账号是否存在
-	if userDTO, err = userDomain.GetUserByEmail(dto.Email); err != nil {
+	if userDTO, isPass, err = userDomain.VerifyPasswordForEmail(dto.Email, dto.Password); isPass && userDTO != nil && err == nil {
+		// JWT token
+		token, err = userDomain.GenToken(userDTO.Id, userDTO.No, userDTO.Name, userDTO.Avatar)
+		if err != nil {
+			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
+	} else if err != nil {
 		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
-	}
-	if userDTO == nil {
+	} else if userDTO == nil {
 		return "", common.ErrorOnVerify("Email Account Not Exist!")
-	} else if !XGlobal.ValidatePassword(dto.Password, userDTO.Salt, userDTO.Password) {
+	} else if !isPass {
 		// 校验密码失败
 		return "", common.ErrorOnVerify("Password Error!")
-	}
-
-	// JWT token
-	token, err = userDomain.GenToken(userDTO.Id, userDTO.No, userDTO.Name, userDTO.Avatar)
-	if err != nil {
-		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
 	return token, nil
@@ -121,6 +119,7 @@ func (service *UserServiceV1) EmailAuth(dto dtos.AuthWithEmailPasswordDTO) (stri
 func (service *UserServiceV1) PhoneAuth(dto dtos.AuthWithPhonePasswordDTO) (string, error) {
 	var err error
 	var token string
+	var isPass bool
 	var userDTO *dtos.UsersDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
@@ -130,24 +129,21 @@ func (service *UserServiceV1) PhoneAuth(dto dtos.AuthWithPhonePasswordDTO) (stri
 		return "", common.ErrorOnValidate(err)
 	}
 
-	// 查找手机账号是否存在
-	userDTO, err = userDomain.GetUserByPhone(dto.Phone)
-	if err != nil {
+	if userDTO, isPass, err = userDomain.VerifyPasswordForPhone(dto.Phone, dto.Password); isPass && userDTO != nil && err == nil {
+		// JWT token
+		token, err = userDomain.GenToken(userDTO.Id, userDTO.No, userDTO.Name, userDTO.Avatar)
+		if err != nil {
+			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
+	} else if err != nil {
 		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
-	}
-
-	if userDTO == nil {
+	} else if userDTO == nil {
 		return "", common.ErrorOnVerify("Phone Account Not Exist!")
-	} else if !XGlobal.ValidatePassword(dto.Password, userDTO.Salt, userDTO.Password) {
+	} else if !isPass {
 		// 校验密码失败
 		return "", common.ErrorOnVerify("Password Error!")
 	}
 
-	// JWT token
-	token, err = userDomain.GenToken(userDTO.Id, userDTO.No, userDTO.Name, userDTO.Avatar)
-	if err != nil {
-		return "", common.ErrorOnServerInner(err, user.DomainName)
-	}
 	return token, nil
 }
 
@@ -288,41 +284,40 @@ func (service *UserServiceV1) SetStatus(dto dtos.SetStatusDTO) (int, error) {
 }
 
 // 修改用户密码
-func (service *UserServiceV1) ChangePassword(dto dtos.ChangePasswordDTO) error {
+func (service *UserServiceV1) ModifiedPassword(dto dtos.ModifiedPasswordDTO) (bool, error) {
 	var err error
+	var isPass bool
 	var userDTO *dtos.UsersDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return common.ErrorOnValidate(err)
+		return false, common.ErrorOnValidate(err)
 	}
 
-	// 查找账号是否存在
-	userDTO, err = userDomain.GetUser(dto.Id)
-	if err != nil {
-		return common.ErrorOnServerInner(err, userDomain.DomainName())
-	}
-
-	// 校验旧密码
-	if userDTO == nil {
-		return common.ErrorOnVerify("Account Not Exist!")
-	} else if !XGlobal.ValidatePassword(dto.Old, userDTO.Salt, userDTO.Password) {
-		// 校验旧密码失败
-		return common.ErrorOnVerify("Old Password Is Wrong!")
+	// 校验密码
+	if userDTO, isPass, err = userDomain.VerifyPassword(dto.Id, dto.Old); isPass && userDTO != nil && err == nil {
+		return true, nil
+	} else if err != nil {
+		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+	} else if userDTO == nil {
+		return false, common.ErrorOnVerify("Account Not Exist!")
+	} else if !isPass {
+		// 校验密码失败
+		return false, common.ErrorOnVerify("Password Error!")
 	}
 
 	// 设置新密码
 	if err = userDomain.ReSetPassword(dto.Id, dto.New); err != nil {
-		return common.ErrorOnServerInner(err, userDomain.DomainName())
+		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
-	return nil
+	return false, nil
 }
 
 // 忘记密码重设
-func (service *UserServiceV1) ForgetPassword(dto dtos.ForgetPasswordDTO) error {
+func (service *UserServiceV1) ResetForgetPassword(dto dtos.ResetForgetPasswordDTO) (bool, error) {
 	var err error
 	var isExist bool
 	var isVerify bool
@@ -333,40 +328,44 @@ func (service *UserServiceV1) ForgetPassword(dto dtos.ForgetPasswordDTO) error {
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return common.ErrorOnValidate(err)
+		return false, common.ErrorOnValidate(err)
 	}
 
 	// 查找账号是否存在
 	isExist, err = userDomain.IsUserExist(dto.Id)
 	if err != nil {
-		return common.ErrorOnServerInner(err, userDomain.DomainName())
+		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 	if !isExist {
-		return common.ErrorOnVerify("Account Not Exist!")
+		return false, common.ErrorOnVerify("Account Not Exist!")
 	}
 
 	// 校验Code
 	isVerify, err = verifyDomain.VerifyResetPasswordCode(dto.Id, dto.Code)
 	if err != nil {
-		return common.ErrorOnServerInner(err, verifyDomain.DomainName())
+		return false, common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}
 
 	if !isVerify {
-		return common.ErrorOnVerify("Reset Password Fail,Please Retry!")
+		return false, common.ErrorOnVerify("Reset Password Fail,Please Retry!")
 	}
 
-	return nil
+	// 重设密码
+	if err = userDomain.ReSetPassword(dto.Id, dto.New); err != nil {
+		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+	}
 
+	return true, nil
 }
 
-// 上传用户头像
+// TODO 上传用户头像
 func (service *UserServiceV1) UploadAvatar() error {
 
 	return nil
 }
 
 // qq oauth 鉴权
-func (service *UserServiceV1) QQOAuth(dto dtos.QQLoginDTO) (string, error) {
+func (service *UserServiceV1) QQOAuthLogin(dto dtos.QQLoginDTO) (string, error) {
 	var err error
 	var token string
 	var isQQBinding bool
@@ -426,7 +425,7 @@ func (service *UserServiceV1) QQOAuth(dto dtos.QQLoginDTO) (string, error) {
 }
 
 // wechat Oauth 鉴权
-func (service *UserServiceV1) WechatOAuth(dto dtos.WechatLoginDTO) (string, error) {
+func (service *UserServiceV1) WechatOAuthLogin(dto dtos.WechatLoginDTO) (string, error) {
 	var err error
 	var token string
 	var isWechatBinding bool
@@ -486,7 +485,7 @@ func (service *UserServiceV1) WechatOAuth(dto dtos.WechatLoginDTO) (string, erro
 }
 
 // 微博 Oauth 鉴权
-func (service *UserServiceV1) WeiboOAuth(dto dtos.WeiboLoginDTO) (string, error) {
+func (service *UserServiceV1) WeiboOAuthLogin(dto dtos.WeiboLoginDTO) (string, error) {
 	var err error
 	var token string
 	var isWeiboBinding bool
