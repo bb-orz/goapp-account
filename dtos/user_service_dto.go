@@ -145,3 +145,7 @@ type WechatBindingDTO struct {
 type WeiboBindingDTO struct {
 	AccessCode string `validate:"required" json:"access_code"`
 }
+
+type SetAvatarUriDTO struct {
+	Avatar string `validate:"uri" json:"avatar"`
+}

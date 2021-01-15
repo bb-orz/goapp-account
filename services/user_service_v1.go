@@ -625,8 +625,10 @@ func (service *UserServiceV1) WeiboOAuthBinding(dto dtos.WeiboBindingDTO) (bool,
 	return false, nil
 }
 
-// TODO 上传用户头像
-func (service *UserServiceV1) UploadAvatar() error {
+// 设置用户头像链接
+func (service *UserServiceV1) SetAvatarUri(dto dtos.SetAvatarUriDTO) error {
+
+	// userDomain.SetUserInfo()
 
 	return nil
 }
