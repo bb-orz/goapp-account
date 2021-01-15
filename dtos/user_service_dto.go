@@ -133,3 +133,15 @@ type ResetForgetPasswordDTO struct {
 	New   string `validate:"required,alphanumunicode,max=20,min=8" json:"new"`
 	ReNew string `validate:"required,alphanumunicode,max=20,min=8,eqfield=New" json:"renew"`
 }
+
+type QQBindingDTO struct {
+	AccessCode string `validate:"required" json:"access_code"`
+}
+
+type WechatBindingDTO struct {
+	AccessCode string `validate:"required" json:"access_code"`
+}
+
+type WeiboBindingDTO struct {
+	AccessCode string `validate:"required" json:"access_code"`
+}

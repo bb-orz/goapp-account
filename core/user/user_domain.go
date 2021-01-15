@@ -322,7 +322,7 @@ func (domain *UserDomain) IsWeiboAccountBinding(openId, unionId string) (bool, e
 }
 
 // Oauth三方账号绑定创建用户
-func (domain *UserDomain) CreateUserOAuthBinding(platform uint, oauthInfo *XOAuth.OAuthAccountInfo) (*dtos.UserOAuthInfoDTO, error) {
+func (domain *UserDomain) CreateUserWithOAuthBinding(platform uint, oauthInfo *XOAuth.OAuthAccountInfo) (*dtos.UserOAuthInfoDTO, error) {
 	var err error
 
 	// 插入用户信息
@@ -337,7 +337,7 @@ func (domain *UserDomain) CreateUserOAuthBinding(platform uint, oauthInfo *XOAut
 			OpenId:      oauthInfo.OpenId,
 			NickName:    oauthInfo.NickName,
 			Avatar:      oauthInfo.AvatarUrl,
-			Gender:      int(oauthInfo.Gender),
+			Gender:      oauthInfo.Gender,
 			Platform:    platform,
 		},
 	}
@@ -360,4 +360,27 @@ func (domain *UserDomain) GetUserOauths(platform uint, openId, unionId string) (
 	}
 
 	return userOAuthsResult, nil
+}
+
+// Oauth三方账号绑定创建用户
+func (domain *UserDomain) CreateOAuthBinding(platform uint, oauthInfo *XOAuth.OAuthAccountInfo) (*dtos.OauthsDTO, error) {
+	var err error
+	var oauthsDTO *dtos.OauthsDTO
+	var result *dtos.OauthsDTO
+	oauthsDTO = &dtos.OauthsDTO{
+		AccessToken: oauthInfo.AccessToken,
+		UnionId:     oauthInfo.UnionId,
+		OpenId:      oauthInfo.OpenId,
+		NickName:    oauthInfo.NickName,
+		Avatar:      oauthInfo.AvatarUrl,
+		Gender:      oauthInfo.Gender,
+		Platform:    platform,
+	}
+
+	oauthsDAO := NewOauthsDAO()
+	if result, err = oauthsDAO.Create(oauthsDTO); err != nil {
+		return nil, common.DomainInnerErrorOnSqlInsert(err, "Create")
+	}
+
+	return result, nil
 }

@@ -421,24 +421,88 @@ func (api *UserApi) verifyPhone(ctx *gin.Context) {
 
 // TODO 绑定微信、QQ、微博三方账号，上传头像
 
-func (api *UserApi) setAvatarHandler(ctx *gin.Context) {
-
-}
-
 /*qq 账号绑定*/
 func (api *UserApi) qqOAuthBindingHandler(ctx *gin.Context) {
-	// Receive Request ...
+	var ok bool
+	var err error
+	var dto dtos.QQBindingDTO
 
+	// Receive Request ...
+	err = ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Call Services method ...
+	userService := services.GetUserService()
+	if ok, err = userService.QQOAuthBinding(dto); err != nil {
+		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
+		return
+	}
+
+	if ok {
+		ctx.Set(common.ResponseDataKey, nil)
+	} else {
+		_ = ctx.Error(errors.New("QQ OAuth Binding Fail "))
+	}
 }
 
 /*微信 账号绑定*/
 func (api *UserApi) wechatOAuthBindingHandler(ctx *gin.Context) {
-	// Receive Request ...
+	var ok bool
+	var err error
+	var dto dtos.WechatBindingDTO
 
+	// Receive Request ...
+	err = ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Call Services method ...
+	userService := services.GetUserService()
+	if ok, err = userService.WechatOAuthBinding(dto); err != nil {
+		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
+		return
+	}
+
+	if ok {
+		ctx.Set(common.ResponseDataKey, nil)
+	} else {
+		_ = ctx.Error(errors.New("Wechat OAuth Binding Fail "))
+	}
 }
 
 /*微博账号绑定*/
 func (api *UserApi) weiboOAuthBindingHandler(ctx *gin.Context) {
+	var ok bool
+	var err error
+	var dto dtos.WeiboBindingDTO
+
 	// Receive Request ...
+	err = ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Call Services method ...
+	userService := services.GetUserService()
+	if ok, err = userService.WeiboOAuthBinding(dto); err != nil {
+		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
+		return
+	}
+
+	if ok {
+		ctx.Set(common.ResponseDataKey, nil)
+	} else {
+		_ = ctx.Error(errors.New("Weibo OAuth Binding Fail "))
+	}
+
+}
+
+func (api *UserApi) setAvatarHandler(ctx *gin.Context) {
 
 }

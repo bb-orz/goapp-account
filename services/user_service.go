@@ -39,4 +39,8 @@ type IUserService interface {
 	ModifiedPassword(dto dtos.ModifiedPasswordDTO) (bool, error)       // 更改用户密码
 	ResetForgetPassword(dto dtos.ResetForgetPasswordDTO) (bool, error) // 忘记密码重设
 	UploadAvatar() error                                               // 上传头像
+
+	QQOAuthBinding(dto dtos.QQBindingDTO) (bool, error)         // qq三方账号绑定
+	WechatOAuthBinding(dto dtos.WechatBindingDTO) (bool, error) // 微信三方账号绑定
+	WeiboOAuthBinding(dto dtos.WeiboBindingDTO) (bool, error)   // 微博三方账号绑定
 }
