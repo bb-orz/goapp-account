@@ -50,17 +50,15 @@ func (api *UserApi) SetRoutes() {
 	// 用户鉴权访问路由组接口
 	userGroup := engine.Group("/user", middleware.JwtAuthMiddleware())
 	userGroup.GET("/info", api.getUserInfoHandler)
+	userGroup.POST("/set_avatar", api.setAvatarHandler)
 	userGroup.POST("/set", api.setUserInfoHandler)
 	userGroup.POST("/modified_password", api.modifiedPassword)
 	userGroup.POST("/forget_password", api.resetForgetPassword)
 	userGroup.POST("/verify_mail", api.verifyEmail)
 	userGroup.POST("/verify_phone", api.verifyPhone)
-	userGroup.POST("/set_avatar", api.setAvatarHandler)
 	oauthGroup.GET("/qq_binding", api.qqOAuthBindingHandler)
 	oauthGroup.GET("/weixin_binding", api.wechatOAuthBindingHandler)
 	oauthGroup.GET("/weibo_binding", api.weiboOAuthBindingHandler)
-
-	// TODO 绑定微信、QQ、微博三方账号，上传头像，
 }
 
 /*邮箱账号登录*/
@@ -244,8 +242,35 @@ func (api *UserApi) weiboOAuthLoginHandler(ctx *gin.Context) {
 
 }
 
-/*设置用户信息*/
+func (api *UserApi) setAvatarHandler(ctx *gin.Context) {
+	// Receive Request ...
+	var userId uint
+	var dto dtos.SetAvatarUriDTO
 
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	userService := services.GetUserService()
+	if isPass, err := userService.SetAvatarUri(dto); !isPass || err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("Email Verify Code Error"))
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, nil)
+}
+
+/*设置用户信息*/
 func (api *UserApi) setUserInfoHandler(ctx *gin.Context) {
 	// Receive Request ...
 	var dto dtos.SetUserInfoDTO
@@ -267,9 +292,8 @@ func (api *UserApi) setUserInfoHandler(ctx *gin.Context) {
 
 	// Call Services method ...
 	userService := services.GetUserService()
-	err = userService.SetUserInfos(dto)
-	if err != nil {
-		_ = ctx.Error(err)
+	if isPass, err := userService.SetUserInfos(dto); !isPass || err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("SetUserInfos Error"))
 		return
 	}
 
@@ -500,9 +524,5 @@ func (api *UserApi) weiboOAuthBindingHandler(ctx *gin.Context) {
 	} else {
 		_ = ctx.Error(errors.New("Weibo OAuth Binding Fail "))
 	}
-
-}
-
-func (api *UserApi) setAvatarHandler(ctx *gin.Context) {
 
 }

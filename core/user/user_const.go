@@ -9,6 +9,13 @@ const (
 
 )
 
+const (
+	UserEmailNotVerify = 0
+	UserEmailVerify    = 1
+	UserPhoneNotVerify = 0
+	UserPhoneVerify    = 1
+)
+
 // 用户绑定的第三方账号平台
 const (
 	QQOauthPlatform = iota

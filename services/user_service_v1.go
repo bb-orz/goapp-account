@@ -365,26 +365,6 @@ func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserIn
 	return userDTO.TransToUserInfoDTO(), nil
 }
 
-// 批量设置用户信息
-func (service *UserServiceV1) SetUserInfos(dto dtos.SetUserInfoDTO) error {
-	var err error
-	var userDomain *user.UserDomain
-	userDomain = user.NewUserDomain()
-
-	// 校验传输参数
-	if err = XValidate.V(dto); err != nil {
-		return common.ErrorOnValidate(err)
-	}
-
-	uid := dto.Id
-	err = userDomain.UpdateUsers(uid, dto)
-	if err != nil {
-		return common.ErrorOnServerInner(err, userDomain.DomainName())
-	}
-
-	return nil
-}
-
 // 验证用户邮箱
 func (service *UserServiceV1) ValidateEmail(dto dtos.ValidateEmailDTO) (bool, error) {
 	var err error
@@ -406,9 +386,14 @@ func (service *UserServiceV1) ValidateEmail(dto dtos.ValidateEmailDTO) (bool, er
 
 	if pass {
 		// 设置email_verify字段
-		if err = userDomain.SetEmailVerify(dto.Id, 1); err != nil {
+		if err = userDomain.SetEmailVerify(dto.Id); err != nil {
 			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
+
+		if err = userDomain.SetUserStatusNormal(dto.Id); err != nil {
+			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
+
 		return true, nil
 	} else {
 		return false, common.ErrorOnVerify("Email Verify Code Error!")
@@ -436,31 +421,18 @@ func (service *UserServiceV1) ValidatePhone(dto dtos.ValidatePhoneDTO) (bool, er
 
 	if pass {
 		// 设置phone_verify字段
-		if err = userDomain.SetPhoneVerify(dto.Id, 1); err != nil {
+		if err = userDomain.SetPhoneVerify(dto.Id); err != nil {
 			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
+
+		if err = userDomain.SetUserStatusNormal(dto.Id); err != nil {
+			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
+
 		return true, nil
 	} else {
 		return false, common.ErrorOnVerify("Sms Verify Code Error!")
 	}
-}
-
-// 设置用户账号状态
-func (service *UserServiceV1) SetStatus(dto dtos.SetStatusDTO) (int, error) {
-	var err error
-	var userDomain *user.UserDomain
-	userDomain = user.NewUserDomain()
-
-	// 校验传输参数
-	if err = XValidate.V(dto); err != nil {
-		return -1, common.ErrorOnValidate(err)
-	}
-
-	if err = userDomain.SetStatus(dto.Id, dto.Status); err != nil {
-		return -1, common.ErrorOnServerInner(err, userDomain.DomainName())
-	}
-
-	return 0, nil
 }
 
 // 修改用户密码
@@ -626,9 +598,43 @@ func (service *UserServiceV1) WeiboOAuthBinding(dto dtos.WeiboBindingDTO) (bool,
 }
 
 // 设置用户头像链接
-func (service *UserServiceV1) SetAvatarUri(dto dtos.SetAvatarUriDTO) error {
+func (service *UserServiceV1) SetAvatarUri(dto dtos.SetAvatarUriDTO) (bool, error) {
 
 	// userDomain.SetUserInfo()
+	var err error
+	var userDomain *user.UserDomain
+	userDomain = user.NewUserDomain()
 
-	return nil
+	// 校验传输参数
+	if err = XValidate.V(dto); err != nil {
+		return false, common.ErrorOnValidate(err)
+	}
+
+	err = userDomain.SetAvatar(dto.Id, dto.Avatar)
+	if err != nil {
+		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+	}
+
+	return true, nil
+}
+
+// 更新用户信息多个字段
+func (service *UserServiceV1) SetUserInfos(dto dtos.SetUserInfoDTO) (bool, error) {
+
+	// userDomain.SetUserInfo()
+	var err error
+	var userDomain *user.UserDomain
+	userDomain = user.NewUserDomain()
+
+	// 校验传输参数
+	if err = XValidate.V(dto); err != nil {
+		return false, common.ErrorOnValidate(err)
+	}
+
+	err = userDomain.UpdateUsers(dto)
+	if err != nil {
+		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+	}
+
+	return true, nil
 }

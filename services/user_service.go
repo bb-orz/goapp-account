@@ -32,13 +32,12 @@ type IUserService interface {
 	WeiboOAuthLogin(dto dtos.WeiboLoginDTO) (string, error)   // 微博三方账号鉴权
 
 	GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserInfoDTO, error)    // 获取用户信息
-	SetUserInfos(dto dtos.SetUserInfoDTO) error                        // 修改用户信息
+	SetUserInfos(dto dtos.SetUserInfoDTO) (bool, error)                // 修改用户信息
 	ValidateEmail(dto dtos.ValidateEmailDTO) (bool, error)             // 绑定邮箱，验证邮箱链接
 	ValidatePhone(dto dtos.ValidatePhoneDTO) (bool, error)             // 绑定手机，验证短信验证码
-	SetStatus(dto dtos.SetStatusDTO) (int, error)                      // 设置用户状态
 	ModifiedPassword(dto dtos.ModifiedPasswordDTO) (bool, error)       // 更改用户密码
 	ResetForgetPassword(dto dtos.ResetForgetPasswordDTO) (bool, error) // 忘记密码重设
-	SetAvatarUri(dto dtos.SetAvatarUriDTO) error                       // 上传头像
+	SetAvatarUri(dto dtos.SetAvatarUriDTO) (bool, error)               // 上传头像
 
 	QQOAuthBinding(dto dtos.QQBindingDTO) (bool, error)         // qq三方账号绑定
 	WechatOAuthBinding(dto dtos.WechatBindingDTO) (bool, error) // 微信三方账号绑定

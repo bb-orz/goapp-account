@@ -100,12 +100,6 @@ type SetUserInfoDTO struct {
 	Gender uint   `validate:"numeric,max=1,min=0" json:"gender"`
 }
 
-// 设置用户状态数据传输对象
-type SetStatusDTO struct {
-	Id     uint `validate:"required,numeric" json:"id"`
-	Status uint `validate:"required,numeric,oneof=0 1 2" json:"status"` // 验证枚举0/1/2
-}
-
 // 验证邮箱数据传输对象
 type ValidateEmailDTO struct {
 	Id         uint   `validate:"required,numeric" json:"id"`
@@ -147,5 +141,6 @@ type WeiboBindingDTO struct {
 }
 
 type SetAvatarUriDTO struct {
+	Id     uint   `validate:"required,numeric" json:"id"`
 	Avatar string `validate:"uri" json:"avatar"`
 }

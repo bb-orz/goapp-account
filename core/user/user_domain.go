@@ -218,40 +218,48 @@ func (domain *UserDomain) GetUserByPhone(phone string) (*dtos.UsersDTO, error) {
 	return userDTO, nil
 }
 
-// 设置用户状态
-func (domain *UserDomain) SetStatus(uid, status uint) error {
-	if err := domain.userDao.SetUsers(uid, "status", status); err != nil {
-		return common.DomainInnerErrorOnSqlUpdate(err, "SetUsers")
+// 设置邮箱已验证
+func (domain *UserDomain) SetEmailVerify(uid uint) error {
+	if err := domain.userDao.SetUsers(uid, "email_verify", UserEmailVerify); err != nil {
+		return common.DomainInnerErrorOnSqlUpdate(err, "SetEmailVerify")
 	}
 	return nil
 }
 
-// 设置用户状态
-func (domain *UserDomain) SetEmailVerify(uid, status uint) error {
-	if err := domain.userDao.SetUsers(uid, "email_verify", status); err != nil {
-		return common.DomainInnerErrorOnSqlUpdate(err, "SetUsers")
+// 设置手机号码已验证
+func (domain *UserDomain) SetPhoneVerify(uid uint) error {
+	if err := domain.userDao.SetUsers(uid, "phone_verify", UserPhoneVerify); err != nil {
+		return common.DomainInnerErrorOnSqlUpdate(err, "SetPhoneVerify")
 	}
 	return nil
 }
 
-// 设置用户状态
-func (domain *UserDomain) SetPhoneVerify(uid, status uint) error {
-	if err := domain.userDao.SetUsers(uid, "phone_verify", status); err != nil {
-		return common.DomainInnerErrorOnSqlUpdate(err, "SetUsers")
+// 设置单个用户头像链接
+func (domain *UserDomain) SetAvatar(uid uint, uri string) error {
+	if err := domain.userDao.SetUsers(uid, "avatar", uri); err != nil {
+		return common.DomainInnerErrorOnSqlUpdate(err, "SetAvatar")
 	}
 	return nil
 }
 
-// 设置单个用户信息
-func (domain *UserDomain) SetUserInfo(uid uint, field string, value interface{}) error {
-	if err := domain.userDao.SetUsers(uid, field, value); err != nil {
-		return common.DomainInnerErrorOnSqlUpdate(err, "SetUsers")
+// 设置单个用户状态已验证
+func (domain *UserDomain) SetUserStatusNormal(uid uint) error {
+	if err := domain.userDao.SetUsers(uid, "status", UserStatusNormal); err != nil {
+		return common.DomainInnerErrorOnSqlUpdate(err, "SetUserStatusNormal")
+	}
+	return nil
+}
+
+// 设置单个用户状态停用
+func (domain *UserDomain) SetUserStatusDeactivation(uid uint) error {
+	if err := domain.userDao.SetUsers(uid, "status", UserStatusDeactivation); err != nil {
+		return common.DomainInnerErrorOnSqlUpdate(err, "SetUserStatusDeactivation")
 	}
 	return nil
 }
 
 // 设置多个用户信息
-func (domain *UserDomain) UpdateUsers(uid uint, dto dtos.SetUserInfoDTO) error {
+func (domain *UserDomain) UpdateUsers(dto dtos.SetUserInfoDTO) error {
 	updateData := dtos.UserInfoDTO{
 		Id:     dto.Id,
 		Name:   dto.Name,
@@ -259,7 +267,7 @@ func (domain *UserDomain) UpdateUsers(uid uint, dto dtos.SetUserInfoDTO) error {
 		Gender: dto.Gender,
 		Age:    dto.Age,
 	}
-	if err := domain.userDao.UpdateUsers(uid, updateData); err != nil {
+	if err := domain.userDao.UpdateUsers(dto.Id, updateData); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "UpdateUsers")
 	}
 
