@@ -17,5 +17,5 @@ vendor/
 .git/
 goapp
 log/
-cache/
 upload/
+cache/

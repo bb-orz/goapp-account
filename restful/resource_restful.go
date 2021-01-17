@@ -86,13 +86,82 @@ func (api *ResourceApi) uploadImageHandler(ctx *gin.Context) {
 }
 
 func (api *ResourceApi) uploadFileHandler(ctx *gin.Context) {
+	var err error
+	var fileHeader *multipart.FileHeader
+	// var file multipart.File
+	if fileHeader, err = ctx.FormFile("file"); err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+	fmt.Printf("FileHeader: %#v \n", fileHeader.Header.Values("Content-Type"))
 
+	contentType := fileHeader.Header.Values("Content-Type")[0]
+	AllowImageTypes := []string{"application/pdf", "application/json", "application/xml", "application/x-xls", "application/msword", "application/zip", "application/gzip", "text/plain"}
+	if !common.IsStringItemExist(AllowImageTypes, contentType) {
+		_ = ctx.Error(errors.New("Content-Type Is Not Allowed! "))
+		return
+	}
+
+	// Upload the file to specific dst.
+	dst := common.UploadImagesPath + "/" + fileHeader.Filename
+	if err := ctx.SaveUploadedFile(fileHeader, dst); err != nil {
+		_ = ctx.Error(errors.New("Save Upload File Fail "))
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, nil)
 }
 
 func (api *ResourceApi) uploadVideoHandler(ctx *gin.Context) {
+	var err error
+	var fileHeader *multipart.FileHeader
+	// var file multipart.File
+	if fileHeader, err = ctx.FormFile("file"); err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+	fmt.Printf("FileHeader: %#v \n", fileHeader.Header.Values("Content-Type"))
 
+	contentType := fileHeader.Header.Values("Content-Type")[0]
+	AllowImageTypes := []string{"video/mpeg4", "video/avi", "video/x-ms-wmv", "video/mpg"}
+	if !common.IsStringItemExist(AllowImageTypes, contentType) {
+		_ = ctx.Error(errors.New("Content-Type Is Not Allowed! "))
+		return
+	}
+
+	// Upload the file to specific dst.
+	dst := common.UploadImagesPath + "/" + fileHeader.Filename
+	if err := ctx.SaveUploadedFile(fileHeader, dst); err != nil {
+		_ = ctx.Error(errors.New("Save Upload Video Fail "))
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, nil)
 }
 
 func (api *ResourceApi) uploadAudioHandler(ctx *gin.Context) {
+	var err error
+	var fileHeader *multipart.FileHeader
+	// var file multipart.File
+	if fileHeader, err = ctx.FormFile("file"); err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+	fmt.Printf("FileHeader: %#v \n", fileHeader.Header.Values("Content-Type"))
 
+	contentType := fileHeader.Header.Values("Content-Type")[0]
+	AllowImageTypes := []string{"audio/mid", "audio/mp3", "audio/mpegurl"}
+	if !common.IsStringItemExist(AllowImageTypes, contentType) {
+		_ = ctx.Error(errors.New("Content-Type Is Not Allowed! "))
+		return
+	}
+
+	// Upload the file to specific dst.
+	dst := common.UploadImagesPath + "/" + fileHeader.Filename
+	if err := ctx.SaveUploadedFile(fileHeader, dst); err != nil {
+		_ = ctx.Error(errors.New("Save Upload Audio Fail "))
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, nil)
 }

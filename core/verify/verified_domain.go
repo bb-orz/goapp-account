@@ -3,7 +3,7 @@ package verify
 import (
 	"errors"
 	"fmt"
-	"github.com/bb-orz/goinfras/XGlobal"
+	"github.com/bb-orz/goinfras"
 	"github.com/bb-orz/goinfras/XMail"
 	"goapp/common"
 	"goapp/dtos"
@@ -43,8 +43,8 @@ func (domain *VerifyDomain) genEmailVerifyCode(uid uint) (string, error) {
 
 // 构造验证邮箱邮件
 func (domain *VerifyDomain) sendValidateEmail(address string, code string) error {
-	from := "no-reply@" + XGlobal.GetHost()
-	subject := "Verify Email Code From " + XGlobal.GetAppName()
+	from := "no-reply@" + goinfras.XApp().Sctx.Global().GetHost()
+	subject := "Verify Email Code From " + goinfras.XApp().Sctx.Global().GetAppName()
 	body := fmt.Sprintf("Verify Code: %s", code)
 	err := XMail.XCommonMail().SendSimpleMail(from, "", "", subject, body, "text/plain", "", []string{address})
 	if err != nil {
@@ -103,10 +103,10 @@ func (domain *VerifyDomain) genResetPasswordCode(uid uint) (string, error) {
 
 // 构造验证邮箱邮件
 func (domain *VerifyDomain) sendResetPasswordCodeEmail(address string, code string) error {
-	from := "no-reply@" + XGlobal.GetHost()
-	subject := "Reset Password Code From " + XGlobal.GetAppName()
+	from := "no-reply@" + goinfras.XApp().Sctx.Global().GetHost()
+	subject := "Reset Password Code From " + goinfras.XApp().Sctx.Global().GetAppName()
 	// 设置重置密码的链接
-	url := XGlobal.GetHost() + "?code=" + code
+	url := goinfras.XApp().Sctx.Global().GetHost() + "?code=" + code
 	body := fmt.Sprintf("Click This link To Reset Your Password: %s", url)
 
 	// 发送邮件
