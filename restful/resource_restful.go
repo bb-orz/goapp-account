@@ -2,7 +2,6 @@ package restful
 
 import (
 	"errors"
-	"fmt"
 	"github.com/bb-orz/goinfras/XGin"
 	"github.com/bb-orz/goinfras/XOss/XQiniuOss"
 	"github.com/gin-gonic/gin"
@@ -65,7 +64,6 @@ func (api *ResourceApi) uploadImageHandler(ctx *gin.Context) {
 		_ = ctx.Error(err)
 		return
 	}
-	fmt.Printf("FileHeader: %#v \n", fileHeader.Header.Values("Content-Type"))
 
 	contentType := fileHeader.Header.Values("Content-Type")[0]
 	AllowImageTypes := []string{"image/jpeg", "image/png", "image/gif"}
@@ -81,7 +79,7 @@ func (api *ResourceApi) uploadImageHandler(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Set(common.ResponseDataKey, nil)
+	ctx.Set(common.ResponseDataKey, gin.H{"dst": "/image/" + fileHeader.Filename})
 
 }
 
@@ -93,7 +91,6 @@ func (api *ResourceApi) uploadFileHandler(ctx *gin.Context) {
 		_ = ctx.Error(err)
 		return
 	}
-	fmt.Printf("FileHeader: %#v \n", fileHeader.Header.Values("Content-Type"))
 
 	contentType := fileHeader.Header.Values("Content-Type")[0]
 	AllowImageTypes := []string{"application/pdf", "application/json", "application/xml", "application/x-xls", "application/msword", "application/zip", "application/gzip", "text/plain"}
@@ -109,7 +106,7 @@ func (api *ResourceApi) uploadFileHandler(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Set(common.ResponseDataKey, nil)
+	ctx.Set(common.ResponseDataKey, gin.H{"dst": "/file/" + fileHeader.Filename})
 }
 
 func (api *ResourceApi) uploadVideoHandler(ctx *gin.Context) {
@@ -120,7 +117,6 @@ func (api *ResourceApi) uploadVideoHandler(ctx *gin.Context) {
 		_ = ctx.Error(err)
 		return
 	}
-	fmt.Printf("FileHeader: %#v \n", fileHeader.Header.Values("Content-Type"))
 
 	contentType := fileHeader.Header.Values("Content-Type")[0]
 	AllowImageTypes := []string{"video/mpeg4", "video/avi", "video/x-ms-wmv", "video/mpg"}
@@ -136,7 +132,7 @@ func (api *ResourceApi) uploadVideoHandler(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Set(common.ResponseDataKey, nil)
+	ctx.Set(common.ResponseDataKey, gin.H{"dst": "/video/" + fileHeader.Filename})
 }
 
 func (api *ResourceApi) uploadAudioHandler(ctx *gin.Context) {
@@ -147,7 +143,6 @@ func (api *ResourceApi) uploadAudioHandler(ctx *gin.Context) {
 		_ = ctx.Error(err)
 		return
 	}
-	fmt.Printf("FileHeader: %#v \n", fileHeader.Header.Values("Content-Type"))
 
 	contentType := fileHeader.Header.Values("Content-Type")[0]
 	AllowImageTypes := []string{"audio/mid", "audio/mp3", "audio/mpegurl"}
@@ -163,5 +158,5 @@ func (api *ResourceApi) uploadAudioHandler(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Set(common.ResponseDataKey, nil)
+	ctx.Set(common.ResponseDataKey, gin.H{"dst": "/audio/" + fileHeader.Filename})
 }
