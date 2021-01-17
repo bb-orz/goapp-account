@@ -204,13 +204,15 @@
     ]
   },
   "QiniuOss": {
-    "AccessKey": "",
-    "SecretKey": "",
-    "Bucket": "",
+    "AccessKey": "nAxImpixsKic5wFQACE178hEi9asxMmV9Qy17x3h",
+    "SecretKey": "_oVvDLJriMyQ0vHH_JSLJXrXWrpI5KJmCB2pZGSW",
+    "DefaultBucket": "dev-imps",
+    "ReturnBody": "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"fsize\":$(fsize),\"bucket\":\"$(bucket)\",\"name\":\"$(x:name)\"}",
     "UseHTTPS": false,
     "UseCdnDomains": false,
     "UpTokenExpires": 7200,
     "CallbackURL": "",
+    "CallbackBody": "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"fsize\":$(fsize),\"bucket\":\"$(bucket)\",\"name\":\"$(x:name)\"}",
     "CallbackBodyType": "application/json",
     "EndUser": "",
     "FsizeMin": 1024,
@@ -220,16 +222,16 @@
   "AliyunOss": {
     "AccessKeyId": "",
     "AccessKeySecret": "",
-    "BucketName": "",
+    "DefaultBucket": "",
     "Endpoint": "http://oss-cn-shenzhen.aliyuncs.com",
-    "UseCname": false,
     "ConnTimeout": 10,
     "RwTimeout": 120,
-    "SecurityToken": "",
     "EnableMD5": false,
     "EnableCRC": true,
+    "UseCname": false,
+    "AuthProxy": "",
     "Proxy": "",
-    "AuthProxy": ""
+    "SecurityToken": ""
   },
   "AliyunSms": {
     "EndPoint": "dysmsapi.aliyuncs.com",

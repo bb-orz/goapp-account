@@ -9,6 +9,7 @@ import (
 	"github.com/bb-orz/goinfras/XJwt"
 	"github.com/bb-orz/goinfras/XLogger"
 	"github.com/bb-orz/goinfras/XOAuth"
+	"github.com/bb-orz/goinfras/XOss/XQiniuOss"
 	"github.com/bb-orz/goinfras/XStore/XGorm"
 	"github.com/bb-orz/goinfras/XValidate"
 	"github.com/spf13/viper"
@@ -65,6 +66,9 @@ func RegisterStarter(viperConfig *viper.Viper) {
 
 	// 注册验证器
 	goinfras.RegisterStarter(XValidate.NewStarter())
+
+	// 注册七牛Oss Client
+	goinfras.RegisterStarter(XQiniuOss.NewStarter())
 
 	// 注册gin web 服务启动器
 	// TODO add your gin middlewares

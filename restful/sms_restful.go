@@ -29,8 +29,8 @@ func (api *SmsApi) SetRoutes() {
 	engine := XGin.XEngine()
 
 	// 用户鉴权访问路由组接口
-	userGroup := engine.Group("/mail", middleware.JwtAuthMiddleware())
-	userGroup.GET("/send_email_verify_code", api.sendSmsForVerifyPhoneNum)
+	userGroup := engine.Group("/sms", middleware.JwtAuthMiddleware())
+	userGroup.GET("/send_sms_verify_code", api.sendSmsForVerifyPhoneNum)
 
 }
 

@@ -1,9 +1,14 @@
 package restful
 
 import (
+	"errors"
+	"fmt"
 	"github.com/bb-orz/goinfras/XGin"
+	"github.com/bb-orz/goinfras/XOss/XQiniuOss"
 	"github.com/gin-gonic/gin"
+	"goapp/common"
 	"goapp/restful/middleware"
+	"mime/multipart"
 	"sync"
 )
 
@@ -25,12 +30,13 @@ type ResourceApi struct{}
 func (api *ResourceApi) SetRoutes() {
 	engine := XGin.XEngine()
 
-	engine.Static("/image", "/upload/images")
-	engine.Static("/file", "/upload/files")
-	engine.Static("/video", "/upload/videos")
-	engine.Static("/audio", "/upload/audios")
+	engine.Static("/image", common.UploadImagesPath)
+	engine.Static("/file", common.UploadFilesPath)
+	engine.Static("/video", common.UploadVideosPath)
+	engine.Static("/audio", common.UploadAudiosPath)
 
-	// 用户鉴权访问路由组接口
+	// 上传资源相关路由
+	engine.MaxMultipartMemory = 15 << 20 // 设置最大上传大小为15M
 	userGroup := engine.Group("/resource", middleware.JwtAuthMiddleware())
 	userGroup.GET("/get_qiniu_upload_token", api.getQiniuUploadTokenHandler)
 	userGroup.POST("/upload_image", api.uploadImageHandler)
@@ -42,9 +48,40 @@ func (api *ResourceApi) SetRoutes() {
 
 func (api *ResourceApi) getQiniuUploadTokenHandler(ctx *gin.Context) {
 
+	upToken := XQiniuOss.XClient().SimpleUpload()
+	if upToken == "" {
+		_ = ctx.Error(common.ErrorOnNetworkRequest("Get Qiniu Oss Client Upload Token Fail"))
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, common.ResponseOK(gin.H{"upToken": upToken}))
 }
 
 func (api *ResourceApi) uploadImageHandler(ctx *gin.Context) {
+	var err error
+	var fileHeader *multipart.FileHeader
+	// var file multipart.File
+	if fileHeader, err = ctx.FormFile("file"); err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+	fmt.Printf("FileHeader: %#v \n", fileHeader.Header.Values("Content-Type"))
+
+	contentType := fileHeader.Header.Values("Content-Type")[0]
+	AllowImageTypes := []string{"image/jpeg", "image/png", "image/gif"}
+	if !common.IsStringItemExist(AllowImageTypes, contentType) {
+		_ = ctx.Error(errors.New("Content-Type Is Not Allowed! "))
+		return
+	}
+
+	// Upload the file to specific dst.
+	dst := common.UploadImagesPath + "/" + fileHeader.Filename
+	if err := ctx.SaveUploadedFile(fileHeader, dst); err != nil {
+		_ = ctx.Error(errors.New("Save Upload Images Fail "))
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, nil)
 
 }
 

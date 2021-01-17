@@ -129,14 +129,17 @@ type ResetForgetPasswordDTO struct {
 }
 
 type QQBindingDTO struct {
+	Id         uint   `validate:"required,numeric" json:"id"`
 	AccessCode string `validate:"required" json:"access_code"`
 }
 
 type WechatBindingDTO struct {
+	Id         uint   `validate:"required,numeric" json:"id"`
 	AccessCode string `validate:"required" json:"access_code"`
 }
 
 type WeiboBindingDTO struct {
+	Id         uint   `validate:"required,numeric" json:"id"`
 	AccessCode string `validate:"required" json:"access_code"`
 }
 

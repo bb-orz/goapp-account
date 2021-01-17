@@ -263,7 +263,7 @@ func (api *UserApi) setAvatarHandler(ctx *gin.Context) {
 
 	userService := services.GetUserService()
 	if isPass, err := userService.SetAvatarUri(dto); !isPass || err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("Email Verify Code Error"))
+		_ = ctx.Error(common.ErrorOnInnerServer(" Error"))
 		return
 	}
 
@@ -293,7 +293,7 @@ func (api *UserApi) setUserInfoHandler(ctx *gin.Context) {
 	// Call Services method ...
 	userService := services.GetUserService()
 	if isPass, err := userService.SetUserInfos(dto); !isPass || err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("SetUserInfos Error"))
+		_ = ctx.Error(err)
 		return
 	}
 
@@ -407,7 +407,7 @@ func (api *UserApi) verifyEmail(ctx *gin.Context) {
 
 	userService := services.GetUserService()
 	if isPass, err := userService.ValidateEmail(dto); !isPass || err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("Email Verify Code Error"))
+		_ = ctx.Error(err)
 		return
 	}
 
@@ -436,19 +436,18 @@ func (api *UserApi) verifyPhone(ctx *gin.Context) {
 
 	userService := services.GetUserService()
 	if isPass, err := userService.ValidatePhone(dto); !isPass || err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("Phone Sms Verify Code Error"))
+		_ = ctx.Error(err)
 		return
 	}
 
 	ctx.Set(common.ResponseDataKey, nil)
 }
 
-// TODO 绑定微信、QQ、微博三方账号，上传头像
-
 /*qq 账号绑定*/
 func (api *UserApi) qqOAuthBindingHandler(ctx *gin.Context) {
 	var ok bool
 	var err error
+	var userId uint
 	var dto dtos.QQBindingDTO
 
 	// Receive Request ...
@@ -456,6 +455,14 @@ func (api *UserApi) qqOAuthBindingHandler(ctx *gin.Context) {
 	if err != nil {
 		_ = ctx.Error(err)
 		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
 	}
 
 	// Call Services method ...
@@ -476,6 +483,7 @@ func (api *UserApi) qqOAuthBindingHandler(ctx *gin.Context) {
 func (api *UserApi) wechatOAuthBindingHandler(ctx *gin.Context) {
 	var ok bool
 	var err error
+	var userId uint
 	var dto dtos.WechatBindingDTO
 
 	// Receive Request ...
@@ -483,6 +491,14 @@ func (api *UserApi) wechatOAuthBindingHandler(ctx *gin.Context) {
 	if err != nil {
 		_ = ctx.Error(err)
 		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
 	}
 
 	// Call Services method ...
@@ -503,6 +519,7 @@ func (api *UserApi) wechatOAuthBindingHandler(ctx *gin.Context) {
 func (api *UserApi) weiboOAuthBindingHandler(ctx *gin.Context) {
 	var ok bool
 	var err error
+	var userId uint
 	var dto dtos.WeiboBindingDTO
 
 	// Receive Request ...
@@ -510,6 +527,14 @@ func (api *UserApi) weiboOAuthBindingHandler(ctx *gin.Context) {
 	if err != nil {
 		_ = ctx.Error(err)
 		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
 	}
 
 	// Call Services method ...

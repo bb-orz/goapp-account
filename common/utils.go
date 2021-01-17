@@ -92,3 +92,12 @@ func ValidatePassword(passStr, salt, passHash string) bool {
 
 	return hashStr == passHash
 }
+
+func IsStringItemExist(slice []string, item string) bool {
+	for _, v := range slice {
+		if v == item {
+			return true
+		}
+	}
+	return false
+}
