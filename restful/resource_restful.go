@@ -2,6 +2,8 @@ package restful
 
 import (
 	"errors"
+	"fmt"
+	"github.com/bb-orz/goinfras"
 	"github.com/bb-orz/goinfras/XGin"
 	"github.com/bb-orz/goinfras/XOss/XQiniuOss"
 	"github.com/gin-gonic/gin"
@@ -39,10 +41,9 @@ func (api *ResourceApi) SetRoutes() {
 	userGroup := engine.Group("/resource", middleware.JwtAuthMiddleware())
 	userGroup.GET("/get_qiniu_upload_token", api.getQiniuUploadTokenHandler)
 	userGroup.POST("/upload_image", api.uploadImageHandler)
-	userGroup.POST("/upload_file", api.uploadFileHandler)
+	userGroup.POST("/upload_doc_file", api.uploadDocFileHandler)
 	userGroup.POST("/upload_video", api.uploadVideoHandler)
 	userGroup.POST("/upload_audio", api.uploadAudioHandler)
-
 }
 
 func (api *ResourceApi) getQiniuUploadTokenHandler(ctx *gin.Context) {
@@ -53,7 +54,7 @@ func (api *ResourceApi) getQiniuUploadTokenHandler(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Set(common.ResponseDataKey, common.ResponseOK(gin.H{"upToken": upToken}))
+	ctx.Set(common.ResponseDataKey, common.ResponseOK(gin.H{"qiniuUpToken": upToken}))
 }
 
 func (api *ResourceApi) uploadImageHandler(ctx *gin.Context) {
@@ -68,7 +69,7 @@ func (api *ResourceApi) uploadImageHandler(ctx *gin.Context) {
 	contentType := fileHeader.Header.Values("Content-Type")[0]
 	AllowImageTypes := []string{"image/jpeg", "image/png", "image/gif"}
 	if !common.IsStringItemExist(AllowImageTypes, contentType) {
-		_ = ctx.Error(errors.New("Content-Type Is Not Allowed! "))
+		_ = ctx.Error(errors.New(fmt.Sprintf("Allowed Image Content-Type: %+v ,You Upload Type is %s", AllowImageTypes, contentType)))
 		return
 	}
 
@@ -79,11 +80,11 @@ func (api *ResourceApi) uploadImageHandler(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Set(common.ResponseDataKey, gin.H{"dst": "/image/" + fileHeader.Filename})
+	ctx.Set(common.ResponseDataKey, common.ResponseOK(gin.H{"dst": goinfras.XApp().Sctx.Global().GetHost() + "/image/" + fileHeader.Filename}))
 
 }
 
-func (api *ResourceApi) uploadFileHandler(ctx *gin.Context) {
+func (api *ResourceApi) uploadDocFileHandler(ctx *gin.Context) {
 	var err error
 	var fileHeader *multipart.FileHeader
 	// var file multipart.File
@@ -93,20 +94,20 @@ func (api *ResourceApi) uploadFileHandler(ctx *gin.Context) {
 	}
 
 	contentType := fileHeader.Header.Values("Content-Type")[0]
-	AllowImageTypes := []string{"application/pdf", "application/json", "application/xml", "application/x-xls", "application/msword", "application/zip", "application/gzip", "text/plain"}
-	if !common.IsStringItemExist(AllowImageTypes, contentType) {
-		_ = ctx.Error(errors.New("Content-Type Is Not Allowed! "))
+	AllowDocFileTypes := []string{"application/pdf", "application/json", "application/xml", "application/x-xls", "application/msword", "application/zip", "application/gzip", "text/plain"}
+	if !common.IsStringItemExist(AllowDocFileTypes, contentType) {
+		_ = ctx.Error(errors.New(fmt.Sprintf("Allowed Video Content-Type: %+v,You Upload Type is %s", AllowDocFileTypes, contentType)))
 		return
 	}
 
 	// Upload the file to specific dst.
-	dst := common.UploadImagesPath + "/" + fileHeader.Filename
+	dst := common.UploadFilesPath + "/" + fileHeader.Filename
 	if err := ctx.SaveUploadedFile(fileHeader, dst); err != nil {
 		_ = ctx.Error(errors.New("Save Upload File Fail "))
 		return
 	}
 
-	ctx.Set(common.ResponseDataKey, gin.H{"dst": "/file/" + fileHeader.Filename})
+	ctx.Set(common.ResponseDataKey, common.ResponseOK(gin.H{"dst": goinfras.XApp().Sctx.Global().GetHost() + "/file/" + fileHeader.Filename}))
 }
 
 func (api *ResourceApi) uploadVideoHandler(ctx *gin.Context) {
@@ -119,20 +120,20 @@ func (api *ResourceApi) uploadVideoHandler(ctx *gin.Context) {
 	}
 
 	contentType := fileHeader.Header.Values("Content-Type")[0]
-	AllowImageTypes := []string{"video/mpeg4", "video/avi", "video/x-ms-wmv", "video/mpg"}
-	if !common.IsStringItemExist(AllowImageTypes, contentType) {
-		_ = ctx.Error(errors.New("Content-Type Is Not Allowed! "))
+	AllowVideoTypes := []string{"video/mpeg4", "video/avi", "video/x-ms-wmv", "video/mpg"}
+	if !common.IsStringItemExist(AllowVideoTypes, contentType) {
+		_ = ctx.Error(errors.New(fmt.Sprintf("Allowed Video Content-Type: %+v,You Upload Type is %s", AllowVideoTypes, contentType)))
 		return
 	}
 
 	// Upload the file to specific dst.
-	dst := common.UploadImagesPath + "/" + fileHeader.Filename
+	dst := common.UploadVideosPath + "/" + fileHeader.Filename
 	if err := ctx.SaveUploadedFile(fileHeader, dst); err != nil {
 		_ = ctx.Error(errors.New("Save Upload Video Fail "))
 		return
 	}
 
-	ctx.Set(common.ResponseDataKey, gin.H{"dst": "/video/" + fileHeader.Filename})
+	ctx.Set(common.ResponseDataKey, common.ResponseOK(gin.H{"dst": goinfras.XApp().Sctx.Global().GetHost() + "/video/" + fileHeader.Filename}))
 }
 
 func (api *ResourceApi) uploadAudioHandler(ctx *gin.Context) {
@@ -145,18 +146,18 @@ func (api *ResourceApi) uploadAudioHandler(ctx *gin.Context) {
 	}
 
 	contentType := fileHeader.Header.Values("Content-Type")[0]
-	AllowImageTypes := []string{"audio/mid", "audio/mp3", "audio/mpegurl"}
-	if !common.IsStringItemExist(AllowImageTypes, contentType) {
-		_ = ctx.Error(errors.New("Content-Type Is Not Allowed! "))
+	AllowAudioTypes := []string{"audio/mid", "audio/mp3", "audio/mpeg"}
+	if !common.IsStringItemExist(AllowAudioTypes, contentType) {
+		_ = ctx.Error(errors.New(fmt.Sprintf("Allowed Audio Content-Type: %+v,You Upload Type is %s", AllowAudioTypes, contentType)))
 		return
 	}
 
 	// Upload the file to specific dst.
-	dst := common.UploadImagesPath + "/" + fileHeader.Filename
+	dst := common.UploadAudiosPath + "/" + fileHeader.Filename
 	if err := ctx.SaveUploadedFile(fileHeader, dst); err != nil {
 		_ = ctx.Error(errors.New("Save Upload Audio Fail "))
 		return
 	}
 
-	ctx.Set(common.ResponseDataKey, gin.H{"dst": "/audio/" + fileHeader.Filename})
+	ctx.Set(common.ResponseDataKey, common.ResponseOK(gin.H{"dst": goinfras.XApp().Sctx.Global().GetHost() + "/audio/" + fileHeader.Filename}))
 }

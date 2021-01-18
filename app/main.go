@@ -7,6 +7,7 @@ import (
 	"github.com/bb-orz/goinfras/XGin"
 	"github.com/bb-orz/goinfras/XJwt"
 	"github.com/bb-orz/goinfras/XLogger"
+	"github.com/bb-orz/goinfras/XMail"
 	"github.com/bb-orz/goinfras/XOAuth"
 	"github.com/bb-orz/goinfras/XOss/XQiniuOss"
 	"github.com/bb-orz/goinfras/XStore/XGorm"
@@ -66,8 +67,11 @@ func RegisterStarter(viperConfig *viper.Viper) {
 	// 注册七牛Oss Client
 	goinfras.RegisterStarter(XQiniuOss.NewStarter())
 
+	// 注册邮件服务 Dialer
+	goinfras.RegisterStarter(XMail.NewStarter())
+
 	// 注册gin web 服务启动器
-	// TODO add your gin middlewares
+	// TODO add your gin global middlewares
 	// 尾部中间件设置为统一错误处理和统一http响应
 	goinfras.RegisterStarter(XGin.NewStarter(
 		middleware.CorsMiddleware(viperConfig),

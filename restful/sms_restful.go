@@ -30,7 +30,7 @@ func (api *SmsApi) SetRoutes() {
 
 	// 用户鉴权访问路由组接口
 	userGroup := engine.Group("/sms", middleware.JwtAuthMiddleware())
-	userGroup.GET("/send_sms_verify_code", api.sendSmsForVerifyPhoneNum)
+	userGroup.POST("/send_sms_verify_code", api.sendSmsForVerifyPhoneNum)
 
 }
 

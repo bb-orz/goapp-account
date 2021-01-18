@@ -104,7 +104,7 @@ func (domain *VerifyDomain) genResetPasswordCode(uid uint) (string, error) {
 // 构造验证邮箱邮件
 func (domain *VerifyDomain) sendResetPasswordCodeEmail(address string, code string) error {
 	from := "no-reply@" + goinfras.XApp().Sctx.Global().GetHost()
-	subject := "Reset Password Code From " + goinfras.XApp().Sctx.Global().GetAppName()
+	subject := "[" + goinfras.XApp().Sctx.Global().GetAppName() + "] " + "Reset Password Code From "
 	// 设置重置密码的链接
 	url := goinfras.XApp().Sctx.Global().GetHost() + "?code=" + code
 	body := fmt.Sprintf("Click This link To Reset Your Password: %s", url)

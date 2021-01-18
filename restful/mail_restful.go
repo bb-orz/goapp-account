@@ -30,7 +30,7 @@ func (api *MailApi) SetRoutes() {
 
 	// 用户鉴权访问路由组接口
 	userGroup := engine.Group("/mail", middleware.JwtAuthMiddleware())
-	userGroup.GET("/send_email_verify_code", api.sendEmailForVerifyEmailAddress)
+	userGroup.POST("/send_email_verify_code", api.sendEmailForVerifyEmailAddress)
 	userGroup.POST("/send_forget_password_verify_code", api.sendEmailForForgetPassword)
 
 }

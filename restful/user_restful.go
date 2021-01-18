@@ -42,23 +42,69 @@ func (api *UserApi) SetRoutes() {
 	registerGroup.POST("/phone", api.registerPhoneHandler)
 
 	// 第三方平台登录或注册接口
-	oauthGroup := engine.Group("/oauth")
-	oauthGroup.GET("/qq", api.qqOAuthLoginHandler)
-	oauthGroup.GET("/weixin", api.wechatOAuthLoginHandler)
-	oauthGroup.GET("/weibo", api.weiboOAuthLoginHandler)
+	oauthGroup := engine.Group("/third_oauth")
+	oauthGroup.GET("/qq_login", api.qqOAuthLoginHandler)
+	oauthGroup.GET("/weixin_login", api.wechatOAuthLoginHandler)
+	oauthGroup.GET("/weibo_login", api.weiboOAuthLoginHandler)
+	oauthGroup.GET("/qq_binding", api.qqOAuthBindingHandler)
+	oauthGroup.GET("/weixin_binding", api.wechatOAuthBindingHandler)
+	oauthGroup.GET("/weibo_binding", api.weiboOAuthBindingHandler)
 
 	// 用户鉴权访问路由组接口
 	userGroup := engine.Group("/user", middleware.JwtAuthMiddleware())
 	userGroup.GET("/info", api.getUserInfoHandler)
-	userGroup.POST("/set_avatar", api.setAvatarHandler)
 	userGroup.POST("/set", api.setUserInfoHandler)
+	userGroup.POST("/set_avatar", api.setAvatarHandler)
+	userGroup.POST("/verify_email", api.verifyEmail)
+	userGroup.POST("/verify_phone", api.verifyPhone)
 	userGroup.POST("/modified_password", api.modifiedPassword)
 	userGroup.POST("/forget_password", api.resetForgetPassword)
-	userGroup.POST("/verify_mail", api.verifyEmail)
-	userGroup.POST("/verify_phone", api.verifyPhone)
-	oauthGroup.GET("/qq_binding", api.qqOAuthBindingHandler)
-	oauthGroup.GET("/weixin_binding", api.wechatOAuthBindingHandler)
-	oauthGroup.GET("/weibo_binding", api.weiboOAuthBindingHandler)
+
+}
+
+/*邮箱注册注册*/
+func (api *UserApi) registerEmailHandler(ctx *gin.Context) {
+	// 接收参数由dto封装验证
+	var dto dtos.CreateUserWithEmailDTO
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Call Services method ...
+	userService := services.GetUserService()
+	userDTO, err := userService.CreateUserWithEmail(dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Send Data to Response Middleware ...
+	ctx.Set(common.ResponseDataKey, *userDTO)
+}
+
+/*手机号码注册注册*/
+func (api *UserApi) registerPhoneHandler(ctx *gin.Context) {
+	// 接收参数由dto封装验证
+	var dto dtos.CreateUserWithPhoneDTO
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Call Services method ...
+	userService := services.GetUserService()
+	userDTO, err := userService.CreateUserWithPhone(dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Send Data to Response Middleware ...
+	ctx.Set(common.ResponseDataKey, *userDTO)
+
 }
 
 /*邮箱账号登录*/
@@ -123,51 +169,6 @@ func (api *UserApi) logoutHandler(ctx *gin.Context) {
 
 	// Send Data to Response Middleware ...
 	ctx.Set(common.ResponseDataKey, nil)
-}
-
-/*邮箱注册注册*/
-func (api *UserApi) registerEmailHandler(ctx *gin.Context) {
-	// 接收参数由dto封装验证
-	var dto dtos.CreateUserWithEmailDTO
-	err := ctx.ShouldBindJSON(&dto)
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	// Call Services method ...
-	userService := services.GetUserService()
-	userDTO, err := userService.CreateUserWithEmail(dto)
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	// Send Data to Response Middleware ...
-	ctx.Set(common.ResponseDataKey, *userDTO)
-}
-
-/*手机号码注册注册*/
-func (api *UserApi) registerPhoneHandler(ctx *gin.Context) {
-	// 接收参数由dto封装验证
-	var dto dtos.CreateUserWithPhoneDTO
-	err := ctx.ShouldBindJSON(&dto)
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	// Call Services method ...
-	userService := services.GetUserService()
-	userDTO, err := userService.CreateUserWithPhone(dto)
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	// Send Data to Response Middleware ...
-	ctx.Set(common.ResponseDataKey, *userDTO)
-
 }
 
 /*qq oauth 登录*/
@@ -240,207 +241,6 @@ func (api *UserApi) weiboOAuthLoginHandler(ctx *gin.Context) {
 	// Send Data to Response Middleware ...
 	ctx.Set(common.ResponseDataKey, common.ResponseOK(gin.H{"token": token}))
 
-}
-
-func (api *UserApi) setAvatarHandler(ctx *gin.Context) {
-	// Receive Request ...
-	var userId uint
-	var dto dtos.SetAvatarUriDTO
-
-	err := ctx.ShouldBindJSON(&dto)
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	// 校验登录用户id是否有获取信息权限
-	if userId, err = common.GetUserId(ctx); err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
-		return
-	} else {
-		dto.Id = userId
-	}
-
-	userService := services.GetUserService()
-	if isPass, err := userService.SetAvatarUri(dto); !isPass || err != nil {
-		_ = ctx.Error(common.ErrorOnInnerServer(" Error"))
-		return
-	}
-
-	ctx.Set(common.ResponseDataKey, nil)
-}
-
-/*设置用户信息*/
-func (api *UserApi) setUserInfoHandler(ctx *gin.Context) {
-	// Receive Request ...
-	var dto dtos.SetUserInfoDTO
-	var userId uint
-	var err error
-	err = ctx.ShouldBindJSON(&dto)
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	// 校验登录用户id是否有获取信息权限
-	if userId, err = common.GetUserId(ctx); err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
-		return
-	} else {
-		dto.Id = userId
-	}
-
-	// Call Services method ...
-	userService := services.GetUserService()
-	if isPass, err := userService.SetUserInfos(dto); !isPass || err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	ctx.Set(common.ResponseDataKey, nil)
-}
-
-/*获取用户信息*/
-func (api *UserApi) getUserInfoHandler(ctx *gin.Context) {
-	var dto dtos.GetUserInfoDTO
-	var userId uint
-	var err error
-
-	// 校验登录用户id是否有获取信息权限
-	if userId, err = common.GetUserId(ctx); err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
-		return
-	} else {
-		dto.Id = userId
-	}
-	// Call Services method ...
-	userService := services.GetUserService()
-	userDTO, err := userService.GetUserInfo(dto)
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	// Send Data to Response Middleware ...
-	ctx.Set(common.ResponseDataKey, *userDTO)
-}
-
-// 修改密码
-func (api *UserApi) modifiedPassword(ctx *gin.Context) {
-	// Receive Request ...
-	var userId uint
-	var dto dtos.ModifiedPasswordDTO
-
-	err := ctx.ShouldBindJSON(&dto)
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	// 校验登录用户id是否有获取信息权限
-	if userId, err = common.GetUserId(ctx); err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
-		return
-	} else {
-		dto.Id = userId
-	}
-
-	userService := services.GetUserService()
-	if isPass, err := userService.ModifiedPassword(dto); !isPass || err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	// Send Data to Response Middleware ...
-	ctx.Set(common.ResponseDataKey, nil)
-}
-
-// 忘记密码:先发送邮箱验证码，用户接收后和新密码一起提交
-func (api *UserApi) resetForgetPassword(ctx *gin.Context) {
-	// Receive Request ...
-	var userId uint
-	var dto dtos.ResetForgetPasswordDTO
-
-	err := ctx.ShouldBindJSON(&dto)
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	// 校验登录用户id是否有获取信息权限
-	if userId, err = common.GetUserId(ctx); err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
-		return
-	} else {
-		dto.Id = userId
-	}
-
-	userService := services.GetUserService()
-	if isPass, err := userService.ResetForgetPassword(dto); !isPass || err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	// Send Data to Response Middleware ...
-	ctx.Set(common.ResponseDataKey, nil)
-}
-
-// 验证账号邮箱
-func (api *UserApi) verifyEmail(ctx *gin.Context) {
-	// Receive Request ...
-	var userId uint
-	var dto dtos.ValidateEmailDTO
-
-	err := ctx.ShouldBindJSON(&dto)
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	// 校验登录用户id是否有获取信息权限
-	if userId, err = common.GetUserId(ctx); err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
-		return
-	} else {
-		dto.Id = userId
-	}
-
-	userService := services.GetUserService()
-	if isPass, err := userService.ValidateEmail(dto); !isPass || err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	ctx.Set(common.ResponseDataKey, nil)
-}
-
-// 验证账号手机号码
-func (api *UserApi) verifyPhone(ctx *gin.Context) {
-	// Receive Request ...
-	var userId uint
-	var dto dtos.ValidatePhoneDTO
-
-	err := ctx.ShouldBindJSON(&dto)
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	// 校验登录用户id是否有获取信息权限
-	if userId, err = common.GetUserId(ctx); err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
-		return
-	} else {
-		dto.Id = userId
-	}
-
-	userService := services.GetUserService()
-	if isPass, err := userService.ValidatePhone(dto); !isPass || err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	ctx.Set(common.ResponseDataKey, nil)
 }
 
 /*qq 账号绑定*/
@@ -550,4 +350,205 @@ func (api *UserApi) weiboOAuthBindingHandler(ctx *gin.Context) {
 		_ = ctx.Error(errors.New("Weibo OAuth Binding Fail "))
 	}
 
+}
+
+/*获取用户信息*/
+func (api *UserApi) getUserInfoHandler(ctx *gin.Context) {
+	var dto dtos.GetUserInfoDTO
+	var userId uint
+	var err error
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+	// Call Services method ...
+	userService := services.GetUserService()
+	userDTO, err := userService.GetUserInfo(dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Send Data to Response Middleware ...
+	ctx.Set(common.ResponseDataKey, *userDTO)
+}
+
+/*设置用户信息*/
+func (api *UserApi) setUserInfoHandler(ctx *gin.Context) {
+	// Receive Request ...
+	var dto dtos.SetUserInfoDTO
+	var userId uint
+	var err error
+	err = ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	// Call Services method ...
+	userService := services.GetUserService()
+	if isPass, err := userService.SetUserInfos(dto); !isPass || err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, nil)
+}
+
+func (api *UserApi) setAvatarHandler(ctx *gin.Context) {
+	// Receive Request ...
+	var userId uint
+	var dto dtos.SetAvatarUriDTO
+
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	userService := services.GetUserService()
+	if isPass, err := userService.SetAvatarUri(dto); !isPass || err != nil {
+		_ = ctx.Error(common.ErrorOnInnerServer(" Error"))
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, nil)
+}
+
+// 验证账号邮箱
+func (api *UserApi) verifyEmail(ctx *gin.Context) {
+	// Receive Request ...
+	var userId uint
+	var dto dtos.ValidateEmailDTO
+
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	userService := services.GetUserService()
+	if isPass, err := userService.ValidateEmail(dto); !isPass || err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, nil)
+}
+
+// 验证账号手机号码
+func (api *UserApi) verifyPhone(ctx *gin.Context) {
+	// Receive Request ...
+	var userId uint
+	var dto dtos.ValidatePhoneDTO
+
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	userService := services.GetUserService()
+	if isPass, err := userService.ValidatePhone(dto); !isPass || err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, nil)
+}
+
+// 修改密码
+func (api *UserApi) modifiedPassword(ctx *gin.Context) {
+	// Receive Request ...
+	var userId uint
+	var dto dtos.ModifiedPasswordDTO
+
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	userService := services.GetUserService()
+	if isPass, err := userService.ModifiedPassword(dto); !isPass || err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Send Data to Response Middleware ...
+	ctx.Set(common.ResponseDataKey, nil)
+}
+
+// 忘记密码:先发送邮箱验证码，用户接收后和新密码一起提交
+func (api *UserApi) resetForgetPassword(ctx *gin.Context) {
+	// Receive Request ...
+	var userId uint
+	var dto dtos.ResetForgetPasswordDTO
+
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	userService := services.GetUserService()
+	if isPass, err := userService.ResetForgetPassword(dto); !isPass || err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Send Data to Response Middleware ...
+	ctx.Set(common.ResponseDataKey, nil)
 }

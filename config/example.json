@@ -1,8 +1,8 @@
 {
   "Global": {
     "Env": "debug",
-    "Host": "example.com",
-    "Endpoint": "localhost",
+    "Host": "localhost:8099",
+    "Endpoint": "localhost:8099",
     "AppName": "goinfras_application",
     "Version": "v1.0.0"
   },
@@ -210,7 +210,7 @@
     "ReturnBody": "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"fsize\":$(fsize),\"bucket\":\"$(bucket)\",\"name\":\"$(x:name)\"}",
     "UseHTTPS": false,
     "UseCdnDomains": false,
-    "UpTokenExpires": 7200,
+    "UpTokenExpires": 3600,
     "CallbackURL": "",
     "CallbackBody": "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"fsize\":$(fsize),\"bucket\":\"$(bucket)\",\"name\":\"$(x:name)\"}",
     "CallbackBodyType": "application/json",
