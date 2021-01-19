@@ -103,12 +103,14 @@ type SetUserInfoDTO struct {
 // 验证邮箱数据传输对象
 type ValidateEmailDTO struct {
 	Id         uint   `validate:"required,numeric" json:"id"`
+	Email      string `validate:"required,email" json:"email"`
 	VerifyCode string `validate:"required,alphanum,len=6" json:"verify_code"`
 }
 
 // 验证手机号码数据传输对象
 type ValidatePhoneDTO struct {
 	Id         uint   `validate:"required,numeric" json:"id"`
+	Phone      string `validate:"required,numeric,len=11" json:"phone"`
 	VerifyCode string `validate:"required,numeric,len=6" json:"verify_code"`
 }
 

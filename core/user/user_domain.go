@@ -28,7 +28,7 @@ func NewUserDomain() *UserDomain {
 }
 
 func (domain *UserDomain) DomainName() string {
-	return "UserDomain"
+	return DomainName
 }
 
 // 生成用户编号
@@ -218,17 +218,33 @@ func (domain *UserDomain) GetUserByPhone(phone string) (*dtos.UsersDTO, error) {
 	return userDTO, nil
 }
 
+// 设置邮箱
+func (domain *UserDomain) SetEmail(uid uint, email string) error {
+	if err := domain.userDao.SetUsers(uid, "email", email); err != nil {
+		return common.DomainInnerErrorOnSqlUpdate(err, "SetEmail")
+	}
+	return nil
+}
+
 // 设置邮箱已验证
 func (domain *UserDomain) SetEmailVerify(uid uint) error {
-	if err := domain.userDao.SetUsers(uid, "email_verify", UserEmailVerify); err != nil {
+	if err := domain.userDao.SetUsers(uid, "email_verified", UserEmailVerify); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetEmailVerify")
+	}
+	return nil
+}
+
+// 设置手机号
+func (domain *UserDomain) SetPhone(uid uint, phone string) error {
+	if err := domain.userDao.SetUsers(uid, "phone", phone); err != nil {
+		return common.DomainInnerErrorOnSqlUpdate(err, "SetPhone")
 	}
 	return nil
 }
 
 // 设置手机号码已验证
 func (domain *UserDomain) SetPhoneVerify(uid uint) error {
-	if err := domain.userDao.SetUsers(uid, "phone_verify", UserPhoneVerify); err != nil {
+	if err := domain.userDao.SetUsers(uid, "phone_verified", UserPhoneVerify); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetPhoneVerify")
 	}
 	return nil

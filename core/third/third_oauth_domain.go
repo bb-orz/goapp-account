@@ -17,7 +17,7 @@ func NewThirdOAuthDomain() *ThirdOAuthDomain {
 }
 
 func (domain *ThirdOAuthDomain) DomainName() string {
-	return "OauthDomain"
+	return "ThirdOAuthDomain"
 
 }
 

@@ -369,6 +369,7 @@ func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserIn
 func (service *UserServiceV1) ValidateEmail(dto dtos.ValidateEmailDTO) (bool, error) {
 	var err error
 	var pass bool
+	var emailExist bool
 	var verifyDomain *verify.VerifyDomain
 	var userDomain *user.UserDomain
 	verifyDomain = verify.NewVerifyDomain()
@@ -376,6 +377,15 @@ func (service *UserServiceV1) ValidateEmail(dto dtos.ValidateEmailDTO) (bool, er
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
 		return false, common.ErrorOnValidate(err)
+	}
+
+	if emailExist, err = userDomain.IsEmailExist(dto.Email); err != nil {
+		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+	} else if !emailExist {
+		// 绑定邮箱
+		if err = userDomain.SetEmail(dto.Id, dto.Email); err != nil {
+			return false, common.ErrorOnVerify("Email Account is Existed")
+		}
 	}
 
 	// 从cache拿出保存的邮箱验证码
@@ -404,6 +414,7 @@ func (service *UserServiceV1) ValidateEmail(dto dtos.ValidateEmailDTO) (bool, er
 func (service *UserServiceV1) ValidatePhone(dto dtos.ValidatePhoneDTO) (bool, error) {
 	var err error
 	var pass bool
+	var phoneExist bool
 	var verifyDomain *verify.VerifyDomain
 	var userDomain *user.UserDomain
 	verifyDomain = verify.NewVerifyDomain()
@@ -412,6 +423,15 @@ func (service *UserServiceV1) ValidatePhone(dto dtos.ValidatePhoneDTO) (bool, er
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
 		return false, common.ErrorOnValidate(err)
+	}
+
+	if phoneExist, err = userDomain.IsPhoneExist(dto.Phone); err != nil {
+		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+	} else if !phoneExist {
+		// 绑定手机号码
+		if err = userDomain.SetPhone(dto.Id, dto.Phone); err != nil {
+			return false, common.ErrorOnVerify("Phone Account is Existed")
+		}
 	}
 
 	// 从cache拿出保存的短信验证码

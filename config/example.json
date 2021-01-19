@@ -1,8 +1,8 @@
 {
   "Global": {
     "Env": "debug",
-    "Host": "localhost:8099",
-    "Endpoint": "localhost:8099",
+    "Host": "example.com",
+    "Endpoint": "example.com",
     "AppName": "goinfras_application",
     "Version": "v1.0.0"
   },
@@ -272,11 +272,11 @@
     "TransZh": true
   },
   "Mail": {
-    "NoAuth": true,
+    "NoAuth": false,
     "NoSmtp": false,
-    "Server": "",
-    "Port": 0,
-    "User": "",
-    "Password": ""
+    "Server": "smtp.139.com",
+    "Port": 25,
+    "User": "15014064227@139.com",
+    "Password": "Goinfras2020"
   }
 }

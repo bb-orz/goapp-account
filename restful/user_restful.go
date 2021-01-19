@@ -30,6 +30,7 @@ func (api *UserApi) SetRoutes() {
 	engine := XGin.XEngine()
 
 	engine.GET("/logout", middleware.JwtAuthMiddleware(), api.logoutHandler)
+	engine.POST("/forget_password", api.resetForgetPassword)
 
 	// 登录登出接口
 	loginGroup := engine.Group("/login")
@@ -58,7 +59,6 @@ func (api *UserApi) SetRoutes() {
 	userGroup.POST("/verify_email", api.verifyEmail)
 	userGroup.POST("/verify_phone", api.verifyPhone)
 	userGroup.POST("/modified_password", api.modifiedPassword)
-	userGroup.POST("/forget_password", api.resetForgetPassword)
 
 }
 
