@@ -42,18 +42,6 @@ type UserOAuthInfoDTO struct {
 	OAuths        []OauthsDTO
 }
 
-type QQLoginDTO struct {
-	AccessCode string `validate:"required" json:"access_code"`
-}
-
-type WechatLoginDTO struct {
-	AccessCode string `validate:"required" json:"access_code"`
-}
-
-type WeiboLoginDTO struct {
-	AccessCode string `validate:"required" json:"access_code"`
-}
-
 // 创建用户的数据传输对象
 type CreateUserWithEmailDTO struct {
 	Name       string `validate:"required,alphanum,max=16,min=4" json:"name"`
@@ -128,21 +116,6 @@ type ResetForgetPasswordDTO struct {
 	Code  string `validate:"required,alphanum,len=6" json:"code"` // 允许重设密码的key值，服务端生成后被发往邮箱，用户点击过来后接收
 	New   string `validate:"required,alphanumunicode,max=20,min=8" json:"new"`
 	ReNew string `validate:"required,alphanumunicode,max=20,min=8,eqfield=New" json:"renew"`
-}
-
-type QQBindingDTO struct {
-	Id         uint   `validate:"required,numeric" json:"id"`
-	AccessCode string `validate:"required" json:"access_code"`
-}
-
-type WechatBindingDTO struct {
-	Id         uint   `validate:"required,numeric" json:"id"`
-	AccessCode string `validate:"required" json:"access_code"`
-}
-
-type WeiboBindingDTO struct {
-	Id         uint   `validate:"required,numeric" json:"id"`
-	AccessCode string `validate:"required" json:"access_code"`
 }
 
 type SetAvatarUriDTO struct {

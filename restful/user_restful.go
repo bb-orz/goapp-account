@@ -29,36 +29,31 @@ type UserApi struct{}
 func (api *UserApi) SetRoutes() {
 	engine := XGin.XEngine()
 
-	engine.GET("/logout", middleware.JwtAuthMiddleware(), api.logoutHandler)
+	// 非鉴权访问接口
+	engine.POST("/register_email", api.registerEmailHandler)
+	engine.POST("/register_phone", api.registerPhoneHandler)
+	engine.POST("/login_email", api.loginEmailHandler)
+	engine.POST("/login_phone", api.loginPhoneHandler)
+	engine.GET("/login_qq", api.qqOAuthLoginHandler)
+	engine.GET("/login_wechat", api.wechatOAuthLoginHandler)
+	engine.GET("/login_weibo", api.weiboOAuthLoginHandler)
 	engine.POST("/forget_password", api.resetForgetPassword)
 
-	// 登录登出接口
-	loginGroup := engine.Group("/login")
-	loginGroup.POST("/email", api.loginEmailHandler)
-	loginGroup.POST("/phone", api.loginPhoneHandler)
-
-	// 邮箱或手机号注册账号接口
-	registerGroup := engine.Group("/register")
-	registerGroup.POST("/email", api.registerEmailHandler)
-	registerGroup.POST("/phone", api.registerPhoneHandler)
-
-	// 第三方平台登录或注册接口
-	oauthGroup := engine.Group("/third_oauth")
-	oauthGroup.GET("/qq_login", api.qqOAuthLoginHandler)
-	oauthGroup.GET("/weixin_login", api.wechatOAuthLoginHandler)
-	oauthGroup.GET("/weibo_login", api.weiboOAuthLoginHandler)
-	oauthGroup.GET("/qq_binding", api.qqOAuthBindingHandler)
-	oauthGroup.GET("/weixin_binding", api.wechatOAuthBindingHandler)
-	oauthGroup.GET("/weibo_binding", api.weiboOAuthBindingHandler)
-
 	// 用户鉴权访问路由组接口
-	userGroup := engine.Group("/user", middleware.JwtAuthMiddleware())
-	userGroup.GET("/info", api.getUserInfoHandler)
-	userGroup.POST("/set", api.setUserInfoHandler)
-	userGroup.POST("/set_avatar", api.setAvatarHandler)
-	userGroup.POST("/verify_email", api.verifyEmail)
-	userGroup.POST("/verify_phone", api.verifyPhone)
-	userGroup.POST("/modified_password", api.modifiedPassword)
+	authGroup := engine.Group("/user", middleware.JwtAuthMiddleware())
+	authGroup.GET("/info", api.getUserInfoHandler)
+	authGroup.POST("/set_info", api.setUserInfoHandler)
+	authGroup.POST("/set_avatar", api.setAvatarHandler)
+	authGroup.POST("/verify_email", api.verifyEmail)
+	authGroup.POST("/verify_phone", api.verifyPhone)
+	authGroup.POST("/modified_password", api.modifiedPassword)
+	authGroup.POST("/send_email_verify_code", api.sendEmailForVerifyEmailAddress)
+	authGroup.POST("/send_forget_password_verify_code", api.sendEmailForForgetPassword)
+	authGroup.POST("/send_sms_verify_code", api.sendSmsForVerifyPhoneNum)
+	authGroup.GET("/qq_binding", api.qqOAuthBindingHandler)
+	authGroup.GET("/weixin_binding", api.wechatOAuthBindingHandler)
+	authGroup.GET("/weibo_binding", api.weiboOAuthBindingHandler)
+	authGroup.GET("/logout", api.logoutHandler)
 
 }
 
@@ -74,14 +69,14 @@ func (api *UserApi) registerEmailHandler(ctx *gin.Context) {
 
 	// Call Services method ...
 	userService := services.GetUserService()
-	userDTO, err := userService.CreateUserWithEmail(dto)
+	userInfoDTO, err := userService.CreateUserWithEmail(dto)
 	if err != nil {
 		_ = ctx.Error(err)
 		return
 	}
 
 	// Send Data to Response Middleware ...
-	ctx.Set(common.ResponseDataKey, *userDTO)
+	ctx.Set(common.ResponseDataKey, common.ResponseOK(userInfoDTO))
 }
 
 /*手机号码注册注册*/
@@ -96,15 +91,14 @@ func (api *UserApi) registerPhoneHandler(ctx *gin.Context) {
 
 	// Call Services method ...
 	userService := services.GetUserService()
-	userDTO, err := userService.CreateUserWithPhone(dto)
+	userInfoDTO, err := userService.CreateUserWithPhone(dto)
 	if err != nil {
 		_ = ctx.Error(err)
 		return
 	}
 
 	// Send Data to Response Middleware ...
-	ctx.Set(common.ResponseDataKey, *userDTO)
-
+	ctx.Set(common.ResponseDataKey, common.ResponseOK(userInfoDTO))
 }
 
 /*邮箱账号登录*/
@@ -183,8 +177,8 @@ func (api *UserApi) qqOAuthLoginHandler(ctx *gin.Context) {
 	}
 
 	// Call Services method ...
-	userService := services.GetUserService()
-	token, err := userService.QQOAuthLogin(dto)
+	thirdOAuthService := services.GetThirdOAuthService()
+	token, err := thirdOAuthService.QQOAuthLogin(dto)
 	if err != nil {
 		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
 		return
@@ -207,8 +201,8 @@ func (api *UserApi) wechatOAuthLoginHandler(ctx *gin.Context) {
 	}
 
 	// Call Services method ...
-	userService := services.GetUserService()
-	token, err := userService.WechatOAuthLogin(dto)
+	thirdOAuthService := services.GetThirdOAuthService()
+	token, err := thirdOAuthService.WechatOAuthLogin(dto)
 	if err != nil {
 		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
 		return
@@ -231,8 +225,8 @@ func (api *UserApi) weiboOAuthLoginHandler(ctx *gin.Context) {
 	}
 
 	// Call Services method ...
-	userService := services.GetUserService()
-	token, err := userService.WeiboOAuthLogin(dto)
+	thirdOAuthService := services.GetThirdOAuthService()
+	token, err := thirdOAuthService.WeiboOAuthLogin(dto)
 	if err != nil {
 		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
 		return
@@ -266,8 +260,8 @@ func (api *UserApi) qqOAuthBindingHandler(ctx *gin.Context) {
 	}
 
 	// Call Services method ...
-	userService := services.GetUserService()
-	if ok, err = userService.QQOAuthBinding(dto); err != nil {
+	thirdOAuthService := services.GetThirdOAuthService()
+	if ok, err = thirdOAuthService.QQOAuthBinding(dto); err != nil {
 		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
 		return
 	}
@@ -302,8 +296,8 @@ func (api *UserApi) wechatOAuthBindingHandler(ctx *gin.Context) {
 	}
 
 	// Call Services method ...
-	userService := services.GetUserService()
-	if ok, err = userService.WechatOAuthBinding(dto); err != nil {
+	thirdOAuthService := services.GetThirdOAuthService()
+	if ok, err = thirdOAuthService.WechatOAuthBinding(dto); err != nil {
 		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
 		return
 	}
@@ -338,8 +332,8 @@ func (api *UserApi) weiboOAuthBindingHandler(ctx *gin.Context) {
 	}
 
 	// Call Services method ...
-	userService := services.GetUserService()
-	if ok, err = userService.WeiboOAuthBinding(dto); err != nil {
+	thirdOAuthService := services.GetThirdOAuthService()
+	if ok, err = thirdOAuthService.WeiboOAuthBinding(dto); err != nil {
 		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
 		return
 	}
@@ -550,5 +544,86 @@ func (api *UserApi) resetForgetPassword(ctx *gin.Context) {
 	}
 
 	// Send Data to Response Middleware ...
+	ctx.Set(common.ResponseDataKey, nil)
+}
+
+func (api *UserApi) sendEmailForVerifyEmailAddress(ctx *gin.Context) {
+	// 接收参数由dto封装验证
+	var userId uint
+	var dto dtos.SendEmailForVerifyDTO
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	mailService := services.GetMailService()
+	if err = mailService.SendEmailForVerify(dto); err != nil {
+		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, nil)
+}
+
+func (api *UserApi) sendEmailForForgetPassword(ctx *gin.Context) {
+	// 接收参数由dto封装验证
+	var userId uint
+	var dto dtos.SendEmailForgetPasswordDTO
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	mailService := services.GetMailService()
+	if err = mailService.SendEmailForgetPassword(dto); err != nil {
+		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, nil)
+}
+
+func (api *UserApi) sendSmsForVerifyPhoneNum(ctx *gin.Context) {
+	// 接收参数由dto封装验证
+	var userId uint
+	var dto dtos.SendPhoneVerifyCodeDTO
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	smsService := services.GetSmsService()
+	if err = smsService.SendPhoneVerifyCode(dto); err != nil {
+		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
+		return
+	}
+
 	ctx.Set(common.ResponseDataKey, nil)
 }
