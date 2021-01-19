@@ -26,7 +26,7 @@ func (domain *VerifyDomain) DomainName() string {
 }
 
 // 构造验证邮箱邮件
-func (domain *VerifyDomain) sendValidateEmail(address string, code string) error {
+func (domain *VerifyDomain) emailVerifyCodeCheckEmailAddressMsg(address string, code string) error {
 	subject := "Verify Email Code From " + goinfras.XApp().Sctx.Global().GetAppName()
 	body := fmt.Sprintf("Verify Code: %s", code)
 	err := XMail.XCommonMail().SendSimpleMail(subject, body, XMail.BodyTypePlain, "", []string{address})
@@ -36,44 +36,8 @@ func (domain *VerifyDomain) sendValidateEmail(address string, code string) error
 	return nil
 }
 
-// 发送验证码到邮箱
-func (domain *VerifyDomain) SendValidateEmail(dto dtos.SendEmailForVerifyDTO) error {
-	var err error
-	var code string
-
-	uid := dto.Id
-	email := dto.Email
-
-	// 生成6位随机字符串
-	code = common.RandomString(6)
-
-	// 保存到缓存
-	err = domain.cache.SetUserVerifyEmailCode(uid, code)
-	if err != nil {
-		return common.DomainInnerErrorOnCacheSet(err, "SetUserVerifyEmailCode")
-	}
-
-	// 发送邮件
-	return domain.sendValidateEmail(email, code)
-}
-
-// 注册时验证邮箱
-func (domain *VerifyDomain) VerifyEmail(uid uint, vcode string) (bool, error) {
-	var code string
-	var isExist bool
-	// 缓存取出
-	if code, isExist = domain.cache.GetUserVerifyEmailCode(uid); !isExist {
-		return false, common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"), "GetUserVerifyEmailCode")
-	}
-	// 校验
-	if vcode == code {
-		return true, nil
-	}
-	return false, nil
-}
-
 // 构造验证邮箱邮件
-func (domain *VerifyDomain) sendResetPasswordCodeEmail(address string, code string) error {
+func (domain *VerifyDomain) emailVerifyCodeResetPasswordMsg(address string, code string) error {
 	subject := "[" + goinfras.XApp().Sctx.Global().GetAppName() + "] " + "Reset Password Code From "
 	// 设置重置密码的链接
 	url := goinfras.XApp().Sctx.Global().GetHost() + "?code=" + code
@@ -88,29 +52,74 @@ func (domain *VerifyDomain) sendResetPasswordCodeEmail(address string, code stri
 	return nil
 }
 
+// 构造注册验证码短信
+func (domain *VerifyDomain) verifyCodeForPhoneRegisterMsg(phone string, code string) error {
+
+	return nil
+}
+
+// 构造手机绑定验证码短信
+func (domain *VerifyDomain) verifyCodeForPhoneBindingMsg(phone string, code string) error {
+
+	return nil
+}
+
+// 构造登录验证码短信
+func (domain *VerifyDomain) verifyCodeForPhoneLoginMsg(phone string, code string) error {
+
+	return nil
+}
+
 // 发送验证码到邮箱
-func (domain *VerifyDomain) SendResetPasswordCodeEmail(dto dtos.SendEmailForgetPasswordDTO) error {
+func (domain *VerifyDomain) SendEmailVerifyCode(dto dtos.SendEmailVerifyCodeDTO) error {
 	var err error
 	var code string
+
+	email := dto.Email
+
 	// 生成6位随机字符串
-	code = common.RandomString(40)
+	code = common.RandomString(6)
+
 	// 保存到缓存
-	err = domain.cache.SetForgetPasswordVerifyCode(dto.Id, code)
+	err = domain.cache.SetEmailVerifyCode(dto.VcType, dto.Email, code)
 	if err != nil {
-		return common.DomainInnerErrorOnCacheSet(err, "SetForgetPasswordVerifyCode")
+		return common.DomainInnerErrorOnCacheSet(err, "SetUserVerifyEmailCode")
 	}
+
 	// 发送邮件
-	return domain.sendResetPasswordCodeEmail(dto.Email, code)
+	switch dto.VcType {
+	case EmailVCTypeCheck:
+		return domain.emailVerifyCodeCheckEmailAddressMsg(email, code)
+	case EmailVCTypeForgetPassword:
+		return domain.emailVerifyCodeResetPasswordMsg(email, code)
+	default:
+		return common.DomainInnerErrorOnParameter(err, "VcType")
+	}
+}
+
+// 验证邮箱
+func (domain *VerifyDomain) VerifyEmailAddress(email string, vcode string) (bool, error) {
+	var code string
+	var isExist bool
+	// 缓存取出
+	if code, isExist = domain.cache.GetEmailVerifyCode(EmailVCTypeCheck, email); !isExist {
+		return false, common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"), "GetEmailVerifyCode")
+	}
+	// 校验
+	if vcode == code {
+		return true, nil
+	}
+	return false, nil
 }
 
 // 忘记密码时验证重置码
-func (domain *VerifyDomain) VerifyResetPasswordCode(uid uint, vcode string) (bool, error) {
+func (domain *VerifyDomain) VerifyResetPasswordCode(email string, vcode string) (bool, error) {
 	var isExist bool
 	var code string
 
 	// 缓存取出
-	if code, isExist = domain.cache.GetForgetPasswordVerifyCode(uid); !isExist {
-		return false, common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"), "GetForgetPasswordVerifyCode")
+	if code, isExist = domain.cache.GetEmailVerifyCode(EmailVCTypeForgetPassword, email); !isExist {
+		return false, common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"), "GetEmailVerifyCode")
 	}
 
 	// 校验
@@ -121,18 +130,11 @@ func (domain *VerifyDomain) VerifyResetPasswordCode(uid uint, vcode string) (boo
 	return false, nil
 }
 
-// 构造短信
-func (domain *VerifyDomain) sendValidatePhoneMsg(phone string, code string) error {
-
-	return nil
-}
-
-// 发送验证码到手机短信
-func (domain *VerifyDomain) SendValidatePhoneMsg(dto dtos.SendPhoneVerifyCodeDTO) error {
+// 手机号注册发送验证码
+func (domain *VerifyDomain) SendPhoneSmsVerifyCodeMsg(dto dtos.SendPhoneVerifyCodeDTO) error {
 	var err error
 	var code string
 
-	uid := dto.Id
 	phone := strconv.Itoa(int(dto.Phone))
 
 	// 生成4位随机数字
@@ -142,22 +144,67 @@ func (domain *VerifyDomain) SendValidatePhoneMsg(dto dtos.SendPhoneVerifyCodeDTO
 	}
 
 	// 保存到缓存
-	err = domain.cache.SetUserVerifyPhoneCode(uid, code)
+	err = domain.cache.SetUserPhoneVerifyCode(dto.VcType, phone, code)
 	if err != nil {
-		return common.DomainInnerErrorOnCacheSet(err, "SetUserVerifyPhoneCode")
+		return common.DomainInnerErrorOnCacheSet(err, "SetUserPhoneVerifyCode")
 	}
 
-	return domain.sendValidatePhoneMsg(phone, code)
+	switch dto.VcType {
+	case PhoneVCTypeRegister:
+		return domain.verifyCodeForPhoneRegisterMsg(phone, code)
+	case PhoneVCTypeLogin:
+		return domain.verifyCodeForPhoneLoginMsg(phone, code)
+	case PhoneVCTypeBinding:
+		return domain.verifyCodeForPhoneBindingMsg(phone, code)
+	default:
+		return common.DomainInnerErrorOnParameter(err, "VcType")
+	}
 }
 
-// 注册时验证手机短信
-func (domain *VerifyDomain) VerifyPhone(uid uint, vcode string) (bool, error) {
+// 注册时手机短信验证码校测
+func (domain *VerifyDomain) VerifyPhoneForRegister(phone string, vcode string) (bool, error) {
 	var isExist bool
 	var code string
 
 	// 缓存取出
-	if code, isExist = domain.cache.GetUserVerifyPhoneCode(uid); !isExist {
-		return false, common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"), "GetUserVerifyPhoneCode")
+	if code, isExist = domain.cache.GetUserPhoneVerifyCode(PhoneVCTypeRegister, phone); !isExist {
+		return false, common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"), "GetUserPhoneVerifyCode")
+	}
+
+	// 校验
+	if vcode == code {
+		return true, nil
+	} else {
+		return false, common.DomainInnerErrorOnDecodeData(errors.New("code verify fail"), fmt.Sprintf("[validating code]:%s | [cache code]:%s", vcode, code))
+	}
+}
+
+// 登录时手机短信验证码校测
+func (domain *VerifyDomain) VerifyPhoneForLogin(phone string, vcode string) (bool, error) {
+	var isExist bool
+	var code string
+
+	// 缓存取出
+	if code, isExist = domain.cache.GetUserPhoneVerifyCode(PhoneVCTypeLogin, phone); !isExist {
+		return false, common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"), "GetUserPhoneVerifyCode")
+	}
+
+	// 校验
+	if vcode == code {
+		return true, nil
+	} else {
+		return false, common.DomainInnerErrorOnDecodeData(errors.New("code verify fail"), fmt.Sprintf("[validating code]:%s | [cache code]:%s", vcode, code))
+	}
+}
+
+// 绑定手机时手机短信验证码校测
+func (domain *VerifyDomain) VerifyPhoneForBinding(phone string, vcode string) (bool, error) {
+	var isExist bool
+	var code string
+
+	// 缓存取出
+	if code, isExist = domain.cache.GetUserPhoneVerifyCode(PhoneVCTypeBinding, phone); !isExist {
+		return false, common.DomainInnerErrorOnCacheGet(errors.New("cache code not exist"), "GetUserPhoneVerifyCode")
 	}
 
 	// 校验

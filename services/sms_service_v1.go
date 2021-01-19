@@ -25,7 +25,7 @@ func init() {
 // 短信服务实例V1
 type SmsServiceV1 struct{}
 
-// 发送绑定手机短信验证码
+// 发送手机短信验证码For 注册、登录、绑定
 func (service *SmsServiceV1) SendPhoneVerifyCode(dto dtos.SendPhoneVerifyCodeDTO) error {
 	var err error
 	var verifyDomain *verify.VerifyDomain
@@ -36,7 +36,7 @@ func (service *SmsServiceV1) SendPhoneVerifyCode(dto dtos.SendPhoneVerifyCodeDTO
 		return common.ErrorOnValidate(err)
 	}
 
-	if err = verifyDomain.SendValidatePhoneMsg(dto); err != nil {
+	if err = verifyDomain.SendPhoneSmsVerifyCodeMsg(dto); err != nil {
 		return common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}
 
@@ -45,5 +45,3 @@ func (service *SmsServiceV1) SendPhoneVerifyCode(dto dtos.SendPhoneVerifyCodeDTO
 }
 
 // TODO 其他短信相关服务...
-
-// 发送忘记密码短信验证码

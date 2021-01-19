@@ -38,27 +38,6 @@ func (d *UsersDAO) isExist(where *UsersModel) (bool, error) {
 	return false, nil
 }
 
-// 查找id是否存在
-func (d *UsersDAO) IsIdExist(id uint) (bool, error) {
-	var err error
-	var count int64
-	err = XGorm.XDB().First(&UsersModel{}, id).Count(&count).Error
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			// 无记录
-			return false, nil
-		} else {
-			// 除无记录外的错误返回
-			return false, err
-		}
-	}
-
-	if count > 0 {
-		return true, nil
-	}
-	return false, nil
-}
-
 // 查找用户名是否存在
 func (d *UsersDAO) IsNameExist(name string) (bool, error) {
 	return d.isExist(&UsersModel{Name: name})
@@ -71,15 +50,74 @@ func (d *UsersDAO) IsEmailExist(email string) (bool, error) {
 
 // 查找手机号码是否存在
 func (d *UsersDAO) IsPhoneExist(phone string) (bool, error) {
-
 	return d.isExist(&UsersModel{Phone: phone})
+}
+
+// 查找id是否存在
+func (d *UsersDAO) IsIdExist(id uint) (bool, error) {
+	var err error
+	var count int64
+	err = XGorm.XDB().Model(&UsersModel{}).Where("id = ?", id).Count(&count).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// 无记录
+			return false, nil
+		} else {
+			// 除无记录外的错误返回
+			return false, err
+		}
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
+// 查找邮箱是否存在
+func (d *UsersDAO) IsEmailBinding(id uint, email string) (bool, error) {
+	var err error
+	var count int64
+	err = XGorm.XDB().Model(&UsersModel{}).Where("id = ? AND email = ? ", id, email).Count(&count).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// 无记录
+			return false, nil
+		} else {
+			// 除无记录外的错误返回
+			return false, err
+		}
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
+// 查找手机号码是否存在
+func (d *UsersDAO) IsPhoneBinding(id uint, phone string) (bool, error) {
+	var err error
+	var count int64
+	err = XGorm.XDB().Model(&UsersModel{}).Where("id = ? AND phone = ? ", id, phone).Count(&count).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// 无记录
+			return false, nil
+		} else {
+			// 除无记录外的错误返回
+			return false, err
+		}
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
 }
 
 // 通过Id查找
 func (d *UsersDAO) GetById(id uint) (*dtos.UsersDTO, error) {
 	var err error
 	var usersResult UsersModel
-	err = XGorm.XDB().Model(&UsersModel{}).Where(id).First(&usersResult).Error
+	err = XGorm.XDB().Model(&UsersModel{}).Where("id = ?", id).First(&usersResult).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// 无记录

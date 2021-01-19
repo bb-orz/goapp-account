@@ -19,6 +19,9 @@ func SetUserService(service IUserService) {
 
 // 定义用户服务接口
 type IUserService interface {
+	IsEmailAccountExist(dto dtos.IsEmailAccountExistDTO) (bool, error) // 邮箱账号是否存在
+	IsPhoneAccountExist(dto dtos.IsPhoneAccountExistDTO) (bool, error) // 手机账号是否存在
+
 	CreateUserWithEmail(dto dtos.CreateUserWithEmailDTO) (*dtos.UserInfoDTO, error) // 创建邮箱账号
 	CreateUserWithPhone(dto dtos.CreateUserWithPhoneDTO) (*dtos.UserInfoDTO, error) // 创建手机号码账号
 
@@ -29,8 +32,9 @@ type IUserService interface {
 
 	GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserInfoDTO, error)    // 获取用户信息
 	SetUserInfos(dto dtos.SetUserInfoDTO) (bool, error)                // 修改用户信息
-	ValidateEmail(dto dtos.ValidateEmailDTO) (bool, error)             // 绑定邮箱，验证邮箱链接
-	ValidatePhone(dto dtos.ValidatePhoneDTO) (bool, error)             // 绑定手机，验证短信验证码
+	EmailValidate(dto dtos.EmailValidateDTO) (bool, error)             // 校验邮箱地址，验证邮箱链接
+	EmailBinding(dto dtos.EmailValidateDTO) (bool, error)              // 绑定邮箱，验证邮箱链接
+	PhoneBinding(dto dtos.PhoneValidateDTO) (bool, error)              // 绑定手机，验证短信验证码
 	ModifiedPassword(dto dtos.ModifiedPasswordDTO) (bool, error)       // 更改用户密码
 	ResetForgetPassword(dto dtos.ResetForgetPasswordDTO) (bool, error) // 忘记密码重设
 	SetAvatarUri(dto dtos.SetAvatarUriDTO) (bool, error)               // 上传头像

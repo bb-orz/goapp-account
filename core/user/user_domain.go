@@ -117,12 +117,12 @@ func (domain *UserDomain) RemoveTokenCache(token string) error {
 }
 
 // 查找用户id是否已存在
-func (domain *UserDomain) IsUserExist(uid uint) (bool, error) {
+func (domain *UserDomain) IsUserExist(id uint) (bool, error) {
 	var err error
 	var isExist bool
 
-	if isExist, err = domain.userDao.IsIdExist(uid); err != nil {
-		return false, common.DomainInnerErrorOnSqlQuery(err, "IsUserIdExist")
+	if isExist, err = domain.userDao.IsIdExist(id); err != nil {
+		return false, common.DomainInnerErrorOnSqlQuery(err, "IsIdExist")
 	} else if isExist {
 		return true, nil
 	}
@@ -149,6 +149,31 @@ func (domain *UserDomain) IsPhoneExist(phone string) (bool, error) {
 	var isExist bool
 	if isExist, err = domain.userDao.IsPhoneExist(phone); err != nil {
 		return false, common.DomainInnerErrorOnSqlQuery(err, "IsPhoneExist")
+	} else if isExist {
+		return true, nil
+	}
+	return false, nil
+}
+
+// 查找邮箱是否已绑定
+func (domain *UserDomain) IsEmailBinding(id uint, email string) (bool, error) {
+	var err error
+	var isExist bool
+	if isExist, err = domain.userDao.IsEmailBinding(id, email); err != nil {
+		return false, common.DomainInnerErrorOnSqlQuery(err, "IsEmailBinding")
+	} else if isExist {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+// 查找手机用户是否已绑定
+func (domain *UserDomain) IsPhoneBinding(id uint, phone string) (bool, error) {
+	var err error
+	var isExist bool
+	if isExist, err = domain.userDao.IsPhoneBinding(id, phone); err != nil {
+		return false, common.DomainInnerErrorOnSqlQuery(err, "IsPhoneBinding")
 	} else if isExist {
 		return true, nil
 	}
@@ -183,7 +208,7 @@ func (domain *UserDomain) CreateUserForPhone(dto dtos.CreateUserWithPhoneDTO) (*
 	createUserData.Phone = dto.Phone
 	createUserData.No = domain.generateUserNo()
 	createUserData.Password, createUserData.Salt = domain.encryptPassword(dto.Password)
-	createUserData.Status = UserStatusNotVerify // 初始创建时未验证状态
+	createUserData.Status = UserStatusNormal // 初始创建时已验证状态
 
 	if userDTO, err = domain.userDao.Create(&createUserData); err != nil {
 		return nil, common.DomainInnerErrorOnSqlInsert(err, "Create")

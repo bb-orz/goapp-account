@@ -42,6 +42,16 @@ type UserOAuthInfoDTO struct {
 	OAuths        []OauthsDTO
 }
 
+// 验证邮箱数据传输对象
+type IsEmailAccountExistDTO struct {
+	Email string `validate:"required,email" json:"email" form:"email"`
+}
+
+// 验证手机号码数据传输对象
+type IsPhoneAccountExistDTO struct {
+	Phone string `validate:"required,numeric,len=11" json:"phone" form:"phone"`
+}
+
 // 创建用户的数据传输对象
 type CreateUserWithEmailDTO struct {
 	Name       string `validate:"required,alphanum,max=16,min=4" json:"name"`
@@ -54,6 +64,7 @@ type CreateUserWithEmailDTO struct {
 type CreateUserWithPhoneDTO struct {
 	Name       string `validate:"required,alphanum,max=16,min=4" json:"name"`
 	Phone      string `validate:"required,numeric,len=11" json:"phone"`
+	VerifyCode string `validate:"required,alphanum,len=6" json:"code"`
 	Password   string `validate:"required,alphanumunicode,max=20,min=8" json:"password"`
 	RePassword string `validate:"required,alphanumunicode,max=20,min=8,eqfield=Password" json:"repassword"`
 }
@@ -66,8 +77,8 @@ type AuthWithEmailPasswordDTO struct {
 
 // 手机号密码鉴权数据传输对象
 type AuthWithPhonePasswordDTO struct {
-	Phone    string `validate:"required,numeric,len=11" json:"phone"`
-	Password string `validate:"required,alphanumunicode" json:"password"`
+	Phone      string `validate:"required,numeric,len=11" json:"phone"`
+	VerifyCode string `validate:"required,alphanum,len=8" json:"code"`
 }
 
 // 移除登录鉴权token的缓存
@@ -89,14 +100,14 @@ type SetUserInfoDTO struct {
 }
 
 // 验证邮箱数据传输对象
-type ValidateEmailDTO struct {
+type EmailValidateDTO struct {
 	Id         uint   `validate:"required,numeric" json:"id"`
 	Email      string `validate:"required,email" json:"email"`
 	VerifyCode string `validate:"required,alphanum,len=6" json:"verify_code"`
 }
 
 // 验证手机号码数据传输对象
-type ValidatePhoneDTO struct {
+type PhoneValidateDTO struct {
 	Id         uint   `validate:"required,numeric" json:"id"`
 	Phone      string `validate:"required,numeric,len=11" json:"phone"`
 	VerifyCode string `validate:"required,numeric,len=6" json:"verify_code"`
@@ -110,12 +121,13 @@ type ModifiedPasswordDTO struct {
 	ReNew string `validate:"required,alphanumunicode,max=20,min=8,eqfield=New" json:"renew"`
 }
 
-// 忘记密码数据传输对象
+// 忘记密码重设数据传输对象
 type ResetForgetPasswordDTO struct {
-	Id    uint   `validate:"required,numeric" json:"id"`
-	Code  string `validate:"required,alphanum,len=6" json:"code"` // 允许重设密码的key值，服务端生成后被发往邮箱，用户点击过来后接收
-	New   string `validate:"required,alphanumunicode,max=20,min=8" json:"new"`
-	ReNew string `validate:"required,alphanumunicode,max=20,min=8,eqfield=New" json:"renew"`
+	Id         uint   `validate:"required,numeric" json:"id"`
+	Email      string `validate:"required,email" json:"email"`
+	VerifyCode string `validate:"required,alphanum,len=6" json:"code"` // 允许重设密码的key值，服务端生成后被发往邮箱，用户点击过来后接收
+	New        string `validate:"required,alphanumunicode,max=20,min=8" json:"new"`
+	ReNew      string `validate:"required,alphanumunicode,max=20,min=8,eqfield=New" json:"renew"`
 }
 
 type SetAvatarUriDTO struct {

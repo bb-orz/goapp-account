@@ -30,15 +30,17 @@ const (
 	ErrorOnCacheDeleteFormat = "[Domain Inner Error]: Cache Delete Error | [command]:%s" // 缓存删除错误
 
 	// 服务端内部网络请求报错
-	ErrorOnNetRequestFormat = "[Domain Inner Error]: Network Request Error | [Request]:%v"   // 网络请求相关错误
-	ErrorOnThirdPartFormat  = "[Domain Inner Error]: Network ThirdPart Error | [Request]:%v" // 第三方接口错误相关错误
+	ErrorOnNetRequestFormat = "[Domain Inner Error]: Network Request Error | [Request]:%#v"   // 网络请求相关错误
+	ErrorOnThirdPartFormat  = "[Domain Inner Error]: Network ThirdPart Error | [Request]:%#v" // 第三方接口错误相关错误
 
 	// 算法逻辑类错误信息格式
 	ErrorOnAlgorithmFormat = "[Domain Inner Error]: Algorithm Error | [Info]:%s" // 算法执行错误
 
 	// 服务端内部编解码错误
-	ErrorOnEncodeFormat = "[Domain Inner Error]: Encode Error | source data:%v" // 编码算法错误
-	ErrorOnDecodeFormat = "[Domain Inner Error]: Decode Error | code string:%s" // 解码算法错误
+	ErrorOnEncodeFormat = "[Domain Inner Error]: Encode Error | source data:%#v" // 编码算法错误
+	ErrorOnDecodeFormat = "[Domain Inner Error]: Decode Error | code string:%s"  // 解码算法错误
+
+	ErrorOnParameterFormat = "[Domain Inner Error]: Parameter Error | %#v" // 传递参数错误
 
 )
 
@@ -170,4 +172,9 @@ func DomainInnerErrorOnEncodeData(err error, data interface{}) InnerError {
 // 数据解码算法错误
 func DomainInnerErrorOnDecodeData(err error, code string) InnerError {
 	return ServerErrorWrapper(err, ErrorOnDecodeFormat, code)
+}
+
+// 数据解码算法错误
+func DomainInnerErrorOnParameter(err error, param string) InnerError {
+	return ServerErrorWrapper(err, ErrorOnParameterFormat, param)
 }

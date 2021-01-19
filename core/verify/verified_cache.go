@@ -3,7 +3,6 @@ package verify
 import (
 	"fmt"
 	"github.com/bb-orz/goinfras/XCache"
-	"strconv"
 )
 
 type verifyCache struct {
@@ -17,64 +16,113 @@ func NewMailCache() *verifyCache {
 }
 
 // 保存邮箱验证码缓存
-func (cache *verifyCache) SetForgetPasswordVerifyCode(uid uint, code string) error {
-	key := UserCacheForgetPasswordVerifyCodePrefix + strconv.Itoa(int(uid))
-	err := cache.commonCache.SetWithExp(key, code, UserCacheForgetPasswordVerifyCodeExpire)
-	if err != nil {
-		return err
+func (cache *verifyCache) SetEmailVerifyCode(vcType uint, email string, code string) error {
+	var key string
+	var err error
+
+	switch vcType {
+	case EmailVCTypeCheck:
+		key = EmailVCTypeCheckPrefix + email
+		err = cache.commonCache.SetWithExp(key, code, EmailVCTypeCheckExpire)
+		if err != nil {
+			return err
+		}
+	case EmailVCTypeForgetPassword:
+		key = EmailVCTypeForgetPasswordPrefix + email
+		err = cache.commonCache.SetWithExp(key, code, EmailVCTypeForgetPasswordExpire)
+		if err != nil {
+			return err
+		}
 	}
+
 	return nil
 }
 
 // 获取邮箱验证码缓存
-func (cache *verifyCache) GetForgetPasswordVerifyCode(uid uint) (string, bool) {
-	key := UserCacheForgetPasswordVerifyCodePrefix + strconv.Itoa(int(uid))
-	reply, isExist := cache.commonCache.Get(key)
-	if !isExist {
-		return "", false
+func (cache *verifyCache) GetEmailVerifyCode(vcType uint, email string) (string, bool) {
+	var key string
+	var code string
+	switch vcType {
+	case EmailVCTypeCheck:
+		key = EmailVCTypeCheckPrefix + email
+		reply, isExist := cache.commonCache.Get(key)
+		if !isExist {
+			return "", false
+		}
+		code = fmt.Sprintf("%s", reply)
+		return code, true
+	case EmailVCTypeForgetPassword:
+		key = EmailVCTypeForgetPasswordPrefix + email
+		reply, isExist := cache.commonCache.Get(key)
+		if !isExist {
+			return "", false
+		}
+		code = fmt.Sprintf("%s", reply)
+		return code, true
 	}
-	code := fmt.Sprintf("%s", reply)
-	return code, false
-}
 
-// 保存邮箱验证码缓存
-func (cache *verifyCache) SetUserVerifyEmailCode(uid uint, code string) error {
-	key := UserCacheVerifyEmailCodePrefix + strconv.Itoa(int(uid))
-	err := cache.commonCache.SetWithExp(key, code, UserCacheVerifyEmailCodeExpire)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// 获取邮箱验证码缓存
-func (cache *verifyCache) GetUserVerifyEmailCode(uid uint) (string, bool) {
-	key := UserCacheVerifyEmailCodePrefix + strconv.Itoa(int(uid))
-	reply, isExist := cache.commonCache.Get(key)
-	if !isExist {
-		return "", false
-	}
-	code := fmt.Sprintf("%s", reply)
-	return code, true
+	return "", false
 }
 
 // 保存手机验证码缓存
-func (cache *verifyCache) SetUserVerifyPhoneCode(uid uint, code string) error {
-	key := UserCacheVerifyPhoneCodePrefix + strconv.Itoa(int(uid))
-	err := cache.commonCache.SetWithExp(key, code, UserCacheVerifyPhoneCodeExpire)
-	if err != nil {
-		return err
+func (cache *verifyCache) SetUserPhoneVerifyCode(vcType uint, phone string, code string) error {
+	var key string
+	var err error
+
+	switch vcType {
+	case PhoneVCTypeRegister:
+		key = PhoneVCTypeRegisterPrefix + phone
+		err = cache.commonCache.SetWithExp(key, code, PhoneVCTypeRegisterExpire)
+		if err != nil {
+			return err
+		}
+	case PhoneVCTypeLogin:
+		key = PhoneVCTypeLoginPrefix + phone
+		err = cache.commonCache.SetWithExp(key, code, PhoneVCTypeLoginExpire)
+		if err != nil {
+			return err
+		}
+	case PhoneVCTypeBinding:
+		key = PhoneVCTypeBindingPrefix + phone
+		err = cache.commonCache.SetWithExp(key, code, PhoneVCTypeBindingExpire)
+		if err != nil {
+			return err
+		}
 	}
+
 	return nil
 }
 
 // 获取手机验证码缓存
-func (cache *verifyCache) GetUserVerifyPhoneCode(uid uint) (string, bool) {
-	key := UserCacheVerifyPhoneCodePrefix + strconv.Itoa(int(uid))
-	reply, isExist := cache.commonCache.Get(key)
-	if !isExist {
-		return "", false
+func (cache *verifyCache) GetUserPhoneVerifyCode(vcType uint, phone string) (string, bool) {
+	var key string
+	var code string
+	switch vcType {
+	case PhoneVCTypeRegister:
+		key = PhoneVCTypeRegisterPrefix + phone
+		reply, isExist := cache.commonCache.Get(key)
+		if !isExist {
+			return "", false
+		}
+		code = fmt.Sprintf("%s", reply)
+		return code, true
+	case PhoneVCTypeLogin:
+		key = PhoneVCTypeLoginPrefix + phone
+		reply, isExist := cache.commonCache.Get(key)
+		if !isExist {
+			return "", false
+		}
+		code = fmt.Sprintf("%s", reply)
+		return code, true
+	case PhoneVCTypeBinding:
+		key = PhoneVCTypeBindingPrefix + phone
+		reply, isExist := cache.commonCache.Get(key)
+		if !isExist {
+			return "", false
+		}
+		code = fmt.Sprintf("%s", reply)
+		return code, true
 	}
-	code := fmt.Sprintf("%s", reply)
-	return code, true
+
+	return "", false
 }

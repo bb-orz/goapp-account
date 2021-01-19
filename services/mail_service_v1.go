@@ -28,7 +28,7 @@ type MailServiceV1 struct {
 }
 
 // 发送绑定邮箱验证码到指定邮箱
-func (service *MailServiceV1) SendEmailForVerify(dto dtos.SendEmailForVerifyDTO) error {
+func (service *MailServiceV1) SendEmailVerifyCode(dto dtos.SendEmailVerifyCodeDTO) error {
 	var err error
 	var verifyDomain *verify.VerifyDomain
 	verifyDomain = verify.NewVerifyDomain()
@@ -38,25 +38,7 @@ func (service *MailServiceV1) SendEmailForVerify(dto dtos.SendEmailForVerifyDTO)
 		return common.ErrorOnValidate(err)
 	}
 
-	if err = verifyDomain.SendValidateEmail(dto); err != nil {
-		return common.ErrorOnServerInner(err, verifyDomain.DomainName())
-	}
-
-	return nil
-}
-
-// 发送忘记密码链接到邮箱
-func (service *MailServiceV1) SendEmailForgetPassword(dto dtos.SendEmailForgetPasswordDTO) error {
-	var err error
-	var verifyDomain *verify.VerifyDomain
-	verifyDomain = verify.NewVerifyDomain()
-
-	// 校验传输参数
-	if err = XValidate.V(dto); err != nil {
-		return common.ErrorOnValidate(err)
-	}
-
-	if err = verifyDomain.SendResetPasswordCodeEmail(dto); err != nil {
+	if err = verifyDomain.SendEmailVerifyCode(dto); err != nil {
 		return common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}
 

@@ -3,9 +3,9 @@ package user
 const (
 	DomainName = "UserDomain"
 	// 用户状态相关
-	UserStatusNotVerify    = iota // 未验证 0
-	UserStatusNormal              // 已验证 1
-	UserStatusDeactivation        // 已停用 2
+	UserStatusNotVerify    = 0 // 未验证 0
+	UserStatusNormal       = 1 // 已验证 1
+	UserStatusDeactivation = 2 // 已停用 2
 
 )
 

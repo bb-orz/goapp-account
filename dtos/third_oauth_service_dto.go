@@ -1,15 +1,15 @@
 package dtos
 
 type QQLoginDTO struct {
-	AccessCode string `validate:"required" json:"access_code"`
+	AccessCode string `validate:"required" json:"access_code" form:"access_code"`
 }
 
 type WechatLoginDTO struct {
-	AccessCode string `validate:"required" json:"access_code"`
+	AccessCode string `validate:"required" json:"access_code" form:"access_code"`
 }
 
 type WeiboLoginDTO struct {
-	AccessCode string `validate:"required" json:"access_code"`
+	AccessCode string `validate:"required" json:"access_code" form:"access_code"`
 }
 
 type QQBindingDTO struct {

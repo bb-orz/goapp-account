@@ -27,6 +27,50 @@ func init() {
 // 用户服务实例 V1
 type UserServiceV1 struct{}
 
+func (service *UserServiceV1) IsEmailAccountExist(dto dtos.IsEmailAccountExistDTO) (bool, error) {
+	var err error
+	var isExist bool
+	var userDomain *user.UserDomain
+	userDomain = user.NewUserDomain()
+	// 校验传输参数
+	if err = XValidate.V(dto); err != nil {
+		return false, common.ErrorOnValidate(err)
+	}
+
+	// 验证用户邮箱是否存在
+	if isExist, err = userDomain.IsEmailExist(dto.Email); err != nil {
+		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+	}
+
+	if isExist {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func (service *UserServiceV1) IsPhoneAccountExist(dto dtos.IsPhoneAccountExistDTO) (bool, error) {
+	var err error
+	var isExist bool
+	var userDomain *user.UserDomain
+	userDomain = user.NewUserDomain()
+	// 校验传输参数
+	if err = XValidate.V(dto); err != nil {
+		return false, common.ErrorOnValidate(err)
+	}
+
+	// 验证用户邮箱是否存在
+	if isExist, err = userDomain.IsPhoneExist(dto.Phone); err != nil {
+		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+	}
+
+	if isExist {
+		return true, nil
+	}
+
+	return false, nil
+}
+
 // 邮箱创建用户账号
 func (service *UserServiceV1) CreateUserWithEmail(dto dtos.CreateUserWithEmailDTO) (*dtos.UserInfoDTO, error) {
 	var err error
@@ -57,17 +101,29 @@ func (service *UserServiceV1) CreateUserWithEmail(dto dtos.CreateUserWithEmailDT
 // 手机号码创建用户账号
 func (service *UserServiceV1) CreateUserWithPhone(dto dtos.CreateUserWithPhoneDTO) (*dtos.UserInfoDTO, error) {
 	var err error
+	var verifyCodeOk bool
 	var isExist bool
 	var userDTO *dtos.UsersDTO
 	var userDomain *user.UserDomain
-	userDomain = user.NewUserDomain()
+	var verifyDomain *verify.VerifyDomain
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
 		return nil, common.ErrorOnValidate(err)
 	}
 
+	// 校验验证码
+	verifyDomain = verify.NewVerifyDomain()
+	if verifyCodeOk, err = verifyDomain.VerifyPhoneForRegister(dto.Phone, dto.VerifyCode); err != nil {
+		return nil, common.ErrorOnServerInner(err, verifyDomain.DomainName())
+	}
+
+	if !verifyCodeOk {
+		return nil, common.ErrorOnVerify("Phone SMS Verify Code Fail")
+	}
+
 	// 验证用户手机号码是否存在
+	userDomain = user.NewUserDomain()
 	if isExist, err = userDomain.IsPhoneExist(dto.Phone); err != nil {
 		return nil, common.ErrorOnServerInner(err, userDomain.DomainName())
 	} else if isExist {
@@ -88,13 +144,13 @@ func (service *UserServiceV1) EmailAuth(dto dtos.AuthWithEmailPasswordDTO) (stri
 	var isPass bool
 	var userDTO *dtos.UsersDTO
 	var userDomain *user.UserDomain
-	userDomain = user.NewUserDomain()
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
 		return "", common.ErrorOnValidate(err)
 	}
 
+	userDomain = user.NewUserDomain()
 	if userDTO, isPass, err = userDomain.VerifyPasswordForEmail(dto.Email, dto.Password); isPass && userDTO != nil && err == nil {
 		// JWT token
 		token, err = userDomain.GenToken(userDTO.Id, userDTO.No, userDTO.Name, userDTO.Avatar)
@@ -113,22 +169,32 @@ func (service *UserServiceV1) EmailAuth(dto dtos.AuthWithEmailPasswordDTO) (stri
 	return token, nil
 }
 
-// 手机账号登录鉴权
+// 手机账号短信验证码登录鉴权
 func (service *UserServiceV1) PhoneAuth(dto dtos.AuthWithPhonePasswordDTO) (string, error) {
 	var err error
 	var token string
-	var isPass bool
+	var verifyCodeOk bool
 	var userDTO *dtos.UsersDTO
 	var userDomain *user.UserDomain
-	userDomain = user.NewUserDomain()
+	var verifyDomain *verify.VerifyDomain
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
 		return "", common.ErrorOnValidate(err)
 	}
 
-	if userDTO, isPass, err = userDomain.VerifyPasswordForPhone(dto.Phone, dto.Password); isPass && userDTO != nil && err == nil {
-		// JWT token
+	// 校验验证码
+	verifyDomain = verify.NewVerifyDomain()
+	if verifyCodeOk, err = verifyDomain.VerifyPhoneForLogin(dto.Phone, dto.VerifyCode); err != nil {
+		return "", common.ErrorOnServerInner(err, verifyDomain.DomainName())
+	}
+
+	if !verifyCodeOk {
+		return "", common.ErrorOnVerify("Phone SMS Verify Code Fail")
+	}
+
+	userDomain = user.NewUserDomain()
+	if userDTO, err = userDomain.GetUserByPhone(dto.Phone); userDTO != nil && err == nil {
 		token, err = userDomain.GenToken(userDTO.Id, userDTO.No, userDTO.Name, userDTO.Avatar)
 		if err != nil {
 			return "", common.ErrorOnServerInner(err, userDomain.DomainName())
@@ -137,9 +203,6 @@ func (service *UserServiceV1) PhoneAuth(dto dtos.AuthWithPhonePasswordDTO) (stri
 		return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 	} else if userDTO == nil {
 		return "", common.ErrorOnVerify("Phone Account Not Exist!")
-	} else if !isPass {
-		// 校验密码失败
-		return "", common.ErrorOnVerify("Password Error!")
 	}
 
 	return token, nil
@@ -183,8 +246,49 @@ func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserIn
 	return userDTO.TransToUserInfoDTO(), nil
 }
 
-// 验证用户邮箱
-func (service *UserServiceV1) ValidateEmail(dto dtos.ValidateEmailDTO) (bool, error) {
+// 注册后验证用户邮箱
+func (service *UserServiceV1) EmailValidate(dto dtos.EmailValidateDTO) (bool, error) {
+	var err error
+	var pass bool
+	var emailBinding bool
+	var verifyDomain *verify.VerifyDomain
+	var userDomain *user.UserDomain
+	verifyDomain = verify.NewVerifyDomain()
+	userDomain = user.NewUserDomain()
+	// 校验传输参数
+	if err = XValidate.V(dto); err != nil {
+		return false, common.ErrorOnValidate(err)
+	}
+
+	// 从cache拿出保存的邮箱验证码
+	if pass, err = verifyDomain.VerifyEmailAddress(dto.Email, dto.VerifyCode); err != nil {
+		return false, common.ErrorOnServerInner(err, verifyDomain.DomainName())
+	}
+
+	if pass {
+		if emailBinding, err = userDomain.IsEmailBinding(dto.Id, dto.Email); err != nil {
+			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
+		if emailBinding {
+			// 设置email_verify字段
+			if err = userDomain.SetEmailVerify(dto.Id); err != nil {
+				return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+			}
+			// 设置用户已校验状态
+			if err = userDomain.SetUserStatusNormal(dto.Id); err != nil {
+				return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+			}
+			return true, nil
+		} else {
+			return false, common.ErrorOnVerify("Email Not Binding!")
+		}
+	} else {
+		return false, common.ErrorOnVerify("Email Verify Code Fail!")
+	}
+}
+
+// 注册后验证用户邮箱
+func (service *UserServiceV1) EmailBinding(dto dtos.EmailValidateDTO) (bool, error) {
 	var err error
 	var pass bool
 	var emailExist bool
@@ -197,39 +301,41 @@ func (service *UserServiceV1) ValidateEmail(dto dtos.ValidateEmailDTO) (bool, er
 		return false, common.ErrorOnValidate(err)
 	}
 
-	if emailExist, err = userDomain.IsEmailExist(dto.Email); err != nil {
-		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
-	} else if !emailExist {
-		// 绑定邮箱
-		if err = userDomain.SetEmail(dto.Id, dto.Email); err != nil {
-			return false, common.ErrorOnVerify("Email Account is Existed")
-		}
-	}
-
 	// 从cache拿出保存的邮箱验证码
-	pass, err = verifyDomain.VerifyEmail(dto.Id, dto.VerifyCode)
-	if err != nil {
+	if pass, err = verifyDomain.VerifyEmailAddress(dto.Email, dto.VerifyCode); err != nil {
 		return false, common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}
 
 	if pass {
+		if emailExist, err = userDomain.IsEmailExist(dto.Email); err != nil {
+			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
+
+		if !emailExist {
+			if err = userDomain.SetEmail(dto.Id, dto.Email); err != nil {
+				return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+			}
+		} else {
+			return false, common.ErrorOnVerify("Email Account Exist!")
+		}
+
 		// 设置email_verify字段
 		if err = userDomain.SetEmailVerify(dto.Id); err != nil {
 			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
-
+		// 设置用户已校验状态
 		if err = userDomain.SetUserStatusNormal(dto.Id); err != nil {
 			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
-
 		return true, nil
+
 	} else {
-		return false, common.ErrorOnVerify("Email Verify Code Error!")
+		return false, common.ErrorOnVerify("Email Verify Code Fail!")
 	}
 }
 
 // 验证手机号码
-func (service *UserServiceV1) ValidatePhone(dto dtos.ValidatePhoneDTO) (bool, error) {
+func (service *UserServiceV1) PhoneBinding(dto dtos.PhoneValidateDTO) (bool, error) {
 	var err error
 	var pass bool
 	var phoneExist bool
@@ -243,31 +349,36 @@ func (service *UserServiceV1) ValidatePhone(dto dtos.ValidatePhoneDTO) (bool, er
 		return false, common.ErrorOnValidate(err)
 	}
 
-	if phoneExist, err = userDomain.IsPhoneExist(dto.Phone); err != nil {
-		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
-	} else if !phoneExist {
-		// 绑定手机号码
-		if err = userDomain.SetPhone(dto.Id, dto.Phone); err != nil {
-			return false, common.ErrorOnVerify("Phone Account is Existed")
-		}
-	}
-
 	// 从cache拿出保存的短信验证码
-	if pass, err = verifyDomain.VerifyPhone(dto.Id, dto.VerifyCode); err != nil {
+	if pass, err = verifyDomain.VerifyPhoneForBinding(dto.Phone, dto.VerifyCode); err != nil {
 		return false, common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}
 
 	if pass {
+		if phoneExist, err = userDomain.IsPhoneExist(dto.Phone); err != nil {
+			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+		}
+
+		if !phoneExist {
+			if err = userDomain.SetPhone(dto.Id, dto.Phone); err != nil {
+				return false, common.ErrorOnServerInner(err, userDomain.DomainName())
+			}
+		} else {
+			return false, common.ErrorOnVerify("Phone Account Exist!")
+		}
+
 		// 设置phone_verify字段
 		if err = userDomain.SetPhoneVerify(dto.Id); err != nil {
 			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
 
+		// 设置用户已校验状态
 		if err = userDomain.SetUserStatusNormal(dto.Id); err != nil {
 			return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 		}
 
 		return true, nil
+
 	} else {
 		return false, common.ErrorOnVerify("Sms Verify Code Error!")
 	}
@@ -287,9 +398,7 @@ func (service *UserServiceV1) ModifiedPassword(dto dtos.ModifiedPasswordDTO) (bo
 	}
 
 	// 校验密码
-	if userDTO, isPass, err = userDomain.VerifyPassword(dto.Id, dto.Old); isPass && userDTO != nil && err == nil {
-		return true, nil
-	} else if err != nil {
+	if userDTO, isPass, err = userDomain.VerifyPassword(dto.Id, dto.Old); err != nil {
 		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 	} else if userDTO == nil {
 		return false, common.ErrorOnVerify("Account Not Exist!")
@@ -303,7 +412,7 @@ func (service *UserServiceV1) ModifiedPassword(dto dtos.ModifiedPasswordDTO) (bo
 		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
-	return false, nil
+	return true, nil
 }
 
 // 忘记密码重设
@@ -331,7 +440,7 @@ func (service *UserServiceV1) ResetForgetPassword(dto dtos.ResetForgetPasswordDT
 	}
 
 	// 校验Code
-	isVerify, err = verifyDomain.VerifyResetPasswordCode(dto.Id, dto.Code)
+	isVerify, err = verifyDomain.VerifyResetPasswordCode(dto.Email, dto.VerifyCode)
 	if err != nil {
 		return false, common.ErrorOnServerInner(err, verifyDomain.DomainName())
 	}

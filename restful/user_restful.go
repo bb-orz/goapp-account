@@ -30,34 +30,82 @@ func (api *UserApi) SetRoutes() {
 	engine := XGin.XEngine()
 
 	// 非鉴权访问接口
-	engine.POST("/register_email", api.registerEmailHandler)
-	engine.POST("/register_phone", api.registerPhoneHandler)
-	engine.POST("/login_email", api.loginEmailHandler)
-	engine.POST("/login_phone", api.loginPhoneHandler)
-	engine.GET("/login_qq", api.qqOAuthLoginHandler)
-	engine.GET("/login_wechat", api.wechatOAuthLoginHandler)
-	engine.GET("/login_weibo", api.weiboOAuthLoginHandler)
-	engine.POST("/forget_password", api.resetForgetPassword)
+	engine.GET("/email_account_exist", api.isEmailAccountExistHandler) // 是否邮箱账号已存在
+	engine.GET("/phone_account_exist", api.isPhoneAccountExistHandler) // 是否手机账号已存在
+	engine.POST("/register_email", api.registerEmailHandler)           // 邮箱注册
+	engine.POST("/register_phone", api.registerPhoneHandler)           // 手机号码注册
+	engine.POST("/login_email", api.loginEmailHandler)                 // 邮箱登录
+	engine.POST("/login_phone", api.loginPhoneHandler)                 // 手机号码登录
+	engine.GET("/login_qq", api.qqOAuthLoginHandler)                   // qq授权登录
+	engine.GET("/login_wechat", api.wechatOAuthLoginHandler)           // 微信授权登录
+	engine.GET("/login_weibo", api.weiboOAuthLoginHandler)             // 微博授权登录
+	engine.POST("/reset_forget_password", api.resetForgetPassword)     // 忘记密码，接收到验证码后重设密码
+	engine.GET("/send_mail_verify_code", api.sendEmailVerifyCode)      // 发送邮箱验证码 for 1校验邮箱，2忘记密码重设邮件
+	engine.GET("/send_sms_verify_code", api.sendSmsVerifyCode)         // 发送手机短信验证码,for 1注册、2登录、3绑定
 
 	// 用户鉴权访问路由组接口
 	authGroup := engine.Group("/user", middleware.JwtAuthMiddleware())
-	authGroup.GET("/info", api.getUserInfoHandler)
-	authGroup.POST("/set_info", api.setUserInfoHandler)
-	authGroup.POST("/set_avatar", api.setAvatarHandler)
-	authGroup.POST("/verify_email", api.verifyEmail)
-	authGroup.POST("/verify_phone", api.verifyPhone)
-	authGroup.POST("/modified_password", api.modifiedPassword)
-	authGroup.POST("/send_email_verify_code", api.sendEmailForVerifyEmailAddress)
-	authGroup.POST("/send_forget_password_verify_code", api.sendEmailForForgetPassword)
-	authGroup.POST("/send_sms_verify_code", api.sendSmsForVerifyPhoneNum)
-	authGroup.GET("/qq_binding", api.qqOAuthBindingHandler)
-	authGroup.GET("/weixin_binding", api.wechatOAuthBindingHandler)
-	authGroup.GET("/weibo_binding", api.weiboOAuthBindingHandler)
-	authGroup.GET("/logout", api.logoutHandler)
+	authGroup.GET("/info", api.getUserInfoHandler)                  // 获取用户信息
+	authGroup.POST("/set_info", api.setUserInfoHandler)             // 设置用户信息
+	authGroup.POST("/set_avatar", api.setAvatarHandler)             // 设置用户头像
+	authGroup.POST("/email_validate", api.emailValidate)            // 登录后校验邮箱地址，接收邮箱验证码后，账号邮箱验证码校验
+	authGroup.POST("/email_binding", api.emailBinding)              // 绑定未注册邮箱
+	authGroup.POST("/phone_binding", api.phoneBinding)              // 绑定未注册手机
+	authGroup.POST("/modified_password", api.modifiedPassword)      // 修改密码
+	authGroup.GET("/qq_binding", api.qqOAuthBindingHandler)         // 登录后绑定qq账号
+	authGroup.GET("/weixin_binding", api.wechatOAuthBindingHandler) // 登录后绑定微信账号
+	authGroup.GET("/weibo_binding", api.weiboOAuthBindingHandler)   // 登录后绑定微博账号
+	authGroup.GET("/logout", api.logoutHandler)                     // 退出登录
 
 }
 
-/*邮箱注册注册*/
+/* 是否邮箱账号已存在 */
+func (api *UserApi) isEmailAccountExistHandler(ctx *gin.Context) {
+	// 接收参数由dto封装验证
+	var dto dtos.IsEmailAccountExistDTO
+	err := ctx.ShouldBindQuery(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Call Services method ...
+	userService := services.GetUserService()
+	isExist, err := userService.IsEmailAccountExist(dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Send Data to Response Middleware ...
+	ctx.Set(common.ResponseDataKey, common.ResponseOK(gin.H{"isExist": isExist}))
+
+}
+
+/* 是否手机账号已存在 */
+func (api *UserApi) isPhoneAccountExistHandler(ctx *gin.Context) {
+	// 接收参数由dto封装验证
+	var dto dtos.IsPhoneAccountExistDTO
+	err := ctx.ShouldBindQuery(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Call Services method ...
+	userService := services.GetUserService()
+	isExist, err := userService.IsPhoneAccountExist(dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// Send Data to Response Middleware ...
+	ctx.Set(common.ResponseDataKey, common.ResponseOK(gin.H{"isExist": isExist}))
+
+}
+
+/*邮箱注册*/
 func (api *UserApi) registerEmailHandler(ctx *gin.Context) {
 	// 接收参数由dto封装验证
 	var dto dtos.CreateUserWithEmailDTO
@@ -170,7 +218,7 @@ func (api *UserApi) qqOAuthLoginHandler(ctx *gin.Context) {
 	// Receive Request ...
 	var dto dtos.QQLoginDTO
 
-	err := ctx.ShouldBindJSON(&dto)
+	err := ctx.ShouldBindQuery(&dto)
 	if err != nil {
 		_ = ctx.Error(err)
 		return
@@ -194,7 +242,7 @@ func (api *UserApi) wechatOAuthLoginHandler(ctx *gin.Context) {
 	// Receive Request ...
 	var dto dtos.WechatLoginDTO
 
-	err := ctx.ShouldBindJSON(&dto)
+	err := ctx.ShouldBindQuery(&dto)
 	if err != nil {
 		_ = ctx.Error(err)
 		return
@@ -218,7 +266,7 @@ func (api *UserApi) weiboOAuthLoginHandler(ctx *gin.Context) {
 	// Receive Request ...
 	var dto dtos.WeiboLoginDTO
 
-	err := ctx.ShouldBindJSON(&dto)
+	err := ctx.ShouldBindQuery(&dto)
 	if err != nil {
 		_ = ctx.Error(err)
 		return
@@ -430,10 +478,10 @@ func (api *UserApi) setAvatarHandler(ctx *gin.Context) {
 }
 
 // 验证账号邮箱
-func (api *UserApi) verifyEmail(ctx *gin.Context) {
+func (api *UserApi) emailValidate(ctx *gin.Context) {
 	// Receive Request ...
 	var userId uint
-	var dto dtos.ValidateEmailDTO
+	var dto dtos.EmailValidateDTO
 
 	err := ctx.ShouldBindJSON(&dto)
 	if err != nil {
@@ -450,7 +498,7 @@ func (api *UserApi) verifyEmail(ctx *gin.Context) {
 	}
 
 	userService := services.GetUserService()
-	if isPass, err := userService.ValidateEmail(dto); !isPass || err != nil {
+	if isPass, err := userService.EmailValidate(dto); !isPass || err != nil {
 		_ = ctx.Error(err)
 		return
 	}
@@ -458,11 +506,11 @@ func (api *UserApi) verifyEmail(ctx *gin.Context) {
 	ctx.Set(common.ResponseDataKey, nil)
 }
 
-// 验证账号手机号码
-func (api *UserApi) verifyPhone(ctx *gin.Context) {
+// 绑定账号邮箱
+func (api *UserApi) emailBinding(ctx *gin.Context) {
 	// Receive Request ...
 	var userId uint
-	var dto dtos.ValidatePhoneDTO
+	var dto dtos.EmailValidateDTO
 
 	err := ctx.ShouldBindJSON(&dto)
 	if err != nil {
@@ -479,7 +527,36 @@ func (api *UserApi) verifyPhone(ctx *gin.Context) {
 	}
 
 	userService := services.GetUserService()
-	if isPass, err := userService.ValidatePhone(dto); !isPass || err != nil {
+	if isPass, err := userService.EmailBinding(dto); !isPass || err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	ctx.Set(common.ResponseDataKey, nil)
+}
+
+// 绑定账号手机号码
+func (api *UserApi) phoneBinding(ctx *gin.Context) {
+	// Receive Request ...
+	var userId uint
+	var dto dtos.PhoneValidateDTO
+
+	err := ctx.ShouldBindJSON(&dto)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	// 校验登录用户id是否有获取信息权限
+	if userId, err = common.GetUserId(ctx); err != nil {
+		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
+		return
+	} else {
+		dto.Id = userId
+	}
+
+	userService := services.GetUserService()
+	if isPass, err := userService.PhoneBinding(dto); !isPass || err != nil {
 		_ = ctx.Error(err)
 		return
 	}
@@ -547,26 +624,17 @@ func (api *UserApi) resetForgetPassword(ctx *gin.Context) {
 	ctx.Set(common.ResponseDataKey, nil)
 }
 
-func (api *UserApi) sendEmailForVerifyEmailAddress(ctx *gin.Context) {
+func (api *UserApi) sendEmailVerifyCode(ctx *gin.Context) {
 	// 接收参数由dto封装验证
-	var userId uint
-	var dto dtos.SendEmailForVerifyDTO
-	err := ctx.ShouldBindJSON(&dto)
+	var dto dtos.SendEmailVerifyCodeDTO
+	err := ctx.ShouldBindQuery(&dto)
 	if err != nil {
 		_ = ctx.Error(err)
 		return
 	}
 
-	// 校验登录用户id是否有获取信息权限
-	if userId, err = common.GetUserId(ctx); err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
-		return
-	} else {
-		dto.Id = userId
-	}
-
 	mailService := services.GetMailService()
-	if err = mailService.SendEmailForVerify(dto); err != nil {
+	if err = mailService.SendEmailVerifyCode(dto); err != nil {
 		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
 		return
 	}
@@ -574,49 +642,13 @@ func (api *UserApi) sendEmailForVerifyEmailAddress(ctx *gin.Context) {
 	ctx.Set(common.ResponseDataKey, nil)
 }
 
-func (api *UserApi) sendEmailForForgetPassword(ctx *gin.Context) {
+func (api *UserApi) sendSmsVerifyCode(ctx *gin.Context) {
 	// 接收参数由dto封装验证
-	var userId uint
-	var dto dtos.SendEmailForgetPasswordDTO
-	err := ctx.ShouldBindJSON(&dto)
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	// 校验登录用户id是否有获取信息权限
-	if userId, err = common.GetUserId(ctx); err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
-		return
-	} else {
-		dto.Id = userId
-	}
-
-	mailService := services.GetMailService()
-	if err = mailService.SendEmailForgetPassword(dto); err != nil {
-		_ = ctx.Error(err) // 所有错误最后传递给错误中间件处理
-		return
-	}
-
-	ctx.Set(common.ResponseDataKey, nil)
-}
-
-func (api *UserApi) sendSmsForVerifyPhoneNum(ctx *gin.Context) {
-	// 接收参数由dto封装验证
-	var userId uint
 	var dto dtos.SendPhoneVerifyCodeDTO
-	err := ctx.ShouldBindJSON(&dto)
+	err := ctx.ShouldBindQuery(&dto)
 	if err != nil {
 		_ = ctx.Error(err)
 		return
-	}
-
-	// 校验登录用户id是否有获取信息权限
-	if userId, err = common.GetUserId(ctx); err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
-		return
-	} else {
-		dto.Id = userId
 	}
 
 	smsService := services.GetSmsService()
