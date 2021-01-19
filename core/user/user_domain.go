@@ -216,10 +216,10 @@ func (domain *UserDomain) CreateUserForPhone(dto dtos.CreateUserWithPhoneDTO) (*
 	return userDTO, nil
 }
 
-func (domain *UserDomain) GetUser(uid uint) (*dtos.UsersDTO, error) {
+func (domain *UserDomain) GetUser(id uint) (*dtos.UsersDTO, error) {
 	var err error
 	var userDTO *dtos.UsersDTO
-	if userDTO, err = domain.userDao.GetById(uid); err != nil {
+	if userDTO, err = domain.userDao.GetById(id); err != nil {
 		return nil, common.DomainInnerErrorOnSqlQuery(err, "GetById")
 	}
 	return userDTO, nil
@@ -244,48 +244,48 @@ func (domain *UserDomain) GetUserByPhone(phone string) (*dtos.UsersDTO, error) {
 }
 
 // 设置邮箱
-func (domain *UserDomain) SetEmail(uid uint, email string) error {
-	if err := domain.userDao.SetUsers(uid, "email", email); err != nil {
+func (domain *UserDomain) SetEmail(id uint, email string) error {
+	if err := domain.userDao.SetUsers(id, "email", email); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetEmail")
 	}
 	return nil
 }
 
 // 设置邮箱已验证
-func (domain *UserDomain) SetEmailVerify(uid uint) error {
-	if err := domain.userDao.SetUsers(uid, "email_verified", UserEmailVerify); err != nil {
+func (domain *UserDomain) SetEmailVerify(id uint) error {
+	if err := domain.userDao.SetUsers(id, "email_verified", UserEmailVerify); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetEmailVerify")
 	}
 	return nil
 }
 
 // 设置手机号
-func (domain *UserDomain) SetPhone(uid uint, phone string) error {
-	if err := domain.userDao.SetUsers(uid, "phone", phone); err != nil {
+func (domain *UserDomain) SetPhone(id uint, phone string) error {
+	if err := domain.userDao.SetUsers(id, "phone", phone); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetPhone")
 	}
 	return nil
 }
 
 // 设置手机号码已验证
-func (domain *UserDomain) SetPhoneVerify(uid uint) error {
-	if err := domain.userDao.SetUsers(uid, "phone_verified", UserPhoneVerify); err != nil {
+func (domain *UserDomain) SetPhoneVerify(id uint) error {
+	if err := domain.userDao.SetUsers(id, "phone_verified", UserPhoneVerify); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetPhoneVerify")
 	}
 	return nil
 }
 
 // 设置单个用户头像链接
-func (domain *UserDomain) SetAvatar(uid uint, uri string) error {
-	if err := domain.userDao.SetUsers(uid, "avatar", uri); err != nil {
+func (domain *UserDomain) SetAvatar(id uint, uri string) error {
+	if err := domain.userDao.SetUsers(id, "avatar", uri); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetAvatar")
 	}
 	return nil
 }
 
 // 设置单个用户状态已验证
-func (domain *UserDomain) SetUserStatusNormal(uid uint) error {
-	if err := domain.userDao.SetUsers(uid, "status", UserStatusNormal); err != nil {
+func (domain *UserDomain) SetUserStatusNormal(id uint) error {
+	if err := domain.userDao.SetUsers(id, "status", UserStatusNormal); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetUserStatusNormal")
 	}
 	return nil
@@ -316,17 +316,26 @@ func (domain *UserDomain) UpdateUsers(dto dtos.SetUserInfoDTO) error {
 }
 
 // 改变密码
-func (domain *UserDomain) ReSetPassword(id uint, password string) error {
+func (domain *UserDomain) ReSetPasswordByEmail(email, password string) error {
 	hashStr, salt := domain.encryptPassword(password)
-	if err := domain.userDao.SetPasswordAndSalt(id, hashStr, salt); err != nil {
+	if err := domain.userDao.SetPasswordAndSaltByEmail(email, hashStr, salt); err != nil {
+		return common.DomainInnerErrorOnSqlUpdate(err, "SetPasswordAndSalt")
+	}
+	return nil
+}
+
+// 改变密码
+func (domain *UserDomain) ReSetPasswordById(id uint, password string) error {
+	hashStr, salt := domain.encryptPassword(password)
+	if err := domain.userDao.SetPasswordAndSaltById(id, hashStr, salt); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetPasswordAndSalt")
 	}
 	return nil
 }
 
 // 真删除
-func (domain *UserDomain) DeleteUser(uid uint) error {
-	if err := domain.userDao.DeleteById(uid); err != nil {
+func (domain *UserDomain) DeleteUser(id uint) error {
+	if err := domain.userDao.DeleteById(id); err != nil {
 		return common.DomainInnerErrorOnSqlDelete(err, "DeleteById")
 	}
 	return nil

@@ -39,9 +39,9 @@ func (api *UserApi) SetRoutes() {
 	engine.GET("/login_qq", api.qqOAuthLoginHandler)                   // qq授权登录
 	engine.GET("/login_wechat", api.wechatOAuthLoginHandler)           // 微信授权登录
 	engine.GET("/login_weibo", api.weiboOAuthLoginHandler)             // 微博授权登录
-	engine.POST("/reset_forget_password", api.resetForgetPassword)     // 忘记密码，接收到验证码后重设密码
 	engine.GET("/send_mail_verify_code", api.sendEmailVerifyCode)      // 发送邮箱验证码 for 1校验邮箱，2忘记密码重设邮件
 	engine.GET("/send_sms_verify_code", api.sendSmsVerifyCode)         // 发送手机短信验证码,for 1注册、2登录、3绑定
+	engine.POST("/reset_forget_password", api.resetForgetPassword)     // 忘记密码，接收到验证码后重设密码
 
 	// 用户鉴权访问路由组接口
 	authGroup := engine.Group("/user", middleware.JwtAuthMiddleware())
@@ -597,21 +597,12 @@ func (api *UserApi) modifiedPassword(ctx *gin.Context) {
 // 忘记密码:先发送邮箱验证码，用户接收后和新密码一起提交
 func (api *UserApi) resetForgetPassword(ctx *gin.Context) {
 	// Receive Request ...
-	var userId uint
 	var dto dtos.ResetForgetPasswordDTO
 
 	err := ctx.ShouldBindJSON(&dto)
 	if err != nil {
 		_ = ctx.Error(err)
 		return
-	}
-
-	// 校验登录用户id是否有获取信息权限
-	if userId, err = common.GetUserId(ctx); err != nil {
-		_ = ctx.Error(common.ErrorOnAuthenticate("No Permission"))
-		return
-	} else {
-		dto.Id = userId
 	}
 
 	userService := services.GetUserService()

@@ -203,9 +203,18 @@ func (d *UsersDAO) UpdateUsers(id uint, dto dtos.UserInfoDTO) error {
 }
 
 // 设置用户密码和盐值
-func (d *UsersDAO) SetPasswordAndSalt(uid uint, passHash, salt string) error {
+func (d *UsersDAO) SetPasswordAndSaltById(id uint, passHash, salt string) error {
 	var err error
-	if err = XGorm.XDB().Model(&UsersModel{}).Where("id", uid).UpdateColumns(&UsersModel{Password: passHash, Salt: salt}).Error; err != nil {
+	if err = XGorm.XDB().Model(&UsersModel{}).Where("id", id).UpdateColumns(&UsersModel{Password: passHash, Salt: salt}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+// 设置用户密码和盐值
+func (d *UsersDAO) SetPasswordAndSaltByEmail(email string, passHash, salt string) error {
+	var err error
+	if err = XGorm.XDB().Model(&UsersModel{}).Where("email", email).UpdateColumns(&UsersModel{Password: passHash, Salt: salt}).Error; err != nil {
 		return err
 	}
 	return nil

@@ -10,6 +10,7 @@ import (
 	"github.com/bb-orz/goinfras/XMail"
 	"github.com/bb-orz/goinfras/XOAuth"
 	"github.com/bb-orz/goinfras/XOss/XQiniuOss"
+	"github.com/bb-orz/goinfras/XSms/XAliyunSms"
 	"github.com/bb-orz/goinfras/XStore/XGorm"
 	"github.com/bb-orz/goinfras/XValidate"
 	"github.com/spf13/viper"
@@ -69,6 +70,9 @@ func RegisterStarter(viperConfig *viper.Viper) {
 
 	// 注册邮件服务 Dialer
 	goinfras.RegisterStarter(XMail.NewStarter())
+
+	// 注册aliyun短信服务客户端组件
+	goinfras.RegisterStarter(XAliyunSms.NewStarter())
 
 	// 注册gin web 服务启动器
 	// TODO add your gin global middlewares

@@ -408,7 +408,7 @@ func (service *UserServiceV1) ModifiedPassword(dto dtos.ModifiedPasswordDTO) (bo
 	}
 
 	// 设置新密码
-	if err = userDomain.ReSetPassword(dto.Id, dto.New); err != nil {
+	if err = userDomain.ReSetPasswordById(dto.Id, dto.New); err != nil {
 		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
@@ -431,7 +431,7 @@ func (service *UserServiceV1) ResetForgetPassword(dto dtos.ResetForgetPasswordDT
 	}
 
 	// 查找账号是否存在
-	isExist, err = userDomain.IsUserExist(dto.Id)
+	isExist, err = userDomain.IsEmailExist(dto.Email)
 	if err != nil {
 		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
@@ -450,7 +450,7 @@ func (service *UserServiceV1) ResetForgetPassword(dto dtos.ResetForgetPasswordDT
 	}
 
 	// 重设密码
-	if err = userDomain.ReSetPassword(dto.Id, dto.New); err != nil {
+	if err = userDomain.ReSetPasswordByEmail(dto.Email, dto.New); err != nil {
 		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 

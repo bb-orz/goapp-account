@@ -52,19 +52,19 @@ func (domain *VerifyDomain) emailVerifyCodeResetPasswordMsg(address string, code
 	return nil
 }
 
-// 构造注册验证码短信
+// TODO 构造注册验证码短信
 func (domain *VerifyDomain) verifyCodeForPhoneRegisterMsg(phone string, code string) error {
 
 	return nil
 }
 
-// 构造手机绑定验证码短信
+// TODO 构造手机绑定验证码短信
 func (domain *VerifyDomain) verifyCodeForPhoneBindingMsg(phone string, code string) error {
 
 	return nil
 }
 
-// 构造登录验证码短信
+// TODO 构造登录验证码短信
 func (domain *VerifyDomain) verifyCodeForPhoneLoginMsg(phone string, code string) error {
 
 	return nil

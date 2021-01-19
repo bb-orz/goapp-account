@@ -123,7 +123,6 @@ type ModifiedPasswordDTO struct {
 
 // 忘记密码重设数据传输对象
 type ResetForgetPasswordDTO struct {
-	Id         uint   `validate:"required,numeric" json:"id"`
 	Email      string `validate:"required,email" json:"email"`
 	VerifyCode string `validate:"required,alphanum,len=6" json:"code"` // 允许重设密码的key值，服务端生成后被发往邮箱，用户点击过来后接收
 	New        string `validate:"required,alphanumunicode,max=20,min=8" json:"new"`
