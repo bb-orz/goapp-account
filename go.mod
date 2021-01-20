@@ -4,7 +4,7 @@ go 1.14
 
 replace (
 	cloud.google.com/go => github.com/googleapis/google-cloud-go v0.47.0
-	github.com/bb-orz/goinfras => /Users/fun/Code/GoProjects/goinfras
+	// github.com/bb-orz/goinfras => /Users/fun/Code/GoProjects/goinfras
 	github.com/coreos/bbolt => go.etcd.io/bbolt v1.3.4
 	github.com/coreos/go-systemd => github.com/coreos/go-systemd/v22 v22.0.0
 	go.uber.org/atomic => github.com/uber-go/atomic v1.5.0
@@ -33,7 +33,7 @@ replace (
 )
 
 require (
-	github.com/bb-orz/goinfras v1.2.0
+	github.com/bb-orz/goinfras v1.2.5
 	github.com/garyburd/redigo v1.6.2
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
