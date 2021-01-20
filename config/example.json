@@ -204,9 +204,9 @@
     ]
   },
   "QiniuOss": {
-    "AccessKey": "nAxImpixsKic5wFQACE178hEi9asxMmV9Qy17x3h",
-    "SecretKey": "_oVvDLJriMyQ0vHH_JSLJXrXWrpI5KJmCB2pZGSW",
-    "DefaultBucket": "dev-imps",
+    "AccessKey": "",
+    "SecretKey": "",
+    "DefaultBucket": "",
     "ReturnBody": "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"fsize\":$(fsize),\"bucket\":\"$(bucket)\",\"name\":\"$(x:name)\"}",
     "UseHTTPS": false,
     "UseCdnDomains": false,
@@ -276,7 +276,7 @@
     "NoSmtp": false,
     "Server": "smtp.139.com",
     "Port": 25,
-    "User": "15014064227@139.com",
-    "Password": "Goinfras2020"
+    "User": "",
+    "Password": ""
   }
 }
