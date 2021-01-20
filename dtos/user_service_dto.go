@@ -64,7 +64,7 @@ type CreateUserWithEmailDTO struct {
 type CreateUserWithPhoneDTO struct {
 	Name       string `validate:"required,alphanum,max=16,min=4" json:"name"`
 	Phone      string `validate:"required,numeric,len=11" json:"phone"`
-	VerifyCode string `validate:"required,alphanum,len=6" json:"code"`
+	VerifyCode string `validate:"required,alphanum,len=6" json:"verify_code"`
 	Password   string `validate:"required,alphanumunicode,max=20,min=8" json:"password"`
 	RePassword string `validate:"required,alphanumunicode,max=20,min=8,eqfield=Password" json:"repassword"`
 }
@@ -78,7 +78,7 @@ type AuthWithEmailPasswordDTO struct {
 // 手机号密码鉴权数据传输对象
 type AuthWithPhonePasswordDTO struct {
 	Phone      string `validate:"required,numeric,len=11" json:"phone"`
-	VerifyCode string `validate:"required,alphanum,len=8" json:"code"`
+	VerifyCode string `validate:"required,alphanum,len=6" json:"verify_code"`
 }
 
 // 移除登录鉴权token的缓存

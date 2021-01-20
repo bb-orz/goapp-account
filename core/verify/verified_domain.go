@@ -27,7 +27,7 @@ func (domain *VerifyDomain) DomainName() string {
 
 // 构造验证邮箱邮件
 func (domain *VerifyDomain) emailVerifyCodeCheckEmailAddressMsg(address string, code string) error {
-	subject := "Verify Email Code From " + goinfras.XApp().Sctx.Global().GetAppName()
+	subject := "[" + goinfras.XApp().Sctx.Global().GetAppName() + "] " + "Check Email Verify Code"
 	body := fmt.Sprintf("Verify Code: %s", code)
 	err := XMail.XCommonMail().SendSimpleMail(subject, body, XMail.BodyTypePlain, "", []string{address})
 	if err != nil {
@@ -36,12 +36,12 @@ func (domain *VerifyDomain) emailVerifyCodeCheckEmailAddressMsg(address string, 
 	return nil
 }
 
-// 构造验证邮箱邮件
+// 构造忘记密码重置验证码邮箱邮件
 func (domain *VerifyDomain) emailVerifyCodeResetPasswordMsg(address string, code string) error {
-	subject := "[" + goinfras.XApp().Sctx.Global().GetAppName() + "] " + "Reset Password Code From "
+	subject := "[" + goinfras.XApp().Sctx.Global().GetAppName() + "] " + "Reset Password Code Verify Code "
 	// 设置重置密码的链接
 	url := goinfras.XApp().Sctx.Global().GetHost() + "?code=" + code
-	body := fmt.Sprintf("Click This link To Reset Your Password: %s", url)
+	body := fmt.Sprintf("Click This link To Reset Your Password: %s ", url)
 
 	// 发送邮件
 	err := XMail.XCommonMail().SendSimpleMail(subject, body, "text/plain", "", []string{address})
@@ -83,7 +83,7 @@ func (domain *VerifyDomain) SendEmailVerifyCode(dto dtos.SendEmailVerifyCodeDTO)
 	// 保存到缓存
 	err = domain.cache.SetEmailVerifyCode(dto.VcType, dto.Email, code)
 	if err != nil {
-		return common.DomainInnerErrorOnCacheSet(err, "SetUserVerifyEmailCode")
+		return common.DomainInnerErrorOnCacheSet(err, "SetEmailVerifyCode")
 	}
 
 	// 发送邮件

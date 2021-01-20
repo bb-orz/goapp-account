@@ -209,6 +209,7 @@ func (domain *UserDomain) CreateUserForPhone(dto dtos.CreateUserWithPhoneDTO) (*
 	createUserData.No = domain.generateUserNo()
 	createUserData.Password, createUserData.Salt = domain.encryptPassword(dto.Password)
 	createUserData.Status = UserStatusNormal // 初始创建时已验证状态
+	createUserData.PhoneVerified = 1         // 初始创建时已验证状态
 
 	if userDTO, err = domain.userDao.Create(&createUserData); err != nil {
 		return nil, common.DomainInnerErrorOnSqlInsert(err, "Create")

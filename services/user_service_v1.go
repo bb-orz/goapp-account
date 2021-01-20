@@ -114,11 +114,7 @@ func (service *UserServiceV1) CreateUserWithPhone(dto dtos.CreateUserWithPhoneDT
 
 	// 校验验证码
 	verifyDomain = verify.NewVerifyDomain()
-	if verifyCodeOk, err = verifyDomain.VerifyPhoneForRegister(dto.Phone, dto.VerifyCode); err != nil {
-		return nil, common.ErrorOnServerInner(err, verifyDomain.DomainName())
-	}
-
-	if !verifyCodeOk {
+	if verifyCodeOk, err = verifyDomain.VerifyPhoneForRegister(dto.Phone, dto.VerifyCode); !verifyCodeOk || err != nil {
 		return nil, common.ErrorOnVerify("Phone SMS Verify Code Fail")
 	}
 
