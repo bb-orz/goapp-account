@@ -109,7 +109,9 @@ func Struct2Map(s interface{}) map[string]interface{} {
 	elem := reflect.ValueOf(&s).Elem()
 	relType := elem.Type()
 	for i := 0; i < relType.NumField(); i++ {
-		m[relType.Field(i).Name] = elem.Field(i).Interface()
+		if !elem.Field(i).IsZero() {
+			m[relType.Field(i).Name] = elem.Field(i).Interface()
+		}
 	}
 	return m
 }
