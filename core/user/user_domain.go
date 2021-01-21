@@ -181,9 +181,9 @@ func (domain *UserDomain) IsPhoneBinding(id uint, phone string) (bool, error) {
 }
 
 // 邮箱账号创建用户
-func (domain *UserDomain) CreateUserForEmail(dto dtos.CreateUserWithEmailDTO) (*dtos.UsersDTO, error) {
+func (domain *UserDomain) CreateUserForEmail(dto dtos.CreateUserWithEmailDTO) (int64, error) {
 	var err error
-	var userDTO *dtos.UsersDTO
+	var insertId int64
 
 	createUserData := dtos.UsersDTO{}
 	createUserData.Name = dto.Name
@@ -192,16 +192,16 @@ func (domain *UserDomain) CreateUserForEmail(dto dtos.CreateUserWithEmailDTO) (*
 	createUserData.Password, createUserData.Salt = domain.encryptPassword(dto.Password)
 	createUserData.Status = UserStatusNotVerify // 初始创建时未验证状态
 
-	if userDTO, err = domain.userDao.Create(&createUserData); err != nil {
-		return nil, common.DomainInnerErrorOnSqlInsert(err, "Create")
+	if insertId, err = domain.userDao.Create(&createUserData); err != nil {
+		return -1, common.DomainInnerErrorOnSqlInsert(err, "Create")
 	}
-	return userDTO, nil
+	return insertId, nil
 }
 
 // 手机号码创建用户
-func (domain *UserDomain) CreateUserForPhone(dto dtos.CreateUserWithPhoneDTO) (*dtos.UsersDTO, error) {
+func (domain *UserDomain) CreateUserForPhone(dto dtos.CreateUserWithPhoneDTO) (int64, error) {
 	var err error
-	var userDTO *dtos.UsersDTO
+	var insertId int64
 
 	createUserData := dtos.UsersDTO{}
 	createUserData.Name = dto.Name
@@ -211,10 +211,10 @@ func (domain *UserDomain) CreateUserForPhone(dto dtos.CreateUserWithPhoneDTO) (*
 	createUserData.Status = UserStatusNormal // 初始创建时已验证状态
 	createUserData.PhoneVerified = 1         // 初始创建时已验证状态
 
-	if userDTO, err = domain.userDao.Create(&createUserData); err != nil {
-		return nil, common.DomainInnerErrorOnSqlInsert(err, "Create")
+	if insertId, err = domain.userDao.Create(&createUserData); err != nil {
+		return -1, common.DomainInnerErrorOnSqlInsert(err, "Create")
 	}
-	return userDTO, nil
+	return int64(insertId), nil
 }
 
 func (domain *UserDomain) GetUser(id uint) (*dtos.UsersDTO, error) {
@@ -381,7 +381,7 @@ func (domain *UserDomain) IsWeiboAccountBinding(openId, unionId string) (bool, e
 }
 
 // Oauth三方账号绑定创建用户
-func (domain *UserDomain) CreateUserWithOAuthBinding(platform uint, oauthInfo *XOAuth.OAuthAccountInfo) (*dtos.UserOAuthInfoDTO, error) {
+func (domain *UserDomain) CreateUserWithOAuthBinding(platform uint, oauthInfo *XOAuth.OAuthAccountInfo) (int64, error) {
 	var err error
 
 	// 插入用户信息
@@ -401,12 +401,12 @@ func (domain *UserDomain) CreateUserWithOAuthBinding(platform uint, oauthInfo *X
 		},
 	}
 
-	var result *dtos.UserOAuthInfoDTO
-	if result, err = domain.userOAuthDao.CreateUserWithOAuth(&createUserData); err != nil {
-		return nil, common.DomainInnerErrorOnSqlInsert(err, "CreateUserWithOAuth")
+	var insertId int64
+	if insertId, err = domain.userOAuthDao.CreateUserWithOAuth(&createUserData); err != nil {
+		return -1, common.DomainInnerErrorOnSqlInsert(err, "CreateUserWithOAuth")
 	}
 
-	return result, nil
+	return insertId, nil
 }
 
 // 获取整个关联的用户信息和三方平台绑定信息
@@ -422,10 +422,10 @@ func (domain *UserDomain) GetUserOauths(platform uint, openId, unionId string) (
 }
 
 // Oauth三方账号绑定创建用户
-func (domain *UserDomain) CreateOAuthBinding(platform uint, oauthInfo *XOAuth.OAuthAccountInfo) (*dtos.OauthsDTO, error) {
+func (domain *UserDomain) CreateOAuthBinding(platform uint, oauthInfo *XOAuth.OAuthAccountInfo) (int64, error) {
 	var err error
 	var oauthsDTO *dtos.OauthsDTO
-	var result *dtos.OauthsDTO
+	var insertId int64
 	oauthsDTO = &dtos.OauthsDTO{
 		AccessToken: oauthInfo.AccessToken,
 		UnionId:     oauthInfo.UnionId,
@@ -437,9 +437,9 @@ func (domain *UserDomain) CreateOAuthBinding(platform uint, oauthInfo *XOAuth.OA
 	}
 
 	oauthsDAO := NewOauthsDAO()
-	if result, err = oauthsDAO.Create(oauthsDTO); err != nil {
-		return nil, common.DomainInnerErrorOnSqlInsert(err, "Create")
+	if insertId, err = oauthsDAO.Create(oauthsDTO); err != nil {
+		return -1, common.DomainInnerErrorOnSqlInsert(err, "Create")
 	}
 
-	return result, nil
+	return insertId, nil
 }

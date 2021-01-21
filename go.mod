@@ -33,16 +33,13 @@ replace (
 )
 
 require (
-	github.com/bb-orz/goinfras v1.2.5
-	github.com/garyburd/redigo v1.6.2
+	github.com/bb-orz/goinfras v1.2.6
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
-	github.com/jinzhu/gorm v1.9.16
 	github.com/segmentio/ksuid v1.0.3
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/viper v1.7.1
 	go.uber.org/zap v1.16.0
-	golang.org/x/tools v0.0.0-20201211025543-abf6a1d87e11
 	gopkg.in/go-playground/validator.v9 v9.31.0
 	gorm.io/gorm v1.20.8
 )

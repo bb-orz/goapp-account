@@ -22,8 +22,8 @@ type IUserService interface {
 	IsEmailAccountExist(dto dtos.IsEmailAccountExistDTO) (bool, error) // 邮箱账号是否存在
 	IsPhoneAccountExist(dto dtos.IsPhoneAccountExistDTO) (bool, error) // 手机账号是否存在
 
-	CreateUserWithEmail(dto dtos.CreateUserWithEmailDTO) (*dtos.UserInfoDTO, error) // 创建邮箱账号
-	CreateUserWithPhone(dto dtos.CreateUserWithPhoneDTO) (*dtos.UserInfoDTO, error) // 创建手机号码账号
+	CreateUserWithEmail(dto dtos.CreateUserWithEmailDTO) (int64, error) // 创建邮箱账号
+	CreateUserWithPhone(dto dtos.CreateUserWithPhoneDTO) (int64, error) // 创建手机号码账号
 
 	EmailAuth(dto dtos.AuthWithEmailPasswordDTO) (string, error) // 邮箱账号鉴权
 	PhoneAuth(dto dtos.AuthWithPhonePasswordDTO) (string, error) // 手机号码鉴权

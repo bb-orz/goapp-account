@@ -117,14 +117,13 @@ func (api *UserApi) registerEmailHandler(ctx *gin.Context) {
 
 	// Call Services method ...
 	userService := services.GetUserService()
-	userInfoDTO, err := userService.CreateUserWithEmail(dto)
-	if err != nil {
+	if insertId, err := userService.CreateUserWithEmail(dto); err != nil || insertId == -1 {
 		_ = ctx.Error(err)
 		return
 	}
 
 	// Send Data to Response Middleware ...
-	ctx.Set(common.ResponseDataKey, common.ResponseOK(userInfoDTO))
+	ctx.Set(common.ResponseDataKey, nil)
 }
 
 /*手机号码注册注册*/
@@ -139,14 +138,13 @@ func (api *UserApi) registerPhoneHandler(ctx *gin.Context) {
 
 	// Call Services method ...
 	userService := services.GetUserService()
-	userInfoDTO, err := userService.CreateUserWithPhone(dto)
-	if err != nil {
+	if insertId, err := userService.CreateUserWithPhone(dto); err != nil || insertId == -1 {
 		_ = ctx.Error(err)
 		return
 	}
 
 	// Send Data to Response Middleware ...
-	ctx.Set(common.ResponseDataKey, common.ResponseOK(userInfoDTO))
+	ctx.Set(common.ResponseDataKey, nil)
 }
 
 /*邮箱账号登录*/

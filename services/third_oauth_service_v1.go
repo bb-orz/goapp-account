@@ -29,8 +29,9 @@ func (service *ThirdOAuthServiceV1) QQOAuthLogin(dto dtos.QQLoginDTO) (string, e
 	var err error
 	var token string
 	var isQQBinding bool
+	var insertId int64
 	var qqOauthAccountInfo *XOAuth.OAuthAccountInfo // qq账号鉴权信息
-	var userOAuthsInfo *dtos.UserOAuthInfoDTO       // 创建用户后的信息
+	var userOAuthsInfo *dtos.UserOAuthInfoDTO
 
 	var thirdOauthDomain *third.ThirdOAuthDomain
 	var userDomain *user.UserDomain
@@ -54,14 +55,15 @@ func (service *ThirdOAuthServiceV1) QQOAuthLogin(dto dtos.QQLoginDTO) (string, e
 
 	if !isQQBinding {
 		// 未绑定，进入创建用户流程
-		userOAuthsInfo, err = userDomain.CreateUserWithOAuthBinding(user.QQOauthPlatform, qqOauthAccountInfo)
+		insertId, err = userDomain.CreateUserWithOAuthBinding(user.QQOauthPlatform, qqOauthAccountInfo)
 		// JWT token
-		if userOAuthsInfo != nil {
+		if insertId >= 0 {
 			token, err = userDomain.GenToken(
-				userOAuthsInfo.Id,
-				userOAuthsInfo.No,
-				userOAuthsInfo.Name,
-				userOAuthsInfo.Avatar)
+				uint(insertId),
+				"",
+				qqOauthAccountInfo.NickName,
+				qqOauthAccountInfo.AvatarUrl,
+			)
 			if err != nil {
 				return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 			}
@@ -89,6 +91,7 @@ func (service *ThirdOAuthServiceV1) WechatOAuthLogin(dto dtos.WechatLoginDTO) (s
 	var err error
 	var token string
 	var isWechatBinding bool
+	var insertId int64
 	var wechatOauthAccountInfo *XOAuth.OAuthAccountInfo // 微信账号鉴权信息
 	var userOAuthsInfo *dtos.UserOAuthInfoDTO           // 创建用户后的信息
 
@@ -114,14 +117,15 @@ func (service *ThirdOAuthServiceV1) WechatOAuthLogin(dto dtos.WechatLoginDTO) (s
 
 	if !isWechatBinding {
 		// 未绑定，进入创建用户流程
-		userOAuthsInfo, err = userDomain.CreateUserWithOAuthBinding(user.WechatOauthPlatform, wechatOauthAccountInfo)
+		insertId, err = userDomain.CreateUserWithOAuthBinding(user.WechatOauthPlatform, wechatOauthAccountInfo)
 		// JWT token
-		if userOAuthsInfo != nil {
+		if insertId >= 0 {
 			token, err = userDomain.GenToken(
-				userOAuthsInfo.Id,
-				userOAuthsInfo.No,
-				userOAuthsInfo.Name,
-				userOAuthsInfo.Avatar)
+				uint(insertId),
+				"",
+				wechatOauthAccountInfo.NickName,
+				wechatOauthAccountInfo.AvatarUrl,
+			)
 			if err != nil {
 				return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 			}
@@ -149,6 +153,8 @@ func (service *ThirdOAuthServiceV1) WeiboOAuthLogin(dto dtos.WeiboLoginDTO) (str
 	var err error
 	var token string
 	var isWeiboBinding bool
+	var insertId int64
+
 	var weiboOauthAccountInfo *XOAuth.OAuthAccountInfo // 微博账号鉴权信息
 	var userOAuthsInfo *dtos.UserOAuthInfoDTO          // 创建用户后的信息
 
@@ -174,14 +180,15 @@ func (service *ThirdOAuthServiceV1) WeiboOAuthLogin(dto dtos.WeiboLoginDTO) (str
 
 	if !isWeiboBinding {
 		// 未绑定，进入创建用户流程
-		userOAuthsInfo, err = userDomain.CreateUserWithOAuthBinding(user.WeiboOauthPlatform, weiboOauthAccountInfo)
+		insertId, err = userDomain.CreateUserWithOAuthBinding(user.WeiboOauthPlatform, weiboOauthAccountInfo)
 		// JWT token
-		if userOAuthsInfo != nil {
+		if insertId >= 0 {
 			token, err = userDomain.GenToken(
-				userOAuthsInfo.Id,
-				userOAuthsInfo.No,
-				userOAuthsInfo.Name,
-				userOAuthsInfo.Avatar)
+				uint(insertId),
+				"",
+				weiboOauthAccountInfo.NickName,
+				weiboOauthAccountInfo.AvatarUrl,
+			)
 			if err != nil {
 				return "", common.ErrorOnServerInner(err, userDomain.DomainName())
 			}
@@ -207,8 +214,8 @@ func (service *ThirdOAuthServiceV1) WeiboOAuthLogin(dto dtos.WeiboLoginDTO) (str
 // QQ账号绑定
 func (service *ThirdOAuthServiceV1) QQOAuthBinding(dto dtos.QQBindingDTO) (bool, error) {
 	var err error
+	var insertId int64
 	var qqBindingDTO dtos.QQBindingDTO
-	var oauthDTO *dtos.OauthsDTO
 	var oAuthAccountInfo *XOAuth.OAuthAccountInfo
 
 	// 校验传输参数
@@ -222,11 +229,11 @@ func (service *ThirdOAuthServiceV1) QQOAuthBinding(dto dtos.QQBindingDTO) (bool,
 	}
 
 	userDomain := user.NewUserDomain()
-	if oauthDTO, err = userDomain.CreateOAuthBinding(user.QQOauthPlatform, oAuthAccountInfo); err != nil {
+	if insertId, err = userDomain.CreateOAuthBinding(user.QQOauthPlatform, oAuthAccountInfo); err != nil {
 		return false, common.ErrorOnServerInner(err, thirdOAuthDomain.DomainName())
 	}
 
-	if oauthDTO != nil {
+	if insertId >= 0 {
 		return true, nil
 	}
 
@@ -236,8 +243,8 @@ func (service *ThirdOAuthServiceV1) QQOAuthBinding(dto dtos.QQBindingDTO) (bool,
 // 微信账号绑定
 func (service *ThirdOAuthServiceV1) WechatOAuthBinding(dto dtos.WechatBindingDTO) (bool, error) {
 	var err error
+	var insertId int64
 	var wechatBindingDTO dtos.WechatBindingDTO
-	var oauthDTO *dtos.OauthsDTO
 	var oAuthAccountInfo *XOAuth.OAuthAccountInfo
 
 	// 校验传输参数
@@ -251,11 +258,11 @@ func (service *ThirdOAuthServiceV1) WechatOAuthBinding(dto dtos.WechatBindingDTO
 	}
 
 	userDomain := user.NewUserDomain()
-	if oauthDTO, err = userDomain.CreateOAuthBinding(user.WechatOauthPlatform, oAuthAccountInfo); err != nil {
+	if insertId, err = userDomain.CreateOAuthBinding(user.WechatOauthPlatform, oAuthAccountInfo); err != nil {
 		return false, common.ErrorOnServerInner(err, thirdOAuthDomain.DomainName())
 	}
 
-	if oauthDTO != nil {
+	if insertId >= 0 {
 		return true, nil
 	}
 
@@ -265,8 +272,8 @@ func (service *ThirdOAuthServiceV1) WechatOAuthBinding(dto dtos.WechatBindingDTO
 // 微博账户绑定
 func (service *ThirdOAuthServiceV1) WeiboOAuthBinding(dto dtos.WeiboBindingDTO) (bool, error) {
 	var err error
+	var insertId int64
 	var weiboBindingDTO dtos.WeiboBindingDTO
-	var oauthDTO *dtos.OauthsDTO
 	var oAuthAccountInfo *XOAuth.OAuthAccountInfo
 
 	// 校验传输参数
@@ -280,11 +287,11 @@ func (service *ThirdOAuthServiceV1) WeiboOAuthBinding(dto dtos.WeiboBindingDTO) 
 	}
 
 	userDomain := user.NewUserDomain()
-	if oauthDTO, err = userDomain.CreateOAuthBinding(user.WeiboOauthPlatform, oAuthAccountInfo); err != nil {
+	if insertId, err = userDomain.CreateOAuthBinding(user.WeiboOauthPlatform, oAuthAccountInfo); err != nil {
 		return false, common.ErrorOnServerInner(err, thirdOAuthDomain.DomainName())
 	}
 
-	if oauthDTO != nil {
+	if insertId >= 0 {
 		return true, nil
 	}
 

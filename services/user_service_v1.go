@@ -72,65 +72,65 @@ func (service *UserServiceV1) IsPhoneAccountExist(dto dtos.IsPhoneAccountExistDT
 }
 
 // 邮箱创建用户账号
-func (service *UserServiceV1) CreateUserWithEmail(dto dtos.CreateUserWithEmailDTO) (*dtos.UserInfoDTO, error) {
+func (service *UserServiceV1) CreateUserWithEmail(dto dtos.CreateUserWithEmailDTO) (int64, error) {
 	var err error
 	var isExist bool
-	var userDTO *dtos.UsersDTO
+	var insertId int64
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return nil, common.ErrorOnValidate(err)
+		return -1, common.ErrorOnValidate(err)
 	}
 
 	// 验证用户邮箱是否存在
 	if isExist, err = userDomain.IsEmailExist(dto.Email); err != nil {
-		return nil, common.ErrorOnServerInner(err, userDomain.DomainName())
+		return -1, common.ErrorOnServerInner(err, userDomain.DomainName())
 	} else if isExist {
-		return nil, common.ErrorOnVerify("Email Account Exist!")
+		return -1, common.ErrorOnVerify("Email Account Exist!")
 	}
 
-	userDTO, err = userDomain.CreateUserForEmail(dto)
+	insertId, err = userDomain.CreateUserForEmail(dto)
 	if err != nil {
-		return nil, common.ErrorOnServerInner(err, userDomain.DomainName())
+		return -1, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
-	return userDTO.TransToUserInfoDTO(), nil
+	return insertId, nil
 }
 
 // 手机号码创建用户账号
-func (service *UserServiceV1) CreateUserWithPhone(dto dtos.CreateUserWithPhoneDTO) (*dtos.UserInfoDTO, error) {
+func (service *UserServiceV1) CreateUserWithPhone(dto dtos.CreateUserWithPhoneDTO) (int64, error) {
 	var err error
 	var verifyCodeOk bool
 	var isExist bool
-	var userDTO *dtos.UsersDTO
+	var insertId int64
 	var userDomain *user.UserDomain
 	var verifyDomain *verify.VerifyDomain
 
 	// 校验传输参数
 	if err = XValidate.V(dto); err != nil {
-		return nil, common.ErrorOnValidate(err)
+		return -1, common.ErrorOnValidate(err)
 	}
 
 	// 校验验证码
 	verifyDomain = verify.NewVerifyDomain()
 	if verifyCodeOk, err = verifyDomain.VerifyPhoneForRegister(dto.Phone, dto.VerifyCode); !verifyCodeOk || err != nil {
-		return nil, common.ErrorOnVerify("Phone SMS Verify Code Fail")
+		return -1, common.ErrorOnVerify("Phone SMS Verify Code Fail")
 	}
 
 	// 验证用户手机号码是否存在
 	userDomain = user.NewUserDomain()
 	if isExist, err = userDomain.IsPhoneExist(dto.Phone); err != nil {
-		return nil, common.ErrorOnServerInner(err, userDomain.DomainName())
+		return -1, common.ErrorOnServerInner(err, userDomain.DomainName())
 	} else if isExist {
-		return nil, common.ErrorOnVerify("Phone Account Exist!")
+		return -1, common.ErrorOnVerify("Phone Account Exist!")
 	}
 
-	userDTO, err = userDomain.CreateUserForPhone(dto)
+	insertId, err = userDomain.CreateUserForPhone(dto)
 	if err != nil {
-		return nil, common.ErrorOnServerInner(err, userDomain.DomainName())
+		return -1, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
-	return userDTO.TransToUserInfoDTO(), nil
+	return insertId, nil
 }
 
 // 邮箱账号登录鉴权

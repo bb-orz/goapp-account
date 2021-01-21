@@ -169,17 +169,17 @@ func (d *UsersDAO) GetByPhone(phone string) (*dtos.UsersDTO, error) {
 }
 
 // 创建
-func (d *UsersDAO) Create(dto *dtos.UsersDTO) (*dtos.UsersDTO, error) {
+func (d *UsersDAO) Create(dto *dtos.UsersDTO) (int64, error) {
 	var err error
 	var usersDTO *dtos.UsersDTO
 	var usersModel UsersModel
 
 	usersModel.FromDTO(dto)
 	if err = XGorm.XDB().Create(&usersModel).Error; err != nil {
-		return nil, err
+		return -1, err
 	}
 	usersDTO = usersModel.ToDTO()
-	return usersDTO, nil
+	return int64(usersDTO.Id), nil
 }
 
 // 设置单个信息字段

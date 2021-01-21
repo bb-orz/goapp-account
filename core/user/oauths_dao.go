@@ -93,17 +93,17 @@ func (d *OauthsDAO) GetById(id uint) (*dtos.OauthsDTO, error) {
 }
 
 // 创建
-func (d *OauthsDAO) Create(dto *dtos.OauthsDTO) (*dtos.OauthsDTO, error) {
+func (d *OauthsDAO) Create(dto *dtos.OauthsDTO) (int64, error) {
 	var err error
 	var oauthsDTO *dtos.OauthsDTO
 	var oauthsModel OAuthsModel
 
 	oauthsModel.FromDTO(dto)
 	if err = XGorm.XDB().Create(&oauthsModel).Error; err != nil {
-		return nil, err
+		return -1, err
 	}
 	oauthsDTO = oauthsModel.ToDTO()
-	return oauthsDTO, nil
+	return int64(oauthsDTO.Id), nil
 }
 
 // 设置单个信息字段

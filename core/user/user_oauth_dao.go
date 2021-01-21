@@ -13,17 +13,17 @@ func NewUserOAuthDAO() *UserOAuthDAO {
 }
 
 // 插入单个用户信息并关联三方平台账户
-func (d *UserOAuthDAO) CreateUserWithOAuth(dto *dtos.UserOAuthInfoDTO) (*dtos.UserOAuthInfoDTO, error) {
+func (d *UserOAuthDAO) CreateUserWithOAuth(dto *dtos.UserOAuthInfoDTO) (int64, error) {
 	var err error
 	var result *dtos.UserOAuthInfoDTO
 	var model UserOAuthModel
 
 	model.FromDTO(dto)
 	if err = XGorm.XDB().Create(&model).Error; err != nil {
-		return nil, err
+		return -1, err
 	}
 	result = model.ToDTO()
-	return result, nil
+	return int64(result.Id), nil
 }
 
 func (d *UserOAuthDAO) GetUserOAuths(platform uint, openId, unionId string) (*dtos.UserOAuthInfoDTO, error) {
