@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"github.com/bb-orz/goinfras/XJwt"
 	"github.com/gin-gonic/gin"
+	"github.com/mitchellh/mapstructure"
 	"io"
 	"math/rand"
+	"reflect"
 	"time"
 )
 
@@ -100,4 +102,18 @@ func IsStringItemExist(slice []string, item string) bool {
 		}
 	}
 	return false
+}
+
+func Struct2Map(s interface{}) map[string]interface{} {
+	var m = make(map[string]interface{})
+	elem := reflect.ValueOf(&s).Elem()
+	relType := elem.Type()
+	for i := 0; i < relType.NumField(); i++ {
+		m[relType.Field(i).Name] = elem.Field(i).Interface()
+	}
+	return m
+}
+
+func Map2Struct(m map[string]interface{}, s interface{}) error {
+	return mapstructure.Decode(m, &s)
 }
