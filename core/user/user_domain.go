@@ -13,15 +13,15 @@ User 领域层：实现用户相关具体业务逻辑
 封装领域层的错误信息并返回给调用者
 */
 type UserDomain struct {
-	userDao      *UsersDAO
-	OauthsDAO    *OauthsDAO
+	userDao      *UserDAO
+	OAuthDAO     *OAuthDAO
 	userOAuthDao *UserOAuthDAO
-	cache        *UsersCache
+	cache        *UserCache
 }
 
 func NewUserDomain() *UserDomain {
 	domain := new(UserDomain)
-	domain.userDao = NewUsersDAO()
+	domain.userDao = NewUserDAO()
 	domain.userOAuthDao = NewUserOAuthDAO()
 	domain.cache = NewUserCache()
 	return domain
@@ -44,7 +44,7 @@ func (domain *UserDomain) encryptPassword(password string) (hashStr, salt string
 }
 
 // 用户密码验证
-func (domain *UserDomain) VerifyPassword(id uint, passwordStr string) (*dtos.UsersDTO, bool, error) {
+func (domain *UserDomain) VerifyPassword(id uint, passwordStr string) (*dtos.UserDTO, bool, error) {
 	// 查找账号是否存在
 	userDTO, err := domain.GetUser(id)
 	if err != nil {
@@ -59,7 +59,7 @@ func (domain *UserDomain) VerifyPassword(id uint, passwordStr string) (*dtos.Use
 }
 
 // 用户密码验证ForEmail
-func (domain *UserDomain) VerifyPasswordForEmail(email, passwordStr string) (*dtos.UsersDTO, bool, error) {
+func (domain *UserDomain) VerifyPasswordForEmail(email, passwordStr string) (*dtos.UserDTO, bool, error) {
 	// 查找账号是否存在
 	userDTO, err := domain.GetUserByEmail(email)
 	if err != nil {
@@ -74,7 +74,7 @@ func (domain *UserDomain) VerifyPasswordForEmail(email, passwordStr string) (*dt
 }
 
 // 用户密码验证ForPhone
-func (domain *UserDomain) VerifyPasswordForPhone(phone, passwordStr string) (*dtos.UsersDTO, bool, error) {
+func (domain *UserDomain) VerifyPasswordForPhone(phone, passwordStr string) (*dtos.UserDTO, bool, error) {
 	// 查找账号是否存在
 	userDTO, err := domain.GetUserByPhone(phone)
 	if err != nil {
@@ -185,7 +185,7 @@ func (domain *UserDomain) CreateUserForEmail(dto dtos.CreateUserWithEmailDTO) (i
 	var err error
 	var insertId int64
 
-	createUserData := dtos.UsersDTO{}
+	createUserData := dtos.UserDTO{}
 	createUserData.Name = dto.Name
 	createUserData.Email = dto.Email
 	createUserData.No = domain.generateUserNo()
@@ -203,7 +203,7 @@ func (domain *UserDomain) CreateUserForPhone(dto dtos.CreateUserWithPhoneDTO) (i
 	var err error
 	var insertId int64
 
-	createUserData := dtos.UsersDTO{}
+	createUserData := dtos.UserDTO{}
 	createUserData.Name = dto.Name
 	createUserData.Phone = dto.Phone
 	createUserData.No = domain.generateUserNo()
@@ -217,27 +217,27 @@ func (domain *UserDomain) CreateUserForPhone(dto dtos.CreateUserWithPhoneDTO) (i
 	return int64(insertId), nil
 }
 
-func (domain *UserDomain) GetUser(id uint) (*dtos.UsersDTO, error) {
+func (domain *UserDomain) GetUser(id uint) (*dtos.UserDTO, error) {
 	var err error
-	var userDTO *dtos.UsersDTO
+	var userDTO *dtos.UserDTO
 	if userDTO, err = domain.userDao.GetById(id); err != nil {
 		return nil, common.DomainInnerErrorOnSqlQuery(err, "GetById")
 	}
 	return userDTO, nil
 }
 
-func (domain *UserDomain) GetUserByEmail(email string) (*dtos.UsersDTO, error) {
+func (domain *UserDomain) GetUserByEmail(email string) (*dtos.UserDTO, error) {
 	var err error
-	var userDTO *dtos.UsersDTO
+	var userDTO *dtos.UserDTO
 	if userDTO, err = domain.userDao.GetByEmail(email); err != nil {
 		return nil, common.DomainInnerErrorOnSqlQuery(err, "GetByEmail")
 	}
 	return userDTO, nil
 }
 
-func (domain *UserDomain) GetUserByPhone(phone string) (*dtos.UsersDTO, error) {
+func (domain *UserDomain) GetUserByPhone(phone string) (*dtos.UserDTO, error) {
 	var err error
-	var userDTO *dtos.UsersDTO
+	var userDTO *dtos.UserDTO
 	if userDTO, err = domain.userDao.GetByPhone(phone); err != nil {
 		return nil, common.DomainInnerErrorOnSqlQuery(err, "GetByPhone")
 	}
@@ -246,7 +246,7 @@ func (domain *UserDomain) GetUserByPhone(phone string) (*dtos.UsersDTO, error) {
 
 // 设置邮箱
 func (domain *UserDomain) SetEmail(id uint, email string) error {
-	if err := domain.userDao.SetUsers(id, "email", email); err != nil {
+	if err := domain.userDao.SetUser(id, "email", email); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetEmail")
 	}
 	return nil
@@ -254,7 +254,7 @@ func (domain *UserDomain) SetEmail(id uint, email string) error {
 
 // 设置邮箱已验证
 func (domain *UserDomain) SetEmailVerify(id uint) error {
-	if err := domain.userDao.SetUsers(id, "email_verified", UserEmailVerify); err != nil {
+	if err := domain.userDao.SetUser(id, "email_verified", UserEmailVerify); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetEmailVerify")
 	}
 	return nil
@@ -262,7 +262,7 @@ func (domain *UserDomain) SetEmailVerify(id uint) error {
 
 // 设置手机号
 func (domain *UserDomain) SetPhone(id uint, phone string) error {
-	if err := domain.userDao.SetUsers(id, "phone", phone); err != nil {
+	if err := domain.userDao.SetUser(id, "phone", phone); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetPhone")
 	}
 	return nil
@@ -270,7 +270,7 @@ func (domain *UserDomain) SetPhone(id uint, phone string) error {
 
 // 设置手机号码已验证
 func (domain *UserDomain) SetPhoneVerify(id uint) error {
-	if err := domain.userDao.SetUsers(id, "phone_verified", UserPhoneVerify); err != nil {
+	if err := domain.userDao.SetUser(id, "phone_verified", UserPhoneVerify); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetPhoneVerify")
 	}
 	return nil
@@ -278,7 +278,7 @@ func (domain *UserDomain) SetPhoneVerify(id uint) error {
 
 // 设置单个用户头像链接
 func (domain *UserDomain) SetAvatar(id uint, uri string) error {
-	if err := domain.userDao.SetUsers(id, "avatar", uri); err != nil {
+	if err := domain.userDao.SetUser(id, "avatar", uri); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetAvatar")
 	}
 	return nil
@@ -286,7 +286,7 @@ func (domain *UserDomain) SetAvatar(id uint, uri string) error {
 
 // 设置单个用户状态已验证
 func (domain *UserDomain) SetUserStatusNormal(id uint) error {
-	if err := domain.userDao.SetUsers(id, "status", UserStatusNormal); err != nil {
+	if err := domain.userDao.SetUser(id, "status", UserStatusNormal); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetUserStatusNormal")
 	}
 	return nil
@@ -294,14 +294,14 @@ func (domain *UserDomain) SetUserStatusNormal(id uint) error {
 
 // 设置单个用户状态停用
 func (domain *UserDomain) SetUserStatusDeactivation(uid uint) error {
-	if err := domain.userDao.SetUsers(uid, "status", UserStatusDeactivation); err != nil {
+	if err := domain.userDao.SetUser(uid, "status", UserStatusDeactivation); err != nil {
 		return common.DomainInnerErrorOnSqlUpdate(err, "SetUserStatusDeactivation")
 	}
 	return nil
 }
 
 // 设置多个用户信息
-func (domain *UserDomain) UpdateUsers(dto dtos.SetUserInfoDTO) error {
+func (domain *UserDomain) UpdateUser(dto dtos.SetUserInfoDTO) error {
 	updateData := dtos.UserInfoDTO{
 		Id:     dto.Id,
 		Name:   dto.Name,
@@ -309,8 +309,8 @@ func (domain *UserDomain) UpdateUsers(dto dtos.SetUserInfoDTO) error {
 		Gender: dto.Gender,
 		Age:    dto.Age,
 	}
-	if err := domain.userDao.UpdateUsers(dto.Id, updateData); err != nil {
-		return common.DomainInnerErrorOnSqlUpdate(err, "UpdateUsers")
+	if err := domain.userDao.UpdateUser(dto.Id, updateData); err != nil {
+		return common.DomainInnerErrorOnSqlUpdate(err, "UpdateUser")
 	}
 
 	return nil
@@ -352,7 +352,7 @@ func (domain *UserDomain) ShamDeleteUser(uid uint) error {
 
 // 是否qq账号已绑定
 func (domain *UserDomain) IsQQAccountBinding(openId, unionId string) (bool, error) {
-	if b, err := domain.OauthsDAO.IsQQAccountBindng(openId, unionId); err != nil {
+	if b, err := domain.OAuthDAO.IsQQAccountBindng(openId, unionId); err != nil {
 		return false, common.DomainInnerErrorOnSqlQuery(err, "IsQQAccountBinding")
 	} else if b {
 		return true, nil
@@ -362,7 +362,7 @@ func (domain *UserDomain) IsQQAccountBinding(openId, unionId string) (bool, erro
 
 // 是否微信账号已绑定
 func (domain *UserDomain) IsWechatAccountBinding(openId, unionId string) (bool, error) {
-	if b, err := domain.OauthsDAO.IsWechatAccountBindng(openId, unionId); err != nil {
+	if b, err := domain.OAuthDAO.IsWechatAccountBindng(openId, unionId); err != nil {
 		return false, common.DomainInnerErrorOnSqlQuery(err, "IsWechatAccountBinding")
 	} else if b {
 		return true, nil
@@ -372,7 +372,7 @@ func (domain *UserDomain) IsWechatAccountBinding(openId, unionId string) (bool, 
 
 // 是否微博账户已绑定
 func (domain *UserDomain) IsWeiboAccountBinding(openId, unionId string) (bool, error) {
-	if b, err := domain.OauthsDAO.IsWeiboAccountBindng(openId, unionId); err != nil {
+	if b, err := domain.OAuthDAO.IsWeiboAccountBindng(openId, unionId); err != nil {
 		return false, common.DomainInnerErrorOnSqlQuery(err, "IsWeiboAccountBinding")
 	} else if b {
 		return true, nil
@@ -380,7 +380,7 @@ func (domain *UserDomain) IsWeiboAccountBinding(openId, unionId string) (bool, e
 	return false, nil
 }
 
-// Oauth三方账号绑定创建用户
+// OAuth三方账号绑定创建用户
 func (domain *UserDomain) CreateUserWithOAuthBinding(platform uint, oauthInfo *XOAuth.OAuthAccountInfo) (int64, error) {
 	var err error
 
@@ -389,7 +389,7 @@ func (domain *UserDomain) CreateUserWithOAuthBinding(platform uint, oauthInfo *X
 	createUserData.Name = oauthInfo.NickName
 	createUserData.No = domain.generateUserNo()
 	createUserData.Status = UserStatusNotVerify // 初始创建时未验证状态
-	createUserData.OAuths = []dtos.OauthsDTO{
+	createUserData.OAuth = []dtos.OAuthDTO{
 		{
 			AccessToken: oauthInfo.AccessToken,
 			UnionId:     oauthInfo.UnionId,
@@ -410,23 +410,23 @@ func (domain *UserDomain) CreateUserWithOAuthBinding(platform uint, oauthInfo *X
 }
 
 // 获取整个关联的用户信息和三方平台绑定信息
-func (domain *UserDomain) GetUserOauths(platform uint, openId, unionId string) (*dtos.UserOAuthInfoDTO, error) {
+func (domain *UserDomain) GetUserOAuth(platform uint, openId, unionId string) (*dtos.UserOAuthInfoDTO, error) {
 	var err error
-	var userOAuthsResult *dtos.UserOAuthInfoDTO
+	var userOAuthResult *dtos.UserOAuthInfoDTO
 
-	if userOAuthsResult, err = domain.userOAuthDao.GetUserOAuths(platform, openId, unionId); err != nil {
-		return nil, common.DomainInnerErrorOnSqlQuery(err, "GetUserOAuths")
+	if userOAuthResult, err = domain.userOAuthDao.GetUserOAuth(platform, openId, unionId); err != nil {
+		return nil, common.DomainInnerErrorOnSqlQuery(err, "GetUserOAuth")
 	}
 
-	return userOAuthsResult, nil
+	return userOAuthResult, nil
 }
 
-// Oauth三方账号绑定创建用户
+// OAuth三方账号绑定创建用户
 func (domain *UserDomain) CreateOAuthBinding(platform uint, oauthInfo *XOAuth.OAuthAccountInfo) (int64, error) {
 	var err error
-	var oauthsDTO *dtos.OauthsDTO
+	var oauthDTO *dtos.OAuthDTO
 	var insertId int64
-	oauthsDTO = &dtos.OauthsDTO{
+	oauthDTO = &dtos.OAuthDTO{
 		AccessToken: oauthInfo.AccessToken,
 		UnionId:     oauthInfo.UnionId,
 		OpenId:      oauthInfo.OpenId,
@@ -436,8 +436,8 @@ func (domain *UserDomain) CreateOAuthBinding(platform uint, oauthInfo *XOAuth.OA
 		Platform:    platform,
 	}
 
-	oauthsDAO := NewOauthsDAO()
-	if insertId, err = oauthsDAO.Create(oauthsDTO); err != nil {
+	oauthDAO := NewOAuthDAO()
+	if insertId, err = oauthDAO.Create(oauthDTO); err != nil {
 		return -1, common.DomainInnerErrorOnSqlInsert(err, "Create")
 	}
 

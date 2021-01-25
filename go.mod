@@ -4,7 +4,7 @@ go 1.14
 
 replace (
 	cloud.google.com/go => github.com/googleapis/google-cloud-go v0.47.0
-	// github.com/bb-orz/goinfras => /Users/fun/Code/GoProjects/goinfras
+	// github.com/bb-orz/goinfras => /User/fun/Code/GoProjects/goinfras
 	github.com/coreos/bbolt => go.etcd.io/bbolt v1.3.4
 	github.com/coreos/go-systemd => github.com/coreos/go-systemd/v22 v22.0.0
 	go.uber.org/atomic => github.com/uber-go/atomic v1.5.0
@@ -36,6 +36,7 @@ require (
 	github.com/bb-orz/goinfras v1.2.7
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
+	github.com/mitchellh/mapstructure v1.4.1
 	github.com/segmentio/ksuid v1.0.3
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/viper v1.7.1

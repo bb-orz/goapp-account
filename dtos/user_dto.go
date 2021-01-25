@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-// UsersDTO is a mapping object for users table in mysql
-type UsersDTO struct {
+// UserDTO is a mapping object for user table in mysql
+type UserDTO struct {
 	Id            uint      `validate:"numeric" json:"id"`                  // 用户id
 	No            string    `validate:"alphanum" json:"no"`                 // 用户生成编号
 	Name          string    `validate:"alphanum" json:"name"`               // 用户名
@@ -25,11 +25,11 @@ type UsersDTO struct {
 	DeletedAt     time.Time `validate:"required,numeric" json:"deleted_at"` //
 }
 
-func (dto *UsersDTO) Validate() error {
+func (dto *UserDTO) Validate() error {
 	return XValidate.V(dto)
 }
 
-func (dto *UsersDTO) TransToUserInfoDTO() *UserInfoDTO {
+func (dto *UserDTO) TransToUserInfoDTO() *UserInfoDTO {
 	return &UserInfoDTO{
 		Id:            dto.Id,
 		No:            dto.No,

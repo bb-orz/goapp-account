@@ -5,10 +5,10 @@ import (
 	"gorm.io/gorm"
 )
 
-const UsersTableName = "users"
+const UserTableName = "user"
 
-// UsersModel is a mapping object for users table in mysql
-type UsersModel struct {
+// UserModel is a mapping object for user table in mysql
+type UserModel struct {
 	gorm.Model
 	No            string `gorm:"no" json:"no"`                         // 用户生成编号
 	Name          string `gorm:"name" json:"name"`                     // 用户名
@@ -24,17 +24,17 @@ type UsersModel struct {
 	Status        int    `gorm:"status" json:"status"`                 // 账户状态：1：启用，0：停用
 }
 
-func NewUsersModel() *UsersModel {
-	return new(UsersModel)
+func NewUserModel() *UserModel {
+	return new(UserModel)
 }
 
-func (*UsersModel) TableName() string {
-	return UsersTableName
+func (*UserModel) TableName() string {
+	return UserTableName
 }
 
 // To DTO
-func (m *UsersModel) ToDTO() *dtos.UsersDTO {
-	return &dtos.UsersDTO{
+func (m *UserModel) ToDTO() *dtos.UserDTO {
+	return &dtos.UserDTO{
 		Id:            m.ID,
 		No:            m.No,
 		Name:          m.Name,
@@ -55,7 +55,7 @@ func (m *UsersModel) ToDTO() *dtos.UsersDTO {
 }
 
 // From DTO
-func (m *UsersModel) FromDTO(dto *dtos.UsersDTO) {
+func (m *UserModel) FromDTO(dto *dtos.UserDTO) {
 	m.ID = dto.Id
 	m.No = dto.No
 	m.Name = dto.Name
@@ -72,7 +72,7 @@ func (m *UsersModel) FromDTO(dto *dtos.UsersDTO) {
 }
 
 // From DTO
-func (m *UsersModel) FromInfoDTO(dto *dtos.UserInfoDTO) {
+func (m *UserModel) FromInfoDTO(dto *dtos.UserInfoDTO) {
 	m.ID = dto.Id
 	m.No = dto.No
 	m.Name = dto.Name

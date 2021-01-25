@@ -138,7 +138,7 @@ func (service *UserServiceV1) EmailAuth(dto dtos.AuthWithEmailPasswordDTO) (stri
 	var err error
 	var token string
 	var isPass bool
-	var userDTO *dtos.UsersDTO
+	var userDTO *dtos.UserDTO
 	var userDomain *user.UserDomain
 
 	// 校验传输参数
@@ -170,7 +170,7 @@ func (service *UserServiceV1) PhoneAuth(dto dtos.AuthWithPhonePasswordDTO) (stri
 	var err error
 	var token string
 	var verifyCodeOk bool
-	var userDTO *dtos.UsersDTO
+	var userDTO *dtos.UserDTO
 	var userDomain *user.UserDomain
 	var verifyDomain *verify.VerifyDomain
 
@@ -224,7 +224,7 @@ func (service *UserServiceV1) RemoveToken(dto dtos.RemoveTokenDTO) error {
 // 获取用户信息
 func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserInfoDTO, error) {
 	var err error
-	var userDTO *dtos.UsersDTO
+	var userDTO *dtos.UserDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
@@ -384,7 +384,7 @@ func (service *UserServiceV1) PhoneBinding(dto dtos.PhoneValidateDTO) (bool, err
 func (service *UserServiceV1) ModifiedPassword(dto dtos.ModifiedPasswordDTO) (bool, error) {
 	var err error
 	var isPass bool
-	var userDTO *dtos.UsersDTO
+	var userDTO *dtos.UserDTO
 	var userDomain *user.UserDomain
 	userDomain = user.NewUserDomain()
 
@@ -487,7 +487,7 @@ func (service *UserServiceV1) SetUserInfos(dto dtos.SetUserInfoDTO) (bool, error
 		return false, common.ErrorOnValidate(err)
 	}
 
-	err = userDomain.UpdateUsers(dto)
+	err = userDomain.UpdateUser(dto)
 	if err != nil {
 		return false, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}

@@ -39,7 +39,7 @@ type UserOAuthInfoDTO struct {
 	CreatedAt     time.Time `validate:"required,numeric" json:"created_at"`         //
 	UpdatedAt     time.Time `validate:"required,numeric" json:"updated_at"`         //
 	DeletedAt     time.Time `validate:"required,numeric" json:"deleted_at"`         //
-	OAuths        []OauthsDTO
+	OAuth         []OAuthDTO
 }
 
 // 验证邮箱数据传输对象

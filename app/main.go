@@ -56,7 +56,7 @@ func RegisterStarter(viperConfig *viper.Viper) {
 	// 本地缓存
 	goinfras.RegisterStarter(XGocache.NewStarter())
 
-	// 注册Oauth Manager
+	// 注册OAuth Manager
 	goinfras.RegisterStarter(XOAuth.NewStarter())
 
 	// 注册JWT 工具

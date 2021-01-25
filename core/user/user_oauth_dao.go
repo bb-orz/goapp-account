@@ -26,17 +26,17 @@ func (d *UserOAuthDAO) CreateUserWithOAuth(dto *dtos.UserOAuthInfoDTO) (int64, e
 	return int64(result.Id), nil
 }
 
-func (d *UserOAuthDAO) GetUserOAuths(platform uint, openId, unionId string) (*dtos.UserOAuthInfoDTO, error) {
+func (d *UserOAuthDAO) GetUserOAuth(platform uint, openId, unionId string) (*dtos.UserOAuthInfoDTO, error) {
 	var err error
 	var result *dtos.UserOAuthInfoDTO
-	var oauthRs OAuthsModel
-	var userRs UsersModel
+	var oauthRs OAuthModel
+	var userRs UserModel
 
-	if err = XGorm.XDB().Model(OAuthsModel{}).Where(OAuthsModel{Platform: platform, OpenId: openId, UnionId: unionId}).First(&oauthRs).Error; err != nil {
+	if err = XGorm.XDB().Model(OAuthModel{}).Where(OAuthModel{Platform: platform, OpenId: openId, UnionId: unionId}).First(&oauthRs).Error; err != nil {
 		return nil, err
 	}
 
-	if err = XGorm.XDB().Model(UsersModel{}).First(&userRs, oauthRs.UserId).Error; err != nil {
+	if err = XGorm.XDB().Model(UserModel{}).First(&userRs, oauthRs.UserId).Error; err != nil {
 		return nil, err
 	}
 
@@ -55,7 +55,7 @@ func (d *UserOAuthDAO) GetUserOAuths(platform uint, openId, unionId string) (*dt
 		CreatedAt:     userRs.CreatedAt,
 		UpdatedAt:     userRs.UpdatedAt,
 		DeletedAt:     userRs.DeletedAt.Time,
-		OAuths:        []dtos.OauthsDTO{*oauthRs.ToDTO()},
+		OAuth:         []dtos.OAuthDTO{*oauthRs.ToDTO()},
 	}
 
 	return result, nil

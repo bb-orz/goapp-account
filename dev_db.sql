@@ -18,10 +18,10 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- Table structure for oauths
+-- Table structure for oauth
 -- ----------------------------
-DROP TABLE IF EXISTS `oauths`;
-CREATE TABLE `oauths` (
+DROP TABLE IF EXISTS `oauth`;
+CREATE TABLE `oauth` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int unsigned NOT NULL COMMENT 'user表外键',
   `platform` tinyint unsigned NOT NULL COMMENT '平台账号类型',
@@ -36,14 +36,14 @@ CREATE TABLE `oauths` (
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
-  CONSTRAINT `oauths_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  CONSTRAINT `oauth_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='第三方账号表';
 
 -- ----------------------------
--- Table structure for users
+-- Table structure for user
 -- ----------------------------
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE `users` (
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT '用户id',
   `no` char(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户生成编号',
   `name` char(12) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户名',

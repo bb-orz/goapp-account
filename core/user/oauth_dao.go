@@ -11,17 +11,17 @@ import (
 直接返回error和执行结果
 */
 
-type OauthsDAO struct{}
+type OAuthDAO struct{}
 
-func NewOauthsDAO() *OauthsDAO {
-	dao := new(OauthsDAO)
+func NewOAuthDAO() *OAuthDAO {
+	dao := new(OAuthDAO)
 	return dao
 }
 
-func (d *OauthsDAO) isExist(where *OAuthsModel) (bool, error) {
+func (d *OAuthDAO) isExist(where *OAuthModel) (bool, error) {
 	var err error
 	var count int64
-	err = XGorm.XDB().Model(&OAuthsModel{}).Where(where).Count(&count).Error
+	err = XGorm.XDB().Model(&OAuthModel{}).Where(where).Count(&count).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// 无记录
@@ -39,10 +39,10 @@ func (d *OauthsDAO) isExist(where *OAuthsModel) (bool, error) {
 }
 
 // 查找id是否存在
-func (d *OauthsDAO) IsIdExist(id uint) (bool, error) {
+func (d *OAuthDAO) IsIdExist(id uint) (bool, error) {
 	var err error
 	var count int64
-	err = XGorm.XDB().First(&OAuthsModel{}, id).Count(&count).Error
+	err = XGorm.XDB().First(&OAuthModel{}, id).Count(&count).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// 无记录
@@ -60,25 +60,25 @@ func (d *OauthsDAO) IsIdExist(id uint) (bool, error) {
 }
 
 // 查找是否绑定微信账号
-func (d *OauthsDAO) IsWechatAccountBindng(openId, unionId string) (bool, error) {
-	return d.isExist(&OAuthsModel{OpenId: openId, UnionId: unionId, Platform: WechatOauthPlatform})
+func (d *OAuthDAO) IsWechatAccountBindng(openId, unionId string) (bool, error) {
+	return d.isExist(&OAuthModel{OpenId: openId, UnionId: unionId, Platform: WechatOAuthPlatform})
 }
 
 // 查找是否绑定微信账号
-func (d *OauthsDAO) IsWeiboAccountBindng(openId, unionId string) (bool, error) {
-	return d.isExist(&OAuthsModel{OpenId: openId, UnionId: unionId, Platform: WeiboOauthPlatform})
+func (d *OAuthDAO) IsWeiboAccountBindng(openId, unionId string) (bool, error) {
+	return d.isExist(&OAuthModel{OpenId: openId, UnionId: unionId, Platform: WeiboOAuthPlatform})
 }
 
 // 查找是否绑定微信账号
-func (d *OauthsDAO) IsQQAccountBindng(openId, unionId string) (bool, error) {
-	return d.isExist(&OAuthsModel{OpenId: openId, UnionId: unionId, Platform: QQOauthPlatform})
+func (d *OAuthDAO) IsQQAccountBindng(openId, unionId string) (bool, error) {
+	return d.isExist(&OAuthModel{OpenId: openId, UnionId: unionId, Platform: QQOAuthPlatform})
 }
 
 // 通过Id查找
-func (d *OauthsDAO) GetById(id uint) (*dtos.OauthsDTO, error) {
+func (d *OAuthDAO) GetById(id uint) (*dtos.OAuthDTO, error) {
 	var err error
-	var oauthsResult OAuthsModel
-	err = XGorm.XDB().Where(id).First(&oauthsResult).Error
+	var oauthResult OAuthModel
+	err = XGorm.XDB().Where(id).First(&oauthResult).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// 无记录
@@ -88,56 +88,56 @@ func (d *OauthsDAO) GetById(id uint) (*dtos.OauthsDTO, error) {
 			return nil, err
 		}
 	}
-	dto := oauthsResult.ToDTO()
+	dto := oauthResult.ToDTO()
 	return dto, nil
 }
 
 // 创建
-func (d *OauthsDAO) Create(dto *dtos.OauthsDTO) (int64, error) {
+func (d *OAuthDAO) Create(dto *dtos.OAuthDTO) (int64, error) {
 	var err error
-	var oauthsDTO *dtos.OauthsDTO
-	var oauthsModel OAuthsModel
+	var oauthDTO *dtos.OAuthDTO
+	var oauthModel OAuthModel
 
-	oauthsModel.FromDTO(dto)
-	if err = XGorm.XDB().Create(&oauthsModel).Error; err != nil {
+	oauthModel.FromDTO(dto)
+	if err = XGorm.XDB().Create(&oauthModel).Error; err != nil {
 		return -1, err
 	}
-	oauthsDTO = oauthsModel.ToDTO()
-	return int64(oauthsDTO.Id), nil
+	oauthDTO = oauthModel.ToDTO()
+	return int64(oauthDTO.Id), nil
 }
 
 // 设置单个信息字段
-func (d *OauthsDAO) SetOauths(id uint, field string, value interface{}) error {
+func (d *OAuthDAO) SetOAuth(id uint, field string, value interface{}) error {
 	var err error
-	if err = XGorm.XDB().Model(&OAuthsModel{}).Where("id", id).Update(field, value).Error; err != nil {
+	if err = XGorm.XDB().Model(&OAuthModel{}).Where("id", id).Update(field, value).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 // 设置多个信息字段
-func (d *OauthsDAO) UpdateOauths(id uint, dto dtos.OauthsDTO) error {
+func (d *OAuthDAO) UpdateOAuth(id uint, dto dtos.OAuthDTO) error {
 	var err error
 
-	if err = XGorm.XDB().Model(&OAuthsModel{}).Where("id", id).Updates(&dto).Error; err != nil {
+	if err = XGorm.XDB().Model(&OAuthModel{}).Where("id", id).Updates(&dto).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 // 真删除
-func (d *OauthsDAO) DeleteById(id uint) error {
+func (d *OAuthDAO) DeleteById(id uint) error {
 	var err error
-	if err = XGorm.XDB().Model(&OAuthsModel{}).Delete(id).Error; err != nil {
+	if err = XGorm.XDB().Model(&OAuthModel{}).Delete(id).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 // 伪删除
-func (d *OauthsDAO) SetDeletedAtById(id uint) error {
+func (d *OAuthDAO) SetDeletedAtById(id uint) error {
 	var err error
-	if err = XGorm.XDB().Model(&OAuthsModel{}).Set("gorm:delete_option", "OPTION (OPTIMIZE FOR UNKNOWN)").Delete(id).Error; err != nil {
+	if err = XGorm.XDB().Model(&OAuthModel{}).Set("gorm:delete_option", "OPTION (OPTIMIZE FOR UNKNOWN)").Delete(id).Error; err != nil {
 		return err
 	}
 	return nil

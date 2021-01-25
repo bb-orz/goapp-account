@@ -5,10 +5,10 @@ import (
 	"gorm.io/gorm"
 )
 
-const OauthsTableName = "oauths"
+const OAuthTableName = "oauth"
 
-// OAuthsModel is a mapping object for oauths table in mysql
-type OAuthsModel struct {
+// OAuthModel is a mapping object for oauth table in mysql
+type OAuthModel struct {
 	gorm.Model
 	UserId      uint   `gorm:"user_id" json:"user_id"`           // user表外键
 	Platform    uint   `gorm:"platform" json:"platform"`         // 平台账号类型
@@ -20,17 +20,17 @@ type OAuthsModel struct {
 	Avatar      string `gorm:"avatar" json:"avatar"`             // 用户头像
 }
 
-func NewOAuthsModel() *OAuthsModel {
-	return new(OAuthsModel)
+func NewOAuthModel() *OAuthModel {
+	return new(OAuthModel)
 }
 
-func (*OAuthsModel) TableName() string {
-	return OauthsTableName
+func (*OAuthModel) TableName() string {
+	return OAuthTableName
 }
 
 // To DTO
-func (m *OAuthsModel) ToDTO() *dtos.OauthsDTO {
-	return &dtos.OauthsDTO{
+func (m *OAuthModel) ToDTO() *dtos.OAuthDTO {
+	return &dtos.OAuthDTO{
 		Id:          m.ID,
 		UserId:      m.UserId,
 		Platform:    m.Platform,
@@ -47,7 +47,7 @@ func (m *OAuthsModel) ToDTO() *dtos.OauthsDTO {
 }
 
 // From DTO
-func (m *OAuthsModel) FromDTO(dto *dtos.OauthsDTO) {
+func (m *OAuthModel) FromDTO(dto *dtos.OAuthDTO) {
 	m.ID = dto.Id
 	m.UserId = dto.UserId
 	m.Platform = dto.Platform

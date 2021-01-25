@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-// OauthsDTO is a mapping object for oauths table in mysql
-type OauthsDTO struct {
+// OAuthDTO is a mapping object for oauth table in mysql
+type OAuthDTO struct {
 	Id          uint      `validate:"numeric" json:"id"`            //
 	UserId      uint      `validate:"numeric" json:"user_id"`       // user表外键
 	Platform    uint      `validate:"numeric" json:"platform"`      // 平台账号类型
@@ -21,6 +21,6 @@ type OauthsDTO struct {
 	DeletedAt   time.Time `validate:"numeric" json:"deleted_at"`    //
 }
 
-func (dto *OauthsDTO) Validate() error {
+func (dto *OAuthDTO) Validate() error {
 	return XValidate.V(dto)
 }

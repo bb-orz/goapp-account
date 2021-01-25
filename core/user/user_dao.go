@@ -11,17 +11,17 @@ import (
 直接返回error和执行结果
 */
 
-type UsersDAO struct{}
+type UserDAO struct{}
 
-func NewUsersDAO() *UsersDAO {
-	dao := new(UsersDAO)
+func NewUserDAO() *UserDAO {
+	dao := new(UserDAO)
 	return dao
 }
 
-func (d *UsersDAO) isExist(where *UsersModel) (bool, error) {
+func (d *UserDAO) isExist(where *UserModel) (bool, error) {
 	var err error
 	var count int64
-	err = XGorm.XDB().Model(&UsersModel{}).Where(where).Count(&count).Error
+	err = XGorm.XDB().Model(&UserModel{}).Where(where).Count(&count).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// 无记录
@@ -39,25 +39,25 @@ func (d *UsersDAO) isExist(where *UsersModel) (bool, error) {
 }
 
 // 查找用户名是否存在
-func (d *UsersDAO) IsNameExist(name string) (bool, error) {
-	return d.isExist(&UsersModel{Name: name})
+func (d *UserDAO) IsNameExist(name string) (bool, error) {
+	return d.isExist(&UserModel{Name: name})
 }
 
 // 查找邮箱是否存在
-func (d *UsersDAO) IsEmailExist(email string) (bool, error) {
-	return d.isExist(&UsersModel{Email: email})
+func (d *UserDAO) IsEmailExist(email string) (bool, error) {
+	return d.isExist(&UserModel{Email: email})
 }
 
 // 查找手机号码是否存在
-func (d *UsersDAO) IsPhoneExist(phone string) (bool, error) {
-	return d.isExist(&UsersModel{Phone: phone})
+func (d *UserDAO) IsPhoneExist(phone string) (bool, error) {
+	return d.isExist(&UserModel{Phone: phone})
 }
 
 // 查找id是否存在
-func (d *UsersDAO) IsIdExist(id uint) (bool, error) {
+func (d *UserDAO) IsIdExist(id uint) (bool, error) {
 	var err error
 	var count int64
-	err = XGorm.XDB().Model(&UsersModel{}).Where("id = ?", id).Count(&count).Error
+	err = XGorm.XDB().Model(&UserModel{}).Where("id = ?", id).Count(&count).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// 无记录
@@ -74,10 +74,10 @@ func (d *UsersDAO) IsIdExist(id uint) (bool, error) {
 }
 
 // 查找邮箱是否存在
-func (d *UsersDAO) IsEmailBinding(id uint, email string) (bool, error) {
+func (d *UserDAO) IsEmailBinding(id uint, email string) (bool, error) {
 	var err error
 	var count int64
-	err = XGorm.XDB().Model(&UsersModel{}).Where("id = ? AND email = ? ", id, email).Count(&count).Error
+	err = XGorm.XDB().Model(&UserModel{}).Where("id = ? AND email = ? ", id, email).Count(&count).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// 无记录
@@ -94,10 +94,10 @@ func (d *UsersDAO) IsEmailBinding(id uint, email string) (bool, error) {
 }
 
 // 查找手机号码是否存在
-func (d *UsersDAO) IsPhoneBinding(id uint, phone string) (bool, error) {
+func (d *UserDAO) IsPhoneBinding(id uint, phone string) (bool, error) {
 	var err error
 	var count int64
-	err = XGorm.XDB().Model(&UsersModel{}).Where("id = ? AND phone = ? ", id, phone).Count(&count).Error
+	err = XGorm.XDB().Model(&UserModel{}).Where("id = ? AND phone = ? ", id, phone).Count(&count).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// 无记录
@@ -114,10 +114,10 @@ func (d *UsersDAO) IsPhoneBinding(id uint, phone string) (bool, error) {
 }
 
 // 通过Id查找
-func (d *UsersDAO) GetById(id uint) (*dtos.UsersDTO, error) {
+func (d *UserDAO) GetById(id uint) (*dtos.UserDTO, error) {
 	var err error
-	var usersResult UsersModel
-	err = XGorm.XDB().Model(&UsersModel{}).Where("id = ?", id).First(&usersResult).Error
+	var userResult UserModel
+	err = XGorm.XDB().Model(&UserModel{}).Where("id = ?", id).First(&userResult).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// 无记录
@@ -127,15 +127,15 @@ func (d *UsersDAO) GetById(id uint) (*dtos.UsersDTO, error) {
 			return nil, err
 		}
 	}
-	dto := usersResult.ToDTO()
+	dto := userResult.ToDTO()
 	return dto, nil
 }
 
 // 通过邮箱账号查找
-func (d *UsersDAO) GetByEmail(email string) (*dtos.UsersDTO, error) {
+func (d *UserDAO) GetByEmail(email string) (*dtos.UserDTO, error) {
 	var err error
-	var userResult UsersModel
-	err = XGorm.XDB().Where(&UsersModel{Email: email}).First(&userResult).Error
+	var userResult UserModel
+	err = XGorm.XDB().Where(&UserModel{Email: email}).First(&userResult).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// 无记录
@@ -151,10 +151,10 @@ func (d *UsersDAO) GetByEmail(email string) (*dtos.UsersDTO, error) {
 }
 
 // 通过邮箱账号查找
-func (d *UsersDAO) GetByPhone(phone string) (*dtos.UsersDTO, error) {
+func (d *UserDAO) GetByPhone(phone string) (*dtos.UserDTO, error) {
 	var err error
-	var userResult UsersModel
-	err = XGorm.XDB().Where(&UsersModel{Phone: phone}).First(&userResult).Error
+	var userResult UserModel
+	err = XGorm.XDB().Where(&UserModel{Phone: phone}).First(&userResult).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// 无记录
@@ -169,70 +169,70 @@ func (d *UsersDAO) GetByPhone(phone string) (*dtos.UsersDTO, error) {
 }
 
 // 创建
-func (d *UsersDAO) Create(dto *dtos.UsersDTO) (int64, error) {
+func (d *UserDAO) Create(dto *dtos.UserDTO) (int64, error) {
 	var err error
-	var usersDTO *dtos.UsersDTO
-	var usersModel UsersModel
+	var userDTO *dtos.UserDTO
+	var userModel UserModel
 
-	usersModel.FromDTO(dto)
-	if err = XGorm.XDB().Create(&usersModel).Error; err != nil {
+	userModel.FromDTO(dto)
+	if err = XGorm.XDB().Create(&userModel).Error; err != nil {
 		return -1, err
 	}
-	usersDTO = usersModel.ToDTO()
-	return int64(usersDTO.Id), nil
+	userDTO = userModel.ToDTO()
+	return int64(userDTO.Id), nil
 }
 
 // 设置单个信息字段
-func (d *UsersDAO) SetUsers(id uint, field string, value interface{}) error {
+func (d *UserDAO) SetUser(id uint, field string, value interface{}) error {
 	var err error
-	if err = XGorm.XDB().Model(&UsersModel{}).Where("id", id).Update(field, value).Error; err != nil {
+	if err = XGorm.XDB().Model(&UserModel{}).Where("id", id).Update(field, value).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 // 设置多个信息字段
-func (d *UsersDAO) UpdateUsers(id uint, dto dtos.UserInfoDTO) error {
+func (d *UserDAO) UpdateUser(id uint, dto dtos.UserInfoDTO) error {
 	var err error
-	var usersModel UsersModel
-	usersModel.FromInfoDTO(&dto)
-	if err = XGorm.XDB().Model(&UsersModel{}).Where("id", id).Updates(&usersModel).Error; err != nil {
+	var userModel UserModel
+	userModel.FromInfoDTO(&dto)
+	if err = XGorm.XDB().Model(&UserModel{}).Where("id", id).Updates(&userModel).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 // 设置用户密码和盐值
-func (d *UsersDAO) SetPasswordAndSaltById(id uint, passHash, salt string) error {
+func (d *UserDAO) SetPasswordAndSaltById(id uint, passHash, salt string) error {
 	var err error
-	if err = XGorm.XDB().Model(&UsersModel{}).Where("id", id).UpdateColumns(&UsersModel{Password: passHash, Salt: salt}).Error; err != nil {
+	if err = XGorm.XDB().Model(&UserModel{}).Where("id", id).UpdateColumns(&UserModel{Password: passHash, Salt: salt}).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 // 设置用户密码和盐值
-func (d *UsersDAO) SetPasswordAndSaltByEmail(email string, passHash, salt string) error {
+func (d *UserDAO) SetPasswordAndSaltByEmail(email string, passHash, salt string) error {
 	var err error
-	if err = XGorm.XDB().Model(&UsersModel{}).Where("email", email).UpdateColumns(&UsersModel{Password: passHash, Salt: salt}).Error; err != nil {
+	if err = XGorm.XDB().Model(&UserModel{}).Where("email", email).UpdateColumns(&UserModel{Password: passHash, Salt: salt}).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 // 真删除
-func (d *UsersDAO) DeleteById(id uint) error {
+func (d *UserDAO) DeleteById(id uint) error {
 	var err error
-	if err = XGorm.XDB().Model(&UsersModel{}).Delete(id).Error; err != nil {
+	if err = XGorm.XDB().Model(&UserModel{}).Delete(id).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 // 伪删除
-func (d *UsersDAO) SetDeletedAtById(id uint) error {
+func (d *UserDAO) SetDeletedAtById(id uint) error {
 	var err error
-	if err = XGorm.XDB().Model(&UsersModel{}).Set("gorm:delete_option", "OPTION (OPTIMIZE FOR UNKNOWN)").Delete(id).Error; err != nil {
+	if err = XGorm.XDB().Model(&UserModel{}).Set("gorm:delete_option", "OPTION (OPTIMIZE FOR UNKNOWN)").Delete(id).Error; err != nil {
 		return err
 	}
 	return nil

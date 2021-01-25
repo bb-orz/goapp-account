@@ -19,7 +19,7 @@ type UserOAuthModel struct {
 	Password      string `gorm:"password" json:"password"`             // 用户已加密密码字符串
 	Salt          string `gorm:"salt" json:"salt"`                     // 加密盐
 	Status        int    `gorm:"status" json:"status"`                 // 账户状态：1：启用，0：停用
-	OAuths        []OAuthsModel
+	OAuth         []OAuthModel
 }
 
 // To DTO
@@ -39,12 +39,12 @@ func (m *UserOAuthModel) ToDTO() *dtos.UserOAuthInfoDTO {
 		CreatedAt:     m.CreatedAt,
 		UpdatedAt:     m.UpdatedAt,
 		DeletedAt:     m.DeletedAt.Time,
-		OAuths:        make([]dtos.OauthsDTO, 0),
+		OAuth:         make([]dtos.OAuthDTO, 0),
 	}
 
-	for _, item := range m.OAuths {
+	for _, item := range m.OAuth {
 		toDTO := item.ToDTO()
-		dto.OAuths = append(dto.OAuths, *toDTO)
+		dto.OAuth = append(dto.OAuth, *toDTO)
 	}
 
 	return dto
@@ -63,11 +63,11 @@ func (m *UserOAuthModel) FromDTO(dto *dtos.UserOAuthInfoDTO) {
 	m.Phone = dto.Phone
 	m.PhoneVerified = dto.PhoneVerified
 	m.Status = dto.Status
-	m.OAuths = make([]OAuthsModel, 0)
+	m.OAuth = make([]OAuthModel, 0)
 
-	for _, item := range dto.OAuths {
-		mo := OAuthsModel{}
+	for _, item := range dto.OAuth {
+		mo := OAuthModel{}
 		mo.FromDTO(&item)
-		m.OAuths = append(m.OAuths, mo)
+		m.OAuth = append(m.OAuth, mo)
 	}
 }
