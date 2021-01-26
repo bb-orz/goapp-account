@@ -5,9 +5,9 @@ import (
 	"gorm.io/gorm"
 )
 
-const OAuthTableName = "oauth"
+const OAuthTableName = "oauths"
 
-// OAuthModel is a mapping object for oauth table in mysql
+// OAuthModel is a mapping object for oauths table in mysql
 type OAuthModel struct {
 	gorm.Model
 	UserId      uint   `gorm:"user_id" json:"user_id"`           // user表外键

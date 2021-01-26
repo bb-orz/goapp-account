@@ -77,8 +77,8 @@ func (d *OAuthDAO) IsQQAccountBindng(openId, unionId string) (bool, error) {
 // 通过Id查找
 func (d *OAuthDAO) GetById(id uint) (*dtos.OAuthDTO, error) {
 	var err error
-	var oauthResult OAuthModel
-	err = XGorm.XDB().Where(id).First(&oauthResult).Error
+	var oauthsResult OAuthModel
+	err = XGorm.XDB().Where(id).First(&oauthsResult).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// 无记录
@@ -88,22 +88,22 @@ func (d *OAuthDAO) GetById(id uint) (*dtos.OAuthDTO, error) {
 			return nil, err
 		}
 	}
-	dto := oauthResult.ToDTO()
+	dto := oauthsResult.ToDTO()
 	return dto, nil
 }
 
 // 创建
 func (d *OAuthDAO) Create(dto *dtos.OAuthDTO) (int64, error) {
 	var err error
-	var oauthDTO *dtos.OAuthDTO
-	var oauthModel OAuthModel
+	var oauthsDTO *dtos.OAuthDTO
+	var oauthsModel OAuthModel
 
-	oauthModel.FromDTO(dto)
-	if err = XGorm.XDB().Create(&oauthModel).Error; err != nil {
+	oauthsModel.FromDTO(dto)
+	if err = XGorm.XDB().Create(&oauthsModel).Error; err != nil {
 		return -1, err
 	}
-	oauthDTO = oauthModel.ToDTO()
-	return int64(oauthDTO.Id), nil
+	oauthsDTO = oauthsModel.ToDTO()
+	return int64(oauthsDTO.Id), nil
 }
 
 // 设置单个信息字段

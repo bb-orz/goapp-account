@@ -424,9 +424,9 @@ func (domain *UserDomain) GetUserOAuth(platform uint, openId, unionId string) (*
 // OAuth三方账号绑定创建用户
 func (domain *UserDomain) CreateOAuthBinding(platform uint, oauthInfo *XOAuth.OAuthAccountInfo) (int64, error) {
 	var err error
-	var oauthDTO *dtos.OAuthDTO
+	var oauthsDTO *dtos.OAuthDTO
 	var insertId int64
-	oauthDTO = &dtos.OAuthDTO{
+	oauthsDTO = &dtos.OAuthDTO{
 		AccessToken: oauthInfo.AccessToken,
 		UnionId:     oauthInfo.UnionId,
 		OpenId:      oauthInfo.OpenId,
@@ -436,8 +436,8 @@ func (domain *UserDomain) CreateOAuthBinding(platform uint, oauthInfo *XOAuth.OA
 		Platform:    platform,
 	}
 
-	oauthDAO := NewOAuthDAO()
-	if insertId, err = oauthDAO.Create(oauthDTO); err != nil {
+	oauthsDAO := NewOAuthDAO()
+	if insertId, err = oauthsDAO.Create(oauthsDTO); err != nil {
 		return -1, common.DomainInnerErrorOnSqlInsert(err, "Create")
 	}
 

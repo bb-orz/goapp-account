@@ -1,46 +1,8 @@
 package dtos
 
-import "time"
-
 /*
 以下为服务方法的待校验传输参数对象
 */
-
-// 用户数据传输对象
-type UserInfoDTO struct {
-	Id            uint      `validate:"required,numeric" json:"id"`                 // 用户id
-	No            string    `validate:"required,alphanum" json:"no"`                // 用户生成编号
-	Name          string    `validate:"required,alphanum" json:"name"`              // 用户名
-	Age           uint      `validate:"required,numeric,,max=100,min=0" json:"age"` // 用户年龄
-	Gender        uint      `validate:"required,numeric,max=1,min=0" json:"gender"` // 用户性别
-	Avatar        string    `validate:"required,uri" json:"avatar"`                 // 用户头像
-	Email         string    `validate:"required,alphanum" json:"email"`             // 账户邮箱
-	EmailVerified int       `validate:"required,numeric" json:"email_verified"`     // 邮箱是否已验证
-	Phone         string    `validate:"required,alphanum" json:"phone"`             // 账户手机号码
-	PhoneVerified int       `validate:"required,numeric" json:"phone_verified"`     // 手机号码是否已验证
-	Status        int       `validate:"required,numeric" json:"status"`             // 账户状态：1：启用，0：停用
-	CreatedAt     time.Time `validate:"required,numeric" json:"created_at"`         //
-	UpdatedAt     time.Time `validate:"required,numeric" json:"updated_at"`         //
-	DeletedAt     time.Time `validate:"required,numeric" json:"deleted_at"`         //
-}
-
-type UserOAuthInfoDTO struct {
-	Id            uint      `validate:"required,numeric" json:"id"`                 // 用户id
-	No            string    `validate:"required,alphanum" json:"no"`                // 用户生成编号
-	Name          string    `validate:"required,alphanum" json:"name"`              // 用户名
-	Age           uint      `validate:"required,numeric,,max=100,min=0" json:"age"` // 用户年龄
-	Gender        uint      `validate:"required,numeric,max=1,min=0" json:"gender"` // 用户性别
-	Avatar        string    `validate:"required,uri" json:"avatar"`                 // 用户头像
-	Email         string    `validate:"required,alphanum" json:"email"`             // 账户邮箱
-	EmailVerified int       `validate:"required,numeric" json:"email_verified"`     // 邮箱是否已验证
-	Phone         string    `validate:"required,alphanum" json:"phone"`             // 账户手机号码
-	PhoneVerified int       `validate:"required,numeric" json:"phone_verified"`     // 手机号码是否已验证
-	Status        int       `validate:"required,numeric" json:"status"`             // 账户状态：1：启用，0：停用
-	CreatedAt     time.Time `validate:"required,numeric" json:"created_at"`         //
-	UpdatedAt     time.Time `validate:"required,numeric" json:"updated_at"`         //
-	DeletedAt     time.Time `validate:"required,numeric" json:"deleted_at"`         //
-	OAuth         []OAuthDTO
-}
 
 // 验证邮箱数据传输对象
 type IsEmailAccountExistDTO struct {

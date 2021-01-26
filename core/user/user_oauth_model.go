@@ -13,12 +13,12 @@ type UserOAuthModel struct {
 	Gender        uint   `gorm:"gender" json:"gender"`                 // 用户性别
 	Avatar        string `gorm:"avatar" json:"avatar"`                 // 用户头像
 	Email         string `gorm:"email" json:"email"`                   // 账户邮箱
-	EmailVerified int    `gorm:"email_verified" json:"email_verified"` // 邮箱是否已验证
+	EmailVerified uint   `gorm:"email_verified" json:"email_verified"` // 邮箱是否已验证
 	Phone         string `gorm:"phone" json:"phone"`                   // 账户手机号码
-	PhoneVerified int    `gorm:"phone_verified" json:"phone_verified"` // 手机号码是否已验证
+	PhoneVerified uint   `gorm:"phone_verified" json:"phone_verified"` // 手机号码是否已验证
 	Password      string `gorm:"password" json:"password"`             // 用户已加密密码字符串
 	Salt          string `gorm:"salt" json:"salt"`                     // 加密盐
-	Status        int    `gorm:"status" json:"status"`                 // 账户状态：1：启用，0：停用
+	Status        uint   `gorm:"status" json:"status"`                 // 账户状态：1：启用，0：停用
 	OAuth         []OAuthModel
 }
 
