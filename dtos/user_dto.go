@@ -1,7 +1,6 @@
 package dtos
 
 import (
-	"github.com/bb-orz/goinfras/XValidate"
 	"time"
 )
 
@@ -25,11 +24,7 @@ type UserDTO struct {
 	DeletedAt     time.Time `json:"deleted_at"`     //
 }
 
-func (dto *UserDTO) Validate() error {
-	return XValidate.V(dto)
-}
-
-func (dto *UserDTO) TransToUserInfoDTO() *UserInfoDTO {
+func (dto *UserDTO) ToInfoDTO() *UserInfoDTO {
 	return &UserInfoDTO{
 		Id:            dto.Id,
 		No:            dto.No,

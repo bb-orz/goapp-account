@@ -93,17 +93,17 @@ func (d *OAuthDAO) GetById(id uint) (*dtos.OAuthDTO, error) {
 }
 
 // 创建
-func (d *OAuthDAO) Create(dto *dtos.OAuthDTO) (int64, error) {
+func (d *OAuthDAO) Create(dto *dtos.CreateOAuthDTO) (int64, error) {
 	var err error
-	var oauthsDTO *dtos.OAuthDTO
-	var oauthsModel OAuthModel
+	var oauthDTO *dtos.OAuthDTO
+	var oauthModel OAuthModel
 
-	oauthsModel.FromDTO(dto)
-	if err = XGorm.XDB().Create(&oauthsModel).Error; err != nil {
+	oauthModel.FromCreateDTO(dto)
+	if err = XGorm.XDB().Create(&oauthModel).Error; err != nil {
 		return -1, err
 	}
-	oauthsDTO = oauthsModel.ToDTO()
-	return int64(oauthsDTO.Id), nil
+	oauthDTO = oauthModel.ToDTO()
+	return int64(oauthDTO.Id), nil
 }
 
 // 设置单个信息字段
@@ -116,10 +116,10 @@ func (d *OAuthDAO) SetOAuth(id uint, field string, value interface{}) error {
 }
 
 // 设置多个信息字段
-func (d *OAuthDAO) UpdateOAuth(id uint, dto dtos.OAuthDTO) error {
+func (d *OAuthDAO) UpdateOAuth(id uint, dto *dtos.UpdateOAuthDTO) error {
 	var err error
 
-	if err = XGorm.XDB().Model(&OAuthModel{}).Where("id", id).Updates(&dto).Error; err != nil {
+	if err = XGorm.XDB().Model(&OAuthModel{}).Where("id", id).Updates(dto).Error; err != nil {
 		return err
 	}
 	return nil

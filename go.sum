@@ -40,6 +40,8 @@ github.com/bb-orz/goinfras v1.2.6 h1:so+bxs+ahE1V62QgjM3ZL7yJiYkBkPWwMlaIsYLw4Ms
 github.com/bb-orz/goinfras v1.2.6/go.mod h1:7TdHV2y2CDn0AUUalCC7kgzibJhh9va1MaYLOqz2xgo=
 github.com/bb-orz/goinfras v1.2.7 h1:XFv3ZbEQAyrtWqCOXOoroAHfqCK+lWIIgaR3XFNmzuE=
 github.com/bb-orz/goinfras v1.2.7/go.mod h1:7TdHV2y2CDn0AUUalCC7kgzibJhh9va1MaYLOqz2xgo=
+github.com/bb-orz/goinfras v1.2.8 h1:IKBR71+y6uBcemyYzM0mmHHRx5B39kaC0OBKYssW8Co=
+github.com/bb-orz/goinfras v1.2.8/go.mod h1:7TdHV2y2CDn0AUUalCC7kgzibJhh9va1MaYLOqz2xgo=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=

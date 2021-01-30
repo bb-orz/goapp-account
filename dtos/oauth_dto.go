@@ -21,6 +21,34 @@ type OAuthDTO struct {
 	DeletedAt   time.Time `json:"deleted_at"`   //
 }
 
-func (dto *OAuthDTO) Validate() error {
+// 创建条目传输对象
+type CreateOAuthDTO struct {
+	UserId      uint   `json:"user_id"`      // user表外键
+	Platform    uint   `json:"platform"`     // 平台账号类型
+	AccessToken string `json:"access_token"` // 获取三方平台用户信息的accessToken
+	OpenId      string `json:"open_id"`      // 开发者可通过OpenID来获取用户基本信息
+	UnionId     string `json:"union_id"`     // 如果开发者拥有多个移动应用、网站应用和公众帐号，可通过获取用户基本信息中的unionid来区分用户的唯一性，因为只要是同一个微信开放平台帐号下的移动应用、网站应用和公众帐号，用户的unionid是唯一的。
+	NickName    string `json:"nick_name"`    // 三方平台账号的用户昵称
+	Gender      uint   `json:"gender"`       // 用户性别：1男2女
+	Avatar      string `json:"avatar"`       // 用户头像
+}
+
+func (dto *CreateOAuthDTO) Validate() error {
+	return XValidate.V(dto)
+}
+
+// 更新条目传输对象
+type UpdateOAuthDTO struct {
+	Id          uint   `json:"id"`           //
+	Platform    uint   `json:"platform"`     // 平台账号类型
+	AccessToken string `json:"access_token"` // 获取三方平台用户信息的accessToken
+	OpenId      string `json:"open_id"`      // 开发者可通过OpenID来获取用户基本信息
+	UnionId     string `json:"union_id"`     // 如果开发者拥有多个移动应用、网站应用和公众帐号，可通过获取用户基本信息中的unionid来区分用户的唯一性，因为只要是同一个微信开放平台帐号下的移动应用、网站应用和公众帐号，用户的unionid是唯一的。
+	NickName    string `json:"nick_name"`    // 三方平台账号的用户昵称
+	Gender      uint   `json:"gender"`       // 用户性别：1男2女
+	Avatar      string `json:"avatar"`       // 用户头像
+}
+
+func (dto *UpdateOAuthDTO) Validate() error {
 	return XValidate.V(dto)
 }

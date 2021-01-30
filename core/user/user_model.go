@@ -71,6 +71,25 @@ func (m *UserModel) FromDTO(dto *dtos.UserDTO) {
 	m.Status = dto.Status
 }
 
+func (m *UserModel) ToInfoDTO() *dtos.UserInfoDTO {
+	return &dtos.UserInfoDTO{
+		Id:            m.ID,
+		No:            m.No,
+		Name:          m.Name,
+		Age:           m.Age,
+		Gender:        m.Gender,
+		Avatar:        m.Avatar,
+		Email:         m.Email,
+		EmailVerified: m.EmailVerified,
+		Phone:         m.Phone,
+		PhoneVerified: m.PhoneVerified,
+		Status:        m.Status,
+		CreatedAt:     m.CreatedAt,
+		UpdatedAt:     m.UpdatedAt,
+		DeletedAt:     m.DeletedAt.Time,
+	}
+}
+
 // From DTO
 func (m *UserModel) FromInfoDTO(dto *dtos.UserInfoDTO) {
 	m.ID = dto.Id

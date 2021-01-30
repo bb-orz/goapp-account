@@ -239,7 +239,7 @@ func (service *UserServiceV1) GetUserInfo(dto dtos.GetUserInfoDTO) (*dtos.UserIn
 		return nil, common.ErrorOnServerInner(err, userDomain.DomainName())
 	}
 
-	return userDTO.TransToUserInfoDTO(), nil
+	return userDTO.ToInfoDTO(), nil
 }
 
 // 注册后验证用户邮箱

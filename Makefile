@@ -2,6 +2,7 @@ PROJECT="goapp"
 MAIN_PATH="./app/main.go"
 VERSION="v1.0.0"
 DATE= `date +%FT%T%z`
+CONFIG = "./config/example.json"
 
 version:
 	@echo ${VERSION}
@@ -21,6 +22,6 @@ build-linux:
 	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ${PROJECT} ${MAIN_PATH}
 
 run:   build
-	@./${PROJECT} -f "./config/example.json"
+	@./${PROJECT} -f ${CONFIG}
 
 

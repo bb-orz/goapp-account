@@ -60,3 +60,25 @@ func (m *OAuthModel) FromDTO(dto *dtos.OAuthDTO) {
 	m.CreatedAt = dto.CreatedAt
 	m.UpdatedAt = dto.UpdatedAt
 }
+
+func (m *OAuthModel) FromCreateDTO(dto *dtos.CreateOAuthDTO) {
+	m.UserId = dto.UserId
+	m.Platform = dto.Platform
+	m.AccessToken = dto.AccessToken
+	m.OpenId = dto.OpenId
+	m.UnionId = dto.UnionId
+	m.NickName = dto.NickName
+	m.Gender = dto.Gender
+	m.Avatar = dto.Avatar
+}
+
+func (m *OAuthModel) FromUpdateDTO(dto *dtos.UpdateOAuthDTO) {
+	m.ID = dto.Id
+	m.Platform = dto.Platform
+	m.AccessToken = dto.AccessToken
+	m.OpenId = dto.OpenId
+	m.UnionId = dto.UnionId
+	m.NickName = dto.NickName
+	m.Gender = dto.Gender
+	m.Avatar = dto.Avatar
+}

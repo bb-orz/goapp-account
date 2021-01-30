@@ -52,7 +52,7 @@ type GetUserInfoDTO struct {
 	Id uint `validate:"required,numeric" json:"id" uri:"id"`
 }
 
-// 修改用户新息的数据传输对象
+// 修改用户信息的数据传输对象
 type SetUserInfoDTO struct {
 	Id     uint   `validate:"required,numeric" json:"id" uri:"id"`
 	Name   string `validate:"alphanum,max=16,min=4" json:"name"`
