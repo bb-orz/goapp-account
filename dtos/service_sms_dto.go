@@ -1,6 +1,6 @@
 package dtos
 
 type SendPhoneVerifyCodeDTO struct {
-	Phone  uint `validate:"required,numeric" json:"phone" form:"phone"`
-	VcType uint `validate:"required,numeric,oneof=1 2" json:"email" form:"vctype"`
+	Phone  uint `json:"phone" form:"phone" validate:"required,numeric"`
+	VcType uint `json:"vctype" form:"vctype" validate:"required,numeric,oneof=1 2"`
 }

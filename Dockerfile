@@ -1,32 +1,22 @@
-# 构建阶段的golang镜像
-FROM golang:1.14 as builder
-
-ENV GO111MODULE=on \
-    GOPROXY=https://goproxy.cn,direct
-
-WORKDIR /app
-
+FROM golang:1.15.8-alpine3.13 AS builder
+WORKDIR /build
+RUN adduser -u 10001 -D app-runner
+ENV GOPROXY https://goproxy.cn
+COPY go.mod .
+RUN go mod download
 COPY . .
+RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -a -o goapp ./app/main.go
 
-RUN make build-linux
+FROM alpine:3.13 AS final
+WORKDIR /run
+COPY --from=builder /build/goapp /run/
+COPY --from=builder /build/config /run/config
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+USER app-runner
 
+ENV GIN_MODE=release \
+    PORT=8099
 
-# 运行阶段指定scratch作为基础镜像
-FROM scratch as goapp
-
-WORKDIR /app
-
-# 拷贝上一阶段的二进制文件及配置文件
-COPY --from=builder /app/goapp .
-COPY --from=builder /app/config .
-
-# 如使用https，拷贝证书
-# COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/cert
-
-# 如使用 gin web 框架，可指定运行时环境变量
-#ENV GIN_MODE=release \
-#    PORT=8090
-
-EXPOSE 8090
-
-ENTRYPOINT ["./goapp -f ./config/example.json"]
+EXPOSE 8099
+ENTRYPOINT ["/run/goapp", "-f" ,"/run/config/example.json"]

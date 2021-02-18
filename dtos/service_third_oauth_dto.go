@@ -1,28 +1,28 @@
 package dtos
 
 type QQLoginDTO struct {
-	AccessCode string `validate:"required" json:"access_code" form:"access_code"`
+	AccessCode string `json:"access_code" form:"access_code" validate:"required"`
 }
 
 type WechatLoginDTO struct {
-	AccessCode string `validate:"required" json:"access_code" form:"access_code"`
+	AccessCode string `json:"access_code" form:"access_code" validate:"required"`
 }
 
 type WeiboLoginDTO struct {
-	AccessCode string `validate:"required" json:"access_code" form:"access_code"`
+	AccessCode string `json:"access_code" form:"access_code" validate:"required"`
 }
 
 type QQBindingDTO struct {
-	Id         uint   `validate:"required,numeric" json:"id"`
-	AccessCode string `validate:"required" json:"access_code"`
+	Id         uint   `json:"id" validate:"required,numeric"`
+	AccessCode string `json:"access_code" validate:"required"`
 }
 
 type WechatBindingDTO struct {
-	Id         uint   `validate:"required,numeric" json:"id"`
-	AccessCode string `validate:"required" json:"access_code"`
+	Id         uint   `json:"id" validate:"required,numeric"`
+	AccessCode string `json:"access_code" validate:"required"`
 }
 
 type WeiboBindingDTO struct {
-	Id         uint   `validate:"required,numeric" json:"id"`
-	AccessCode string `validate:"required" json:"access_code"`
+	Id         uint   `json:"id" validate:"required,numeric"`
+	AccessCode string `json:"access_code" validate:"required"`
 }

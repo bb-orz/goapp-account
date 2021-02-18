@@ -9,7 +9,7 @@ Global:
 # Gin web 引擎配置
 Gin:
   Mode:       debug            # 运行模式设置
-  ListenHost: "127.0.0.1"      # 服务运行ip
+  ListenHost: ""      # 服务运行ip
   ListenPort: 8090             # 服务运行端口
   Tls:        false            # HTTPS相关配置，开关
   CertFile:   ""               # HTTPS相关配置，证书文件
