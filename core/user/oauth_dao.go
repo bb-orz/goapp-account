@@ -118,8 +118,9 @@ func (d *OAuthDAO) SetOAuth(id uint, field string, value interface{}) error {
 // 设置多个信息字段
 func (d *OAuthDAO) UpdateOAuth(id uint, dto *dtos.UpdateOAuthDTO) error {
 	var err error
-
-	if err = XGorm.XDB().Model(&OAuthModel{}).Where("id", id).Updates(dto).Error; err != nil {
+	var updater OAuthModel
+	updater.FromUpdateDTO(dto)
+	if err = XGorm.XDB().Model(&OAuthModel{}).Where("id", id).Updates(&updater).Error; err != nil {
 		return err
 	}
 	return nil
